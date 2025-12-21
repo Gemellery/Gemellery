@@ -101,15 +101,15 @@ function SignIn() {
             Select your role to begin your secure transaction.
           </h5>
 
-          <div className="w-full max-w-lg mt-8 rounded-xl overflow-hidden shadow-sm border mb-8">
-            <div className="p-6 space-y-5 bg-[#F3EEE5]">
+          <div className="w-full max-w-lg mt-8 rounded-xl overflow-hidden shadow-sm mb-8">
+            <div className="p-6 space-y-5 bg-[#F2F2F2]">
 
               {mode === "signin" ? (
                 /* ================= SIGN IN FORM ================= */
                 <>
                   {/* Type */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       ACCOUNT TYPE
                     </label>
                     <select
@@ -124,7 +124,7 @@ function SignIn() {
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       EMAIL ADDRESS
                     </label>
                     <input
@@ -138,7 +138,7 @@ function SignIn() {
 
                   {/* Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       PASSWORD
                     </label>
                     <input
@@ -180,7 +180,7 @@ function SignIn() {
                 <>
                   {/* Name */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       FULL NAME
                     </label>
                     <input
@@ -195,7 +195,7 @@ function SignIn() {
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       EMAIL ADDRESS
                     </label>
                     <input
@@ -210,7 +210,7 @@ function SignIn() {
 
                   {/* Password */}
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       PASSWORD
                     </label>
                     <input
@@ -224,7 +224,7 @@ function SignIn() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       Contact No
                     </label>
                     <input
@@ -238,7 +238,7 @@ function SignIn() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       Country
                     </label>
                     <input
@@ -249,7 +249,7 @@ function SignIn() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                    <label className="block text-xs font-semibold text-black mb-1">
                       Address
                     </label>
                     <input
@@ -283,13 +283,10 @@ function SignIn() {
 
             </div>
 
-            <div className="border-t p-4 text-center text-xs text-gray-600 bg-white">
+            <div className="p-4 text-center text-xs text-gray-600 bg-white">
               Learn how we verify sellers
             </div>
           </div>
-
-
-
         </div>
       </div>
     </>
