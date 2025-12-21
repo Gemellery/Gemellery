@@ -1,7 +1,6 @@
 import { LockKeyhole } from 'lucide-react';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 
 function SignIn() {
   const [role, setRole] = useState("buyer");
@@ -12,8 +11,23 @@ function SignIn() {
   const [full_name, setFullName] = useState("");
   const [mobile, setMobile] = useState("");
   const navigate = useNavigate();
+  const [countries, setCountries] = useState<any[]>([]);
+  const [countryId, setCountryId] = useState("");
+  const [address, setAddress] = useState("");
 
+  useEffect(() => {
+    const loadCountries = async () => {
+      try {
+        const res = await fetch("http://localhost:5001/api/countries");
+        const data = await res.json();
+        setCountries(data);
+      } catch (err) {
+        console.error("Failed to load countries");
+      }
+    };
 
+    loadCountries();
+  }, []);
 
   const handleLogin = async () => {
     setError("");
@@ -56,8 +70,8 @@ function SignIn() {
         role,
         full_name,
         mobile,
-        country_id: 1, // temp value
-        address_id: 1
+        country_id: countryId,
+        address
       }),
     });
 
@@ -69,7 +83,7 @@ function SignIn() {
     }
 
     alert("Registration successful. Please sign in.");
-    setMode("signin"); // switch back to sign in form
+    setMode("signin");
 
     console.log({
       email,
@@ -80,8 +94,6 @@ function SignIn() {
     });
 
   };
-
-
 
   return (
     <>
@@ -205,7 +217,6 @@ function SignIn() {
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-3 py-2 rounded-md border bg-white text-sm"
                     />
-
                   </div>
 
                   {/* Password */}
@@ -220,9 +231,9 @@ function SignIn() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-3 py-2 rounded-md border bg-white text-sm"
                     />
-
                   </div>
 
+                  {/* Contact No */}
                   <div>
                     <label className="block text-xs font-semibold text-black mb-1">
                       Contact No
@@ -234,30 +245,39 @@ function SignIn() {
                       onChange={(e) => setMobile(e.target.value)}
                       className="w-full px-3 py-2 rounded-md border bg-white text-sm"
                     />
-
                   </div>
 
+                  {/* Country*/}
                   <div>
                     <label className="block text-xs font-semibold text-black mb-1">
                       Country
                     </label>
-                    <input
-                      type="text"
-                      placeholder="Sri Lanka"
-                      className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
-                    />
+                    <select
+                      value={countryId}
+                      onChange={(e) => setCountryId(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600">
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option
+                          key={country.country_id}
+                          value={country.country_id}>
+                          {country.country_name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-black mb-1">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="123 Main St, City, Country"
-                      className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
-                    />
-                  </div>
+                  {/* Address */}
+                  <label className="block text-xs font-semibold text-black mb-1">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="123 Main St, City, Country"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
+                  />
 
                   {/* Submit */}
                   <button type='button' onClick={handleRegister} className="w-full bg-teal-700 text-white py-3 rounded-md font-semibold hover:bg-teal-800 transition">
@@ -269,23 +289,21 @@ function SignIn() {
                     </p>
                   )}
 
-
                   {/* Back to Sign In */}
                   <button
                     type="button"
                     onClick={() => setMode("signin")}
-                    className="w-full text-xs font-bold text-black hover:underline text-center"
-                  >
+                    className="w-full text-xs font-bold text-black hover:underline text-center">
                     Already have an account? Sign in
                   </button>
                 </>
               )}
-
             </div>
 
             <div className="p-4 text-center text-xs text-gray-600 bg-[#fcfbf8]">
               Learn how we verify sellers
             </div>
+
           </div>
         </div>
       </div>

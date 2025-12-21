@@ -13,7 +13,7 @@ export const register = async (req: Request, res: Response) => {
         full_name = null,
         mobile = null,
         country_id = null,
-        address_id = null,
+        address = null,
     } = req.body;
 
     if (!email || !password || !role) {
@@ -27,32 +27,32 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-        await pool.query(
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const [userResult]: any = await pool.query(
             `INSERT INTO user
-       (email, password, role, full_name, mobile, joined_date, country_id, address_id)
-       VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?)`,
-            [
-                email,
-                hashedPassword,
-                role,
-                full_name,
-                mobile,
-                country_id,
-                address_id,
-            ]
+            (email, password, role, full_name, mobile, joined_date, country_id)
+            VALUES (?, ?, ?, ?, ?, CURDATE(), ?)`,
+            [email, hashedPassword, role, full_name, mobile, country_id]
         );
 
-        res.status(201).json({ message: "User registered successfully" });
+        const user_id = userResult.insertId;
+        if (address) {
+            await pool.query(
+                `INSERT INTO address (address, user_id) VALUES (?, ?)`,
+                [address, user_id]
+            );
+        }
+        return res.status(201).json({ message: "User registered successfully" });
+
     } catch (err: any) {
         if (err.code === "ER_DUP_ENTRY") {
             return res.status(409).json({ message: "Email already exists" });
         }
 
         console.error(err);
-        res.status(500).json({ message: "Server error" });
+        return res.status(500).json({ message: "Server error" });
     }
 };
-
 
 export const login = async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
