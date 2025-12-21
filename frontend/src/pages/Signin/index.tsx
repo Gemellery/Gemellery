@@ -85,7 +85,7 @@ function SignIn() {
 
   return (
     <>
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-[#fcfbf8]">
         <nav className="w-full px-48 py-4 flex justify-between items-center border-b">
           <div>
             <img src="src\assets\logos\Elegance Jewelry.png" alt="Gemellery Logo" width={"25%"} />
@@ -102,7 +102,7 @@ function SignIn() {
           </h5>
 
           <div className="w-full max-w-lg mt-8 rounded-xl overflow-hidden shadow-sm mb-8">
-            <div className="p-6 space-y-5 bg-[#F2F2F2]">
+            <div className="p-6 space-y-5 bg-[#f3eee5]">
 
               {mode === "signin" ? (
                 /* ================= SIGN IN FORM ================= */
@@ -283,7 +283,7 @@ function SignIn() {
 
             </div>
 
-            <div className="p-4 text-center text-xs text-gray-600 bg-white">
+            <div className="p-4 text-center text-xs text-gray-600 bg-[#fcfbf8]">
               Learn how we verify sellers
             </div>
           </div>
