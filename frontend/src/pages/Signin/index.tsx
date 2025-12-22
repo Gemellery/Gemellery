@@ -57,13 +57,23 @@ function SignIn() {
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
 
-    alert("Login successful");
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    const userRole =
+      data.user?.role ||
+      data.user?.user_type ||
+      data.role;
 
-    navigate("/");
+    if (!userRole) {
+      setError("User role not found");
+      return;
+    }
 
+    if (userRole.toLowerCase() === "buyer") {
+      navigate("/", { replace: true });
+    } else if (userRole.toLowerCase() === "seller") {
+      navigate("/seller/dashboard", { replace: true });
+    }
   };
+
 
   const handleRegister = async () => {
     setError("");
