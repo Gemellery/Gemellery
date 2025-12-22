@@ -8,12 +8,21 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [full_name, setFullName] = useState("");
   const [mobile, setMobile] = useState("");
   const navigate = useNavigate();
   const [countries, setCountries] = useState<any[]>([]);
   const [countryId, setCountryId] = useState("");
   const [address, setAddress] = useState("");
+
+  const [userType, setUserType] = useState<"buyer" | "seller">("buyer");
+
+  const [businessName, setBusinessName] = useState("");
+  const [businessRegNo, setBusinessRegNo] = useState("");
+  const [ngjaRegNo, setNgjaRegNo] = useState("");
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
+
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -58,42 +67,44 @@ function SignIn() {
 
   const handleRegister = async () => {
     setError("");
+    setSuccess("");
+
+    const formData = new FormData();
+
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("role", userType);
+    formData.append("full_name", full_name);
+    formData.append("mobile", mobile);
+    formData.append("country_id", countryId);
+    formData.append("address", address);
+
+    if (userType === "seller") {
+      formData.append("business_name", businessName);
+      formData.append("business_reg_no", businessRegNo);
+      formData.append("ngja_registration_no", ngjaRegNo);
+      if (licenseFile) {
+        formData.append("seller_license", licenseFile);
+      }
+    }
 
     const res = await fetch("http://localhost:5001/api/auth/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        role,
-        full_name,
-        mobile,
-        country_id: countryId,
-        address
-      }),
+      body: formData,
     });
 
     const data = await res.json();
-
     if (!res.ok) {
-      setError(data.message || "Registration failed");
+      setError(data.message);
       return;
     }
-
-    alert("Registration successful. Please sign in.");
-    setMode("signin");
-
-    console.log({
-      email,
-      password,
-      role,
-      full_name,
-      mobile,
-    });
-
+    setSuccess("Registration successful! You can now sign in.");
+    setTimeout(() => {
+      setMode("signin");
+      setSuccess("")
+    }, 2000);
   };
+
 
   return (
     <>
@@ -191,6 +202,23 @@ function SignIn() {
                 /* ================= SIGN UP FORM ================= */
                 <>
                   {/* Name */}
+
+                  {/* Account Type */}
+                  <div>
+                    <label className="block text-xs font-bold text-black mb-1">
+                      <u>Are you going to create a Buying or Selling account?</u>
+                    </label>
+                    <select
+                      value={userType}
+                      onChange={(e) => setUserType(e.target.value as "buyer" | "seller")}
+                      className="w-full px-3 py-2 rounded-md border bg-white text-sm"
+                    >
+                      <option value="buyer">Buying Account</option>
+                      <option value="seller">Selling Account</option>
+                    </select>
+                  </div>
+
+
                   <div>
                     <label className="block text-xs font-semibold text-black mb-1">
                       FULL NAME
@@ -279,10 +307,72 @@ function SignIn() {
                     className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
                   />
 
+                  {userType === "seller" && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-black mb-1">
+                          BUSINESS NAME
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="ABC Jewelers Pvt Ltd"
+                          value={businessName}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border bg-white text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-black mb-1">
+                          BUSINESS REGISTRATION NO
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="BRN123456"
+                          value={businessRegNo}
+                          onChange={(e) => setBusinessRegNo(e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border bg-white text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-black mb-1">
+                          NGJA REGISTRATION NO
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="NGJA123456"
+                          value={ngjaRegNo}
+                          onChange={(e) => setNgjaRegNo(e.target.value)}
+                          className="w-full px-3 py-2 rounded-md border bg-white text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-black mb-1">
+                          NGJA CERTIFICATE (PDF / Image)
+                        </label>
+                        <input
+                          type="file"
+                          accept=".pdf,image/*"
+                          onChange={(e) => setLicenseFile(e.target.files?.[0] || null)}
+                          className="w-full text-sm"
+                        />
+                      </div>
+                    </>
+                  )}
+
+
                   {/* Submit */}
                   <button type='button' onClick={handleRegister} className="w-full bg-teal-700 text-white py-3 rounded-md font-semibold hover:bg-teal-800 transition">
                     Create Account →
                   </button>
+                  {success && (
+                    <p className="text-green-600 text-sm text-center mt-2">
+                      {success}
+                    </p>
+                  )}
+
                   {error && (
                     <p className="text-red-600 text-sm text-center mt-2">
                       {error}

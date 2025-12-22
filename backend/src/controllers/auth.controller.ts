@@ -14,9 +14,12 @@ export const register = async (req: Request, res: Response) => {
         mobile = null,
         country_id = null,
         address = null,
+        business_name,
+        business_reg_no,
+        ngja_registration_no,
     } = req.body;
 
-    if (!email || !password || !role) {
+    if (!email || !password || !role || (role === "seller" && !business_name) || (role === "seller" && !business_reg_no) || (role === "seller" && !ngja_registration_no)) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -24,10 +27,13 @@ export const register = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid role" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const conn = await pool.getConnection();
+    await conn.beginTransaction();
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+
+
         const [userResult]: any = await pool.query(
             `INSERT INTO user
             (email, password, role, full_name, mobile, joined_date, country_id)
@@ -36,16 +42,34 @@ export const register = async (req: Request, res: Response) => {
         );
 
         const user_id = userResult.insertId;
+
+        if (role === "seller") {
+            const licenseUrl = req.file
+                ? `/uploads/licenses/${req.file.filename}`
+                : null;
+
+            await conn.query(
+                `INSERT INTO seller
+     (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url)
+     VALUES (?, ?, ?, ?, ?)`,
+                [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
+            );
+        }
+
         if (address) {
             await pool.query(
                 `INSERT INTO address (address, user_id) VALUES (?, ?)`,
                 [address, user_id]
             );
         }
-        return res.status(201).json({ message: "User registered successfully" });
+
+        await conn.commit();
+        return res.status(201).json({ message: "Account created successfully" });
+
 
     } catch (err: any) {
         if (err.code === "ER_DUP_ENTRY") {
+            await conn.rollback();
             return res.status(409).json({ message: "Email already exists" });
         }
 
