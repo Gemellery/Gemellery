@@ -142,6 +142,7 @@ function SignIn() {
                 <>
                   {/* Type */}
                   <div>
+                    <h1 className='text-2xl font-bold text-center mb-8'>Log In</h1>
                     <label className="block text-xs font-semibold text-black mb-1">
                       ACCOUNT TYPE
                     </label>
@@ -215,6 +216,7 @@ function SignIn() {
 
                   {/* Account Type */}
                   <div>
+                    <h1 className='text-2xl font-bold text-center mb-8'>Register New Account</h1>
                     <label className="block text-xs font-bold text-black mb-1">
                       <u>Are you going to create a Buying or Selling account?</u>
                     </label>
