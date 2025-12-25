@@ -1,6 +1,7 @@
 import { LockKeyhole } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import BasicFooter from '../../components/BasicFooter';
 
 function SignIn() {
   const [role, setRole] = useState("buyer");
@@ -118,7 +119,7 @@ function SignIn() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#fcfbf8]">
+      <div className="min-h-screen bg-[#fcfbf8] relative pb-24">
         <nav className="w-full px-48 py-4 flex justify-between items-center border-b">
           <div>
             <img src="src\assets\logos\Elegance Jewelry.png" alt="Gemellery Logo" width={"25%"} />
@@ -405,10 +406,14 @@ function SignIn() {
             <div className="p-4 text-center text-xs text-gray-600 bg-[#fcfbf8]">
               Learn how we verify sellers
             </div>
-
           </div>
         </div>
-      </div>
+
+        <div className="absolute bottom-0 left-0 w-full">
+          <BasicFooter />
+        </div>
+
+      </div >
     </>
   )
 }
