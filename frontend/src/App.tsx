@@ -4,6 +4,7 @@ import SignIn from './pages/Signin'
 import Home from './pages/Home'
 import SignUp from './pages/Signup'
 import SellerDashboard from './pages/Dashboards/seller.dashboard';
+import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
+          <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
         </Routes>
       </BrowserRouter>
 

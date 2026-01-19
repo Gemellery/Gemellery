@@ -1,11 +1,17 @@
+import SellerSidebar from "../../components/SellerSidebar";
 
-function SellerDashboard() {
+function SellerDashboardLayout() {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     return (
-        <>
-            <h1 className='text-3xl font-bold underline'>Seller Dashboard</h1>
-        </>
-    )
+        <div className="flex">
+            <SellerSidebar sellerName={user.full_name || user.email} />
+
+            <main className="flex-1 p-8 bg-gray-50">
+                {/* Dashboard content here */}
+            </main>
+        </div>
+    );
 }
 
-export default SellerDashboard
+export default SellerDashboardLayout;

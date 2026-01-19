@@ -5,6 +5,7 @@ import { ShoppingCart, CircleUserRound, Search, Menu, X } from "lucide-react";
 
 function Navbar() {
   const [userName, setUserName] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<"Seller" | "Buyer" | null>(null);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -13,20 +14,28 @@ function Navbar() {
     if (user) {
       const parsed = JSON.parse(user);
       setUserName(parsed.full_name || parsed.email);
+      setUserRole(parsed.role);
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/signin");
+  const handleProfileRedirect = () => {
+    if (userRole === "Seller") {
+      navigate("/seller/dashboard");
+    } else if (userRole === "Buyer") {
+      navigate("/buyer/dashboard");
+    }
   };
+
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("user");
+  //   navigate("/signin");
+  // };
 
   return (
     <nav className="w-full border-b bg-[#fcfbf8]">
       <div className="px-4 md:px-20 py-4 flex items-center justify-between">
 
-        {/* LEFT: Logo */}
         <img
           src={logo}
           alt="Gemellery Logo"
@@ -34,7 +43,6 @@ function Navbar() {
           onClick={() => navigate("/")}
         />
 
-        {/* DESKTOP: Search */}
         <div className="hidden md:flex items-center gap-2">
           <input
             type="text"
@@ -44,53 +52,59 @@ function Navbar() {
           <Search className="w-4 h-4" />
         </div>
 
-        {/* DESKTOP: Nav Links */}
-        <div className="hidden lg:flex items-center gap-8 text-lg font-medium">
+        <div className="hidden lg:flex items-center gap-10 text-lg font-medium">
           <button onClick={() => navigate("/about")} className="hover:underline">
-            Shop Gems
+            Marketplace
           </button>
           <button onClick={() => navigate("/shop")} className="hover:underline">
-            AI Design Studio
+            About
           </button>
           <button onClick={() => navigate("/ai-studio")} className="hover:underline">
-            About Us
+            Blog
           </button>
           <button onClick={() => navigate("/sellers")} className="hover:underline">
-            Sellers
+            Contact Us
+          </button>
+          <button
+            className="px-6 py-3 bg-[#cc000b] 
+             text-white font-semibold rounded-full shadow-lg 
+             hover:scale-105 hover:shadow-xl transition-all duration-300">
+            Design With AI
           </button>
         </div>
 
-        {/* RIGHT: Cart + Auth */}
         <div className="flex items-center gap-4">
           <button onClick={() => navigate("/cart")}>
             <ShoppingCart className="w-5 h-5" />
           </button>
 
           {userName ? (
-            <span className="hidden md:inline text-sm font-semibold">
-              {userName}
-            </span>
+            <button
+              onClick={handleProfileRedirect}
+              className="hidden md:flex flex-col items-start text-left">
+              <span className="text-sm font-semibold">
+                {userName}
+              </span>
+              <span className="text-xs text-gray-500 capitalize">
+                {userRole}
+              </span>
+            </button>
           ) : (
             <button onClick={() => navigate("/signin")}>
               <CircleUserRound className="w-5 h-5" />
             </button>
           )}
 
-          {/* MOBILE: Hamburger */}
           <button
             className="md:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
+            onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
       </div>
 
-      {/* MOBILE MENU */}
       {menuOpen && (
         <div className="md:hidden border-t px-4 py-4 space-y-4">
-
-          {/* Mobile Search */}
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -100,30 +114,42 @@ function Navbar() {
             <Search className="w-4 h-4" />
           </div>
 
-          {/* Mobile Links */}
+          {userName && (
+            <button onClick={handleProfileRedirect} className="md:flex flex-col items-start text-left">
+              <span className="text-sm font-semibold">
+                {userName}
+              </span><br />
+              <span className="text-xs text-gray-500 capitalize">
+                {userRole}
+              </span>
+            </button>
+          )}
           <button onClick={() => navigate("/about")} className="block w-full text-left">
-            Shop Gems
+            Marketplace
           </button>
           <button onClick={() => navigate("/shop")} className="block w-full text-left">
-            AI Design Studio
+            About
           </button>
           <button onClick={() => navigate("/ai-studio")} className="block w-full text-left">
-            About Us
+            Blog
           </button>
           <button onClick={() => navigate("/sellers")} className="block w-full text-left">
-            Sellers
+            Contact Us
+          </button>
+          <button
+            className="px-6 py-3 bg-[#cc000b] 
+             text-white font-semibold rounded-full shadow-lg 
+             hover:scale-105 hover:shadow-xl transition-all duration-300">
+            Design With AI
           </button>
 
+
           {/* Auth */}
-          {userName ? (
+          {/* {userName && (
             <button onClick={handleLogout} className="text-red-600">
               Logout
             </button>
-          ) : (
-            <button onClick={() => navigate("/signin")}>
-              Sign In
-            </button>
-          )}
+          )} */}
         </div>
       )}
     </nav>
