@@ -12,9 +12,9 @@ const GemCard = () => {
     weight: "2.05 ct",
     cut: "Cushion",
     origin: "Ceylon (Sri Lanka)",
-    certification: "GRS Certified",
+    certification: "NGJA Certified",
     verified: true,
-    image: "https://via.placeholder.com/400x300?text=Blue+Sapphire"
+    image: "https://placehold.co/400x300?text=Blue+Sapphire"
   }
 
   return (
