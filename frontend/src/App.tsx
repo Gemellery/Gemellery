@@ -3,8 +3,9 @@ import './index.css'
 import SignIn from './pages/Signin'
 import Home from './pages/Home'
 import SignUp from './pages/Signup'
-import SellerDashboard from './pages/Dashboards/seller.dashboard';
+import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
+import GemCard from './components/GemCard'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
+          <Route path="/gem" element={<GemCard />} />
         </Routes>
       </BrowserRouter>
 
