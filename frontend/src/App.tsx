@@ -6,6 +6,7 @@ import SignUp from './pages/Signup'
 import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
 import GemCard from './components/GemCard'
+import ShippingForm from './components/ShippingForm'
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
           <Route path="/gem" element={<GemCard />} />
+          <Route path="/shipping-form" element={<ShippingForm />} />
         </Routes>
       </BrowserRouter>
 
