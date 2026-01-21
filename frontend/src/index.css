@@ -130,3 +130,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+.input {
+  @apply w-full px-3 py-2 text-sm border rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-gray-400;
+}
+
+.payment-btn {
+  @apply px-4 py-2 text-sm border rounded-full flex items-center gap-2;
+}
+
+.payment-btn.active {
+  @apply bg-emerald-600 text-white border-emerald-600;
+}
