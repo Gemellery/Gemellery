@@ -5,7 +5,7 @@ import Home from './pages/Home'
 import SignUp from './pages/Signup'
 import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
-import GemCard from './components/GemCard'
+import FilterSection from './components/FilterSection'
 
 function App() {
 
@@ -18,7 +18,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
-          <Route path="/gem" element={<GemCard />} />
+          <Route path="/gem" element={<FilterSection />} />
         </Routes>
       </BrowserRouter>
 
