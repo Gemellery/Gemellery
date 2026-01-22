@@ -10,6 +10,7 @@ import ShippingForm from './components/ShippingForm'
 import ProductSpecifications from './components/ProductSpecifications'
 import Cart from './components/Cart'
 import About from './pages/About'
+import Contact from './components/ContactFormPage'
 
 function App() {
 
@@ -28,6 +29,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
           
+          <Route path="/contact" element={<Contact />} />
+
         </Routes>
       </BrowserRouter>
 
