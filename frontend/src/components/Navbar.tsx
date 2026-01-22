@@ -53,16 +53,16 @@ function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-10 text-lg font-medium">
-          <button onClick={() => navigate("/about")} className="hover:underline">
+          <button onClick={() => navigate("/marketplace")} className="hover:underline">
             Marketplace
           </button>
-          <button onClick={() => navigate("/shop")} className="hover:underline">
+          <button onClick={() => navigate("/about")} className="hover:underline">
             About
           </button>
-          <button onClick={() => navigate("/ai-studio")} className="hover:underline">
+          <button onClick={() => navigate("/blog")} className="hover:underline">
             Blog
           </button>
-          <button onClick={() => navigate("/sellers")} className="hover:underline">
+          <button onClick={() => navigate("/contact")} className="hover:underline">
             Contact Us
           </button>
           <button
