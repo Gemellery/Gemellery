@@ -8,6 +8,8 @@ import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
 import Marketplace from './pages/Marketplace'
 import ShippingForm from './components/ShippingForm'
 import ProductSpecifications from './components/ProductSpecifications'
+import Cart from './components/Cart'
+import About from './pages/About'
 
 function App() {
 
@@ -23,7 +25,9 @@ function App() {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/shipping-form" element={<ShippingForm />} />
           <Route path="/product-gallery" element={<ProductSpecifications />} />
-
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
+          
         </Routes>
       </BrowserRouter>
 
