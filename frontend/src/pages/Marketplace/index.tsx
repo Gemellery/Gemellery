@@ -41,7 +41,7 @@ const Marketplace = () => {
       cut: "Oval Cut",
       origin: "Burma",
       certification: "GIA Certified",
-      verified: true,
+      verified: false,
       image: "https://placehold.co/400x300?text=Ruby"
     },
     {
@@ -119,7 +119,17 @@ const Marketplace = () => {
           <div className="flex-1">
             <div className="grid grid-cols-3 gap-6 mb-8">
               {displayedGems.map((gem) => (
-                <GemCard key={gem.id} />
+                <GemCard 
+                  key={gem.id} 
+                  name={gem.name}
+                  price={gem.price}
+                  weight={gem.weight}
+                  cut={gem.cut}
+                  origin={gem.origin}
+                  certification={gem.certification}
+                  verified={gem.verified}
+                  image={gem.image}
+                />
               ))}
             </div>
 
