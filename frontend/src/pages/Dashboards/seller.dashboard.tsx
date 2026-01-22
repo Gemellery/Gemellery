@@ -1,5 +1,6 @@
 import { useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
+import Footer from "../../components/BasicFooter";
 import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
 
 function SellerDashboardLayout() {
@@ -7,12 +8,12 @@ function SellerDashboardLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
-        <div className="flex">
+        <div className="flex h-screen overflow-hidden">
             <SellerSidebar sellerName={user.full_name || user.email}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 p-6 md:p-8">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
                 <div className="flex items-center justify-between mb-5">
                     <button
                         onClick={() => setSidebarOpen(true)}
@@ -199,6 +200,7 @@ function SellerDashboardLayout() {
                         </div>
                     </div>
                 </div>
+                <Footer/>
             </main>
         </div>
     );

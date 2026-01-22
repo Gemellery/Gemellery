@@ -23,9 +23,10 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
         onClick={onClose}
         className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       />
-      <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#fcfbf8] border-r flex flex-col justify-between transform transition-transform duration-300
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        md:translate-x-0`}>
+      <aside
+        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between overflow-hidden
+        transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+      >
 
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
