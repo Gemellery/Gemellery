@@ -5,7 +5,9 @@ import Home from './pages/Home'
 import SignUp from './pages/Signup'
 import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
-import FilterSection from './components/FilterSection'
+import Marketplace from './pages/Marketplace'
+import ShippingForm from './components/ShippingForm'
+import ProductInfo from './components/ProductInfo'
 
 function App() {
 
@@ -18,7 +20,10 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
-          <Route path="/gem" element={<FilterSection />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/shipping-form" element={<ShippingForm />} />
+          <Route path="/product-gallery" element={<ProductInfo />} />
+
         </Routes>
       </BrowserRouter>
 
