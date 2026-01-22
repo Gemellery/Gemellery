@@ -7,7 +7,7 @@ import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
 import Marketplace from './pages/Marketplace'
 import ShippingForm from './components/ShippingForm'
-import ProductInfo from './components/ProductInfo'
+import ProductSpecifications from './components/ProductSpecifications'
 
 function App() {
 
@@ -22,7 +22,7 @@ function App() {
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/shipping-form" element={<ShippingForm />} />
-          <Route path="/product-gallery" element={<ProductInfo />} />
+          <Route path="/product-gallery" element={<ProductSpecifications />} />
 
         </Routes>
       </BrowserRouter>
