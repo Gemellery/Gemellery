@@ -41,34 +41,37 @@ const SearchBar = () => {
         </div>
 
         {/* Sort Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <span className="text-sm font-medium">Sort by: {sortBy}</span>
-            <ChevronDown size={18} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
+        <div className="flex items-center gap-3" ref={dropdownRef}>
+          <span className="text-sm font-medium text-gray-700">Sort by:</span>
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <span className="text-sm font-medium">{sortBy}</span>
+              <ChevronDown size={18} className={`transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-              {sortOptions.map((option) => (
-                <button
-                  key={option}
-                  onClick={() => {
-                    setSortBy(option)
-                    setIsDropdownOpen(false)
-                  }}
-                  className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg ${
-                    sortBy === option ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          )}
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setSortBy(option)
+                      setIsDropdownOpen(false)
+                    }}
+                    className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg ${
+                      sortBy === option ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
