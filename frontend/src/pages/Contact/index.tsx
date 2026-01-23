@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Phone, FileText, ChevronDown } from 'lucide-react';
+import { Phone, FileText, ChevronDown, Sparkles, Gem } from 'lucide-react';
+import Navbar from '../../components/Navbar';
+import AdvancedFooter from '../../components/AdvancedFooter';
 
 interface FormData {
   firstName: string;
@@ -59,13 +61,17 @@ const ConciergeContactPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* NavBar */}
+      <Navbar />
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900 text-white py-20 px-6">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-800/20 via-transparent to-transparent"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-block mb-6 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
-            ✦ CONCIERGE SERVICE
-          </div>
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
+  <Sparkles className="w-4 h-4 text-teal-300" />
+  <span className="tracking-wide uppercase">Concierge Service</span>
+</div>
+
           <h1 className="text-5xl font-serif font-bold mb-6">
             How can we assist you today?
           </h1>
@@ -81,11 +87,9 @@ const ConciergeContactPage: React.FC = () => {
           {/* AI Gemologist */}
           <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
             <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-teal-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L4 7V12C4 16.97 7.58 21.29 12 22C16.42 21.29 20 16.97 20 12V7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 8L9 11L10.5 13L12 15L13.5 13L15 11L12 8Z" fill="currentColor"/>
-              </svg>
-            </div>
+  <Gem className="w-7 h-7 text-teal-600" />
+</div>
+
             <h3 className="text-xl font-semibold mb-2">AI Gemologist</h3>
             <p className="text-gray-600 mb-6 text-sm">
               Get instant expert knowledge on quality, cuts, valuation, and origin with Gembot 24/7.
@@ -308,8 +312,11 @@ const ConciergeContactPage: React.FC = () => {
           </div>
         </div>
       </div>
+        {/* Footer */}
+        <AdvancedFooter />
     </div>
   );
+  
 };
 
 export default ConciergeContactPage;

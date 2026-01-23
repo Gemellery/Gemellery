@@ -10,7 +10,7 @@ import ShippingForm from './components/ShippingForm'
 import ProductSpecifications from './components/ProductSpecifications'
 import Cart from './components/Cart'
 import About from './pages/About'
-import Contact from './components/ContactFormPage'
+import Contact from './pages/Contact'
 
 function App() {
 
