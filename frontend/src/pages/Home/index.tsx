@@ -1,5 +1,7 @@
 import Navbar from "../../components/Navbar"
 import HeroCarousel from "../../components/HeroCarousel";
+import AdvancedFooter from "../../components/AdvancedFooter";
+
 
 function Home() {
 
@@ -7,7 +9,7 @@ function Home() {
         <>
             <Navbar />
             <HeroCarousel/>
-            {/* <h1 className='text-3xl font-bold underline'>Home Page</h1> */}
+            <AdvancedFooter/>
         </>
     )
 }

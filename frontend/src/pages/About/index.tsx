@@ -1,7 +1,8 @@
 // About.tsx
 import { ArrowRight, Shield, Award, Sparkles, CheckCircle } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import Footer from '../../components/BasicFooter';
+import AdvanedFooter from '../../components/AdvancedFooter';
+import AdvancedFooter from '../../components/AdvancedFooter';
 
 function About() {
   return (
@@ -284,7 +285,7 @@ function About() {
         </section>
 
         {/* Footer */}
-        <Footer />
+        <AdvancedFooter />
       </main>
     </div>
   );
