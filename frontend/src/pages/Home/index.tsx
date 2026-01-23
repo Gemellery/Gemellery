@@ -1,6 +1,7 @@
 import Navbar from "../../components/Navbar"
 import HeroCarousel from "../../components/HeroCarousel";
 import AdvancedFooter from "../../components/AdvancedFooter";
+import Cards from "../../components/HomePageCard";
 
 
 function Home() {
@@ -8,8 +9,10 @@ function Home() {
     return (
         <>
             <Navbar />
-            <HeroCarousel/>
-            <AdvancedFooter/>
+            <HeroCarousel />
+            <Cards/>
+
+            <AdvancedFooter />
         </>
     )
 }
