@@ -28,7 +28,6 @@ function App() {
           <Route path="/product-gallery" element={<ProductSpecifications />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
-          
           <Route path="/contact" element={<Contact />} />
 
         </Routes>
