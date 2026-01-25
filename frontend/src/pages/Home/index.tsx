@@ -1,6 +1,7 @@
 import Navbar from "../../components/Navbar"
 import HeroCarousel from "../../components/HeroCarousel";
 import AdvancedFooter from "../../components/AdvancedFooter";
+import NewsLetter from "../../components/NewsLetter";
 import Cards from "../../components/HomePageCard";
 
 
@@ -10,8 +11,9 @@ function Home() {
         <>
             <Navbar />
             <HeroCarousel />
-            <Cards/>
+            <Cards />
 
+            <NewsLetter />
             <AdvancedFooter />
         </>
     )
