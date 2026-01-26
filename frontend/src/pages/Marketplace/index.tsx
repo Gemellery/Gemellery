@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import FilterSection from '../../components/FilterSection'
+import AdvancedFooter from '../../components/AdvancedFooter'
 import GemCard from '../../components/GemCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -168,6 +169,7 @@ const Marketplace = () => {
           </div>
         </div>
       </div>
+      <AdvancedFooter/>
     </div>
   )
 }

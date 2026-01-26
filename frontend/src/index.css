@@ -143,3 +143,4 @@ body {
 .payment-btn.active {
   @apply bg-emerald-600 text-white border-emerald-600;
 }
+

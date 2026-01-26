@@ -1,13 +1,20 @@
 import Navbar from "../../components/Navbar"
 import HeroCarousel from "../../components/HeroCarousel";
+import AdvancedFooter from "../../components/AdvancedFooter";
+import NewsLetter from "../../components/NewsLetter";
+import Cards from "../../components/HomePageCard";
+
 
 function Home() {
 
     return (
         <>
             <Navbar />
-            <HeroCarousel/>
-            {/* <h1 className='text-3xl font-bold underline'>Home Page</h1> */}
+            <HeroCarousel />
+            <Cards />
+
+            <NewsLetter />
+            <AdvancedFooter />
         </>
     )
 }
