@@ -35,10 +35,10 @@ const ProductDetail = () => {
           <div>
             <ProductGallery
               images={[
-                '/sample_gems/blue_sapphire_main.jpg',
-                '/sample_gems/blue_sapphire_side1.jpg',
-                '/sample_gems/blue_sapphire_top.jpg',
-                '/sample_gems/blue_sapphire_side2.jpg',
+                "../public/sample_gems/alexandrite_18.jpg",
+                '../public/sample_gems/aquamarine_8.jpg',
+                '../public/sample_gems/solitaire.jpg',
+                '../public/sample_gems/sapphire blue_6.jpg',
               ]}
               productName="3.5 Carat Vivid Royal Blue Sapphire"
             />
