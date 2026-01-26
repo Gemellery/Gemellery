@@ -26,14 +26,6 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header/Navigation - Placeholder */}
-      <div className="bg-white shadow-sm py-4 px-6 mb-8">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-sm text-gray-600">
-            Home / Marketplace / Blue Sapphire
-          </p>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pb-16">
