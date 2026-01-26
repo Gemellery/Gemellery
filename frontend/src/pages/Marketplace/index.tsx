@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import FilterSection from '../../components/FilterSection'
+import Navbar from '@/components/Navbar'
 import AdvancedFooter from '../../components/AdvancedFooter'
 import GemCard from '../../components/GemCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -89,6 +90,17 @@ const Marketplace = () => {
       verified: true,
       image: "https://placehold.co/400x300?text=Spinel"
     },
+    {
+      id: 7,
+      name: "Blue Sapphire",
+      price: "$2,500",
+      weight: "3.5 ct",
+      cut: "Cushion",
+      origin: "Sri Lanka",
+      certification: "GIA",
+      verified: true,
+      image: "https://placehold.co/400x300?text=Spinel"
+    }
   ]
 
   const totalPages = Math.ceil(gems.length / gemsPerPage)
@@ -97,6 +109,7 @@ const Marketplace = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Navbar />
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-8 py-12">
         <h1 className="text-5xl font-bold text-gray-900 mb-2">Discover Ceylon's Finest Gems</h1>
@@ -121,7 +134,8 @@ const Marketplace = () => {
             <div className="grid grid-cols-3 gap-6 mb-8">
               {displayedGems.map((gem) => (
                 <GemCard 
-                  key={gem.id} 
+                  key={gem.id}
+                  id={gem.id.toString()}
                   name={gem.name}
                   price={gem.price}
                   weight={gem.weight}

@@ -26,7 +26,7 @@ function App() {
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/shipping-form" element={<ShippingForm />} />
-          <Route path="/product-detail" element={<ProductDetail />} />
+          <Route path="/product-detail/:id" element={<ProductDetail />} />
           <Route path="/product-gallery" element={<ProductSpecifications />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
