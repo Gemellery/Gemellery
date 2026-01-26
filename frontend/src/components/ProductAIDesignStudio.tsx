@@ -7,18 +7,17 @@ interface ProductAIDesignStudioProps {
 const ProductAIDesignStudio: React.FC<ProductAIDesignStudioProps> = ({ onTryAIDesign }) => {
   return (
     <div 
-      className="relative rounded-lg overflow-hidden bg-gradient-to-r from-slate-900 to-slate-800 p-8 md:p-12 flex items-center justify-between gap-8"
+      className="relative rounded-lg overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 p-8 md:p-12 flex items-center justify-between gap-8"
       style={{
-        backgroundImage: "url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 400%22%3E%3Cdefs%3E%3C/defs%3E%3C/svg%3E')",
+        backgroundImage: "url('https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80')",
         backgroundPosition: "right center",
-        backgroundSize: "40%",
-        backgroundRepeat: "no-repeat"
+        backgroundSize: "50%",
+        backgroundRepeat: "no-repeat",
+        backgroundBlendMode: "overlay"
       }}
     >
-      {/* Background image element (ring) */}
-      <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-20 pointer-events-none">
-        <div className="w-full h-full bg-gradient-to-l from-white to-transparent"></div>
-      </div>
+      {/* Background overlay for better text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 from-40% to-transparent pointer-events-none"></div>
 
       {/* Content */}
       <div className="relative z-10 flex-1">
