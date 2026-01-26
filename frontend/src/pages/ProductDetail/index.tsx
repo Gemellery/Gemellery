@@ -1,4 +1,6 @@
 import React from 'react'
+import { useParams } from 'react-router-dom'
+import Navbar from '@/components/Navbar'
 import ProductGallery from '../../components/ProductGallery'
 import ProductInfo from '../../components/ProductInfo'
 import ProductActions from '../../components/ProductActions'
@@ -8,6 +10,7 @@ import GemPassport from '../../components/GemPassport'
 import ProductAIDesignStudio from '../../components/ProductAIDesignStudio'
 
 const ProductDetail = () => {
+  const { id } = useParams<{ id: string }>()
   const handleAddToCart = (quantity: number) => {
     console.log(`Added ${quantity} items to cart`)
   }
@@ -25,10 +28,11 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
 
+    <div className="min-h-screen bg-gray-100">
+        <Navbar />
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-16">
+      <div className="max-w-7xl mx-auto px-6 pb-16 pt-8">
         {/* Product Gallery and Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Left Column - Gallery */}

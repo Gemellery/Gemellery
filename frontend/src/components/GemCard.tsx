@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Heart, Shield, Sparkles } from 'lucide-react'
 import { MdOutlineScale } from "react-icons/md";
 import { FaRegGem } from "react-icons/fa";
@@ -6,6 +7,7 @@ import { IoMdGlobe } from "react-icons/io";
 import { GrCertificate } from "react-icons/gr";
 
 interface GemCardProps {
+  id?: string
   name: string
   price: string
   weight: string
@@ -16,9 +18,19 @@ interface GemCardProps {
   image: string
 }
 
-const GemCard: React.FC<GemCardProps> = ({ name, price, weight, cut, origin, certification, verified, image }) => {
+const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin, certification, verified, image }) => {
+  const navigate = useNavigate()
+
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/product-detail/${id}`)
+    }
+  }
   return (
-    <div className="max-w-sm bg-white rounded-3xl shadow-lg overflow-hidden">
+    <div 
+      onClick={handleCardClick}
+      className="max-w-sm bg-white rounded-3xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300"
+    >
       {/* Image Container */}
       <div className="relative bg-amber-100 h-80 flex items-center justify-center">
         <img 
