@@ -60,9 +60,9 @@ export const register = async (req: Request, res: Response) => {
                 [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
             );
         }
-
+// edited pool to conn
         if (address) {
-            await pool.query(
+            await conn.query(
                 `INSERT INTO address (address, user_id) VALUES (?, ?)`,
                 [address, user_id]
             );
