@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Trash2, Plus, Minus, Lock, Sparkles, CheckCircle, Truck, Shield } from 'lucide-react';
 import Navbar from './Navbar';
-import Footer from '../components/BasicFooter';
+// import Footer from '../components/BasicFooter';
+import AdvancedFooter from '../components/AdvancedFooter';
 
 // Type definitions
 interface CartItem {
@@ -327,7 +328,7 @@ function Cart() {
         </div>
 
         {/* Footer */}
-        <Footer />
+        <AdvancedFooter />
       </main>
     </div>
   );
