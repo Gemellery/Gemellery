@@ -27,12 +27,17 @@ export const register = async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid role" });
     }
 
+    if (role === "seller" && !req.file) {
+        return res.status(400).json({
+            message: "Seller license is required"
+        })
+    }
+
     const conn = await pool.getConnection();
-    await conn.beginTransaction();
 
     try {
+        await conn.beginTransaction();
         const hashedPassword = await bcrypt.hash(password, 10);
-
 
         const [userResult]: any = await pool.query(
             `INSERT INTO user
@@ -55,9 +60,9 @@ export const register = async (req: Request, res: Response) => {
                 [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
             );
         }
-
+// edited pool to conn
         if (address) {
-            await pool.query(
+            await conn.query(
                 `INSERT INTO address (address, user_id) VALUES (?, ?)`,
                 [address, user_id]
             );
@@ -68,13 +73,20 @@ export const register = async (req: Request, res: Response) => {
 
 
     } catch (err: any) {
+        await conn.rollback();
+
         if (err.code === "ER_DUP_ENTRY") {
-            await conn.rollback();
             return res.status(409).json({ message: "Email already exists" });
+        }
+
+        if (err.code === "ER_DATA_TOO_LONG") {
+            return res.status(400).json({ message: "Input data is too long" });
         }
 
         console.error(err);
         return res.status(500).json({ message: "Server error" });
+    } finally {
+        conn.release();
     }
 };
 
