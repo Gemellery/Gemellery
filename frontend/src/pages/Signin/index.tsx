@@ -193,7 +193,7 @@ function SignIn() {
                         Don’t have an account? Register here
                       </button>
 
-                      <button className="text-xs text-teal-700 hover:underline">
+                      <button type='button' onClick={() => navigate("/forgot-password")} className="text-xs text-teal-700 hover:underline">
                         Forgot password?
                       </button>
                     </div>

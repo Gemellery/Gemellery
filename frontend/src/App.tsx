@@ -12,6 +12,8 @@ import ProductSpecifications from './components/ProductSpecifications'
 import Cart from './components/Cart'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 
@@ -31,6 +33,9 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         </Routes>
       </BrowserRouter>
