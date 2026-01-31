@@ -1,6 +1,6 @@
 import pool from "../database";
 
-/* Create reset token */
+// Reset token
 export const createResetToken = async (
     email: string,
     token: string,
@@ -13,7 +13,7 @@ export const createResetToken = async (
     );
 };
 
-/* Find reset token */
+// Find token
 export const findResetToken = async (token: string) => {
     const [rows]: any = await pool.query(
         `SELECT * FROM password_resets WHERE token = ?`,
@@ -22,7 +22,7 @@ export const findResetToken = async (token: string) => {
     return rows[0];
 };
 
-/* Delete token after use */
+// Delete token
 export const deleteResetToken = async (token: string) => {
     await pool.query(
         `DELETE FROM password_resets WHERE token = ?`,
