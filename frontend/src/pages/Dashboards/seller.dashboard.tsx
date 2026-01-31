@@ -1,9 +1,11 @@
 import { useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
 
 function SellerDashboardLayout() {
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -29,6 +31,7 @@ function SellerDashboardLayout() {
                     </div>
 
                     <button
+                        onClick={() => navigate("/add-new-gem")}
                         className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#1F7A73] text-white font-semibold rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
                         <Plus size={18} /> List New Gem
                     </button>
@@ -200,7 +203,7 @@ function SellerDashboardLayout() {
                         </div>
                     </div>
                 </div>
-                <Footer/>
+                <Footer />
             </main>
         </div>
     );

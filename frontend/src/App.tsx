@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './index.css'
 import SignIn from './pages/Signin'
 import Home from './pages/Home'
-import SignUp from './pages/Signup'
+// import SignUp from './pages/Signup'
 import SellerDashboard from './pages/Dashboards/seller.dashboard'
 import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard'
 import Marketplace from './pages/Marketplace'
@@ -14,6 +14,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AddNewGem from "./pages/Gem/AddNewGem";
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+          {/* <Route path="/signup" element={<SignUp />} /> */}
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/buyer/dashboard" element={<BuyerDashboardLayout />} />
           <Route path="/marketplace" element={<Marketplace />} />
@@ -33,7 +34,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          
+          <Route path="/add-new-gem" element={<AddNewGem />} />
+
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
