@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { authGuard } from "../middleware/auth.middleware";
 import {
     getUserDesigns,
@@ -7,11 +8,32 @@ import {
     saveDesign,
     refineDesign,
     deleteDesignController,
+    uploadGemImage,
+    getAIStatus,
 } from "../controllers/jewelry-design.controller";
 
 const router = Router();
 
-// All routes require authentication
+// Configure multer for memory storage (files stored in buffer)
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB max file size
+    },
+    fileFilter: (req, file, cb) => {
+        // Accept only image files
+        if (file.mimetype.startsWith("image/")) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only image files are allowed"));
+        }
+    },
+});
+
+// Public route - Get AI status (no auth required)
+router.get("/status", getAIStatus);
+
+// All other routes require authentication
 router.use(authGuard);
 
 // GET /api/jewelry-design/user-designs - Get all designs for current user
@@ -22,6 +44,9 @@ router.get("/:id", getDesignByIdController);
 
 // POST /api/jewelry-design/generate - Generate new jewelry designs
 router.post("/generate", generateDesign);
+
+// POST /api/jewelry-design/upload-gem-image - Upload a gem image
+router.post("/upload-gem-image", upload.single("image"), uploadGemImage);
 
 // PUT /api/jewelry-design/:id/save - Save/select a design image
 router.put("/:id/save", saveDesign);
