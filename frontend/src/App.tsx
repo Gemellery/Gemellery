@@ -16,6 +16,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
+import JewelryResults from "./pages/JewelryDesigner/Results";
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
           {/* AI Jewelry Designer */}
           <Route path="/jewelry-designer" element={<JewelryDesigner />} />
           <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+          <Route path="/jewelry-designer/results" element={<JewelryResults />} />
 
         </Routes>
       </BrowserRouter>
