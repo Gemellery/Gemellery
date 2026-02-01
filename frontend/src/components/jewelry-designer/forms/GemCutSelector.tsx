@@ -1,6 +1,6 @@
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { GemFormValues } from '../../../lib/jewelry-designer/validation';
+import type { UseFormRegister, FieldErrors } from 'react-hook-form';
+import type { GemFormValues } from '../../../lib/jewelry-designer/validation';
 import { GEM_CUTS } from '../../../lib/jewelry-designer/constants';
 
 interface GemCutSelectorProps {

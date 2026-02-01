@@ -1,4 +1,4 @@
-import { GemFormData, JewelryDesign, GenerateDesignResponse, RefineDesignResponse, UploadGemImageResponse } from './types';
+import type { GemFormData, JewelryDesign, GenerateDesignResponse, RefineDesignResponse, UploadGemImageResponse } from './types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 

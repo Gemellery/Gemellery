@@ -42,6 +42,7 @@ function App() {
 
           {/* AI Jewelry Designer */}
           <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+          <Route path="/jewelry_designer" element={<JewelryDesigner />} />
 
         </Routes>
       </BrowserRouter>
