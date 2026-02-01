@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
+import JewelryRefine from "./pages/JewelryDesigner/Refine";
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/jewelry-designer" element={<JewelryDesigner />} />
           <Route path="/jewelry_designer" element={<JewelryDesigner />} />
           <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+          <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
 
         </Routes>
       </BrowserRouter>
