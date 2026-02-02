@@ -33,8 +33,9 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
                             style={{
                                 padding: '16px 8px',
                                 borderRadius: '12px',
-                                border: isSelected ? '1px solid #D4AF37' : '1px solid #2D2B3B',
-                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : '#13111C', // Dark purple/black
+                                border: isSelected ? '1px solid rgba(212, 175, 55, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
+                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                                color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.6)',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
                                 display: 'flex',
@@ -42,17 +43,18 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
                                 alignItems: 'center',
                                 position: 'relative',
                                 overflow: 'hidden',
+                                boxShadow: isSelected ? '0 4px 6px -1px rgba(212, 175, 55, 0.1)' : 'none',
                             }}
                         >
                             {/* SVG Icon */}
-                            <div style={{ width: '32px', height: '32px', marginBottom: '8px', color: isSelected ? '#D4AF37' : '#9CA3AF' }}>
+                            <div style={{ width: '48px', height: '48px', marginBottom: '8px', color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.5)' }}>
                                 {getCutIcon(cut.value)}
                             </div>
 
                             <p style={{
                                 fontSize: '11px',
                                 fontWeight: 500,
-                                color: isSelected ? 'white' : '#9CA3AF',
+                                color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.7)',
                                 textAlign: 'center',
                                 fontFamily: 'Inter, sans-serif',
                             }}>
@@ -66,7 +68,7 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemCut')} value={value} />
 
-            <p style={{ fontSize: '12px', color: '#6B7280' }}>
+            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.4)' }}>
                 Click on a shape that matches your gemstone
             </p>
 
@@ -77,119 +79,150 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
     );
 };
 
-// SVG icons matching mockup exactly - thin 1px strokes
+// Premium SVG icons for each cut type - detailed gem facet representations
+// EXACTLY matching user provided snippet
 function getCutIcon(cut: string) {
-    const svgStyle = {
-        width: '100%',
-        height: '100%',
-        fill: 'none',
-        stroke: 'currentColor',
-        strokeWidth: '1', // Thin stroke
-        strokeLinecap: 'round' as const,
-        strokeLinejoin: 'round' as const,
+    const iconMap: Record<string, React.ReactNode> = {
+        'round-brilliant': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Outer circle */}
+                <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Table facet (center) */}
+                <circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Star facets */}
+                <line x1="24" y1="4" x2="24" y2="16" stroke="currentColor" strokeWidth="1" />
+                <line x1="24" y1="32" x2="24" y2="44" stroke="currentColor" strokeWidth="1" />
+                <line x1="4" y1="24" x2="16" y2="24" stroke="currentColor" strokeWidth="1" />
+                <line x1="32" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" />
+                {/* Diagonal facets */}
+                <line x1="9" y1="9" x2="18" y2="18" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="39" y1="9" x2="30" y2="18" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="9" y1="39" x2="18" y2="30" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="39" y1="39" x2="30" y2="30" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+            </svg>
+        ),
+        'oval': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Outer oval */}
+                <ellipse cx="24" cy="24" rx="14" ry="19" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner table */}
+                <ellipse cx="24" cy="24" rx="7" ry="10" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Vertical facets */}
+                <line x1="24" y1="5" x2="24" y2="14" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="24" y1="34" x2="24" y2="43" stroke="currentColor" strokeWidth="0.8" />
+                {/* Side facets */}
+                <line x1="10" y1="24" x2="17" y2="24" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="31" y1="24" x2="38" y2="24" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
+        'cushion': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Outer rounded square */}
+                <rect x="6" y="6" width="36" height="36" rx="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner table */}
+                <rect x="14" y="14" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Corner facets */}
+                <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="14" y1="6" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="34" y1="6" x2="34" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="34" y1="14" x2="42" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="6" y1="34" x2="14" y2="34" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="14" y1="34" x2="14" y2="42" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="34" y1="34" x2="34" y2="42" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+                <line x1="34" y1="34" x2="42" y2="34" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+            </svg>
+        ),
+        'pear': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Pear outline */}
+                <path d="M24 4 C14 14 10 26 14 34 C18 42 30 42 34 34 C38 26 34 14 24 4 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner facet */}
+                <path d="M24 12 C19 18 17 26 19 31 C21 35 27 35 29 31 C31 26 29 18 24 12 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+                {/* Center line */}
+                <line x1="24" y1="4" x2="24" y2="12" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
+        'emerald-cut': ( // Mapped from 'emerald' in snippet
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Octagonal outline */}
+                <polygon points="12,6 36,6 44,14 44,34 36,42 12,42 4,34 4,14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner octagon */}
+                <polygon points="16,12 32,12 38,18 38,30 32,36 16,36 10,30 10,18" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Step cut lines */}
+                <line x1="4" y1="14" x2="10" y2="18" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="44" y1="14" x2="38" y2="18" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="4" y1="34" x2="10" y2="30" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="44" y1="34" x2="38" y2="30" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
+        'marquise': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Pointed oval */}
+                <path d="M24 4 C14 12 10 20 10 24 C10 28 14 36 24 44 C34 36 38 28 38 24 C38 20 34 12 24 4 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner facet */}
+                <path d="M24 12 C19 17 16 22 16 24 C16 26 19 31 24 36 C29 31 32 26 32 24 C32 22 29 17 24 12 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+                {/* Center line */}
+                <line x1="24" y1="4" x2="24" y2="44" stroke="currentColor" strokeWidth="0.5" opacity="0.5" />
+            </svg>
+        ),
+        'asscher': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Outer square */}
+                <rect x="6" y="6" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner square */}
+                <rect x="14" y="14" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Corner step cuts */}
+                <line x1="6" y1="6" x2="14" y2="14" stroke="currentColor" strokeWidth="1" />
+                <line x1="42" y1="6" x2="34" y2="14" stroke="currentColor" strokeWidth="1" />
+                <line x1="6" y1="42" x2="14" y2="34" stroke="currentColor" strokeWidth="1" />
+                <line x1="42" y1="42" x2="34" y2="34" stroke="currentColor" strokeWidth="1" />
+                {/* Mid step lines */}
+                <rect x="10" y="10" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.5" />
+            </svg>
+        ),
+        'princess': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Outer square */}
+                <rect x="6" y="6" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Diagonal cross - signature of princess cut */}
+                <line x1="6" y1="6" x2="42" y2="42" stroke="currentColor" strokeWidth="1" />
+                <line x1="42" y1="6" x2="6" y2="42" stroke="currentColor" strokeWidth="1" />
+                {/* Inner diamond */}
+                <polygon points="24,10 38,24 24,38 10,24" fill="none" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
+        'radiant': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Octagonal outline */}
+                <polygon points="12,6 36,6 44,14 44,34 36,42 12,42 4,34 4,14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Radiant inner pattern */}
+                <rect x="16" y="16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.2" />
+                {/* Radiant facet lines */}
+                <line x1="12" y1="6" x2="16" y2="16" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="36" y1="6" x2="32" y2="16" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="12" y1="42" x2="16" y2="32" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="36" y1="42" x2="32" y2="32" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="4" y1="14" x2="16" y2="16" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="44" y1="14" x2="32" y2="16" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="4" y1="34" x2="16" y2="32" stroke="currentColor" strokeWidth="0.8" />
+                <line x1="44" y1="34" x2="32" y2="32" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
+        'heart': (
+            <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+                {/* Heart outline */}
+                <path d="M24 44 C8 30 4 20 10 12 C14 8 20 8 24 14 C28 8 34 8 38 12 C44 20 40 30 24 44 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                {/* Inner facets */}
+                <path d="M24 36 C14 28 12 22 15 17 C17 14 20 14 24 18 C28 14 31 14 33 17 C36 22 34 28 24 36 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+                {/* Center cleft */}
+                <line x1="24" y1="14" x2="24" y2="22" stroke="currentColor" strokeWidth="0.8" />
+            </svg>
+        ),
     };
 
-    switch (cut) {
-        case 'round-brilliant':
-            // Round with 8 spokes
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <circle cx="16" cy="16" r="12" />
-                    <circle cx="16" cy="16" r="6" />
-                    {/* Spokes */}
-                    <line x1="16" y1="4" x2="16" y2="10" />
-                    <line x1="16" y1="22" x2="16" y2="28" />
-                    <line x1="4" y1="16" x2="10" y2="16" />
-                    <line x1="22" y1="16" x2="28" y2="16" />
-                    <line x1="7.5" y1="7.5" x2="11.7" y2="11.7" />
-                    <line x1="24.5" y1="7.5" x2="20.3" y2="11.7" />
-                    <line x1="7.5" y1="24.5" x2="11.7" y2="20.3" />
-                    <line x1="24.5" y1="24.5" x2="20.3" y2="20.3" />
-                </svg>
-            );
-        case 'oval':
-            // Concentric Ovals
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <ellipse cx="16" cy="16" rx="9" ry="12" />
-                    <ellipse cx="16" cy="16" rx="5" ry="7" />
-                </svg>
-            );
-        case 'cushion':
-            // Concentric Rounded Squares (Fixed from teardrop)
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <rect x="5" y="5" width="22" height="22" rx="6" />
-                    <rect x="10" y="10" width="12" height="12" rx="3" />
-                </svg>
-            );
-        case 'pear':
-            // Concentric Teardrops
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <path d="M16 4 C10 12, 8 20, 16 28 C24 20, 22 12, 16 4 Z" />
-                    <path d="M16 9 C13 14, 12 18, 16 23 C20 18, 19 14, 16 9 Z" />
-                </svg>
-            );
-        case 'emerald-cut':
-            // Concentric Octagons
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <polygon points="8,4 24,4 28,8 28,24 24,28 8,28 4,24 4,8" />
-                    <polygon points="11,8 21,8 24,11 24,21 21,24 11,24 8,21 8,11" />
-                </svg>
-            );
-        case 'marquise':
-            // Concentric Footballs
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <path d="M16 3 C8 10, 8 22, 16 29 C24 22, 24 10, 16 3 Z" />
-                    <path d="M16 8 C12 12, 12 20, 16 24 C20 20, 20 12, 16 8 Z" />
-                </svg>
-            );
-        case 'asscher':
-            // Concentric clipped squares
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <polygon points="9,5 23,5 27,9 27,23 23,27 9,27 5,23 5,9" />
-                    <rect x="10" y="10" width="12" height="12" />
-                    <line x1="5" y1="9" x2="10" y2="10" />
-                    <line x1="27" y1="9" x2="22" y2="10" />
-                    <line x1="27" y1="23" x2="22" y2="22" />
-                    <line x1="5" y1="23" x2="10" y2="22" />
-                </svg>
-            );
-        case 'princess':
-            // Square with diagonals/star pattern
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <rect x="5" y="5" width="22" height="22" />
-                    <rect x="11" y="11" width="10" height="10" transform="rotate(45 16 16)" />
-                </svg>
-            );
-        case 'radiant':
-            // Octagon with grid lines
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <polygon points="8,4 24,4 28,8 28,24 24,28 8,28 4,24 4,8" />
-                    <rect x="10" y="10" width="12" height="12" />
-                    <line x1="16" y1="4" x2="16" y2="28" />
-                    <line x1="4" y1="16" x2="28" y2="16" />
-                </svg>
-            );
-        case 'heart':
-            // Concentric Hearts
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <path d="M16 28 C16 28 3 20 3 11 C3 7 6 4 10 4 C13 4 15 6 16 8 C17 6 19 4 22 4 C26 4 29 7 29 11 C29 20 16 28 16 28 Z" />
-                    <path d="M16 23 C16 23 7 17 7 11 C7 9 8 7 10 7 C12 7 14 9 14.5 10 L17.5 10 C18 9 20 7 22 7 C24 7 25 9 25 11 C25 17 16 23 16 23 Z" />
-                </svg>
-            );
-        default:
-            return (
-                <svg viewBox="0 0 32 32" style={svgStyle}>
-                    <circle cx="16" cy="16" r="12" />
-                </svg>
-            );
-    }
+    return iconMap[cut] || (
+        <svg viewBox="0 0 48 48" style={{ width: '100%', height: '100%' }}>
+            <polygon points="24,4 44,40 4,40" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+    );
 }
