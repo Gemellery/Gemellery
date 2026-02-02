@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
@@ -56,7 +56,7 @@ class ErrorBoundary extends Component<Props, State> {
                             We encountered an unexpected error. Please try again or return to the home page.
                         </p>
 
-                        {process.env.NODE_ENV === 'development' && this.state.error && (
+                        {import.meta.env.DEV && this.state.error && (
                             <div className="mb-6 p-4 rounded-lg bg-red-900/20 border border-red-700/30 text-left overflow-auto max-h-40">
                                 <p className="text-red-300 text-sm font-mono">
                                     {this.state.error.toString()}
