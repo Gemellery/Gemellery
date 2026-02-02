@@ -247,7 +247,7 @@ const JewelryDesigner: React.FC = () => {
                 </div>
             </header>
 
-            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 16px' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 16px' }}>
                 {/* Badge */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                     <span style={{
