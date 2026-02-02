@@ -17,152 +17,175 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
     onChange,
 }) => {
     return (
-        <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
-                What is the shape/cut of your gem? <span className="text-red-500">*</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <label style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
+                What is the shape/cut of your gem? <span style={{ color: '#EF4444' }}>*</span>
             </label>
 
-            <div className="grid grid-cols-5 gap-3">
-                {GEM_CUTS.map((cut) => (
-                    <button
-                        key={cut.value}
-                        type="button"
-                        onClick={() => onChange(cut.value)}
-                        className={`
-              relative p-4 rounded-xl border-2 transition-all duration-200
-              hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 group
-              ${value === cut.value
-                                ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                : 'border-gray-700 bg-[#1a1f35]'
-                            }
-            `}
-                    >
-                        {/* SVG Icon */}
-                        <div className={`
-              w-10 h-10 mx-auto mb-2
-              ${value === cut.value ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-[#D4AF37]'}
-            `}>
-                            {getCutIcon(cut.value)}
-                        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+                {GEM_CUTS.map((cut) => {
+                    const isSelected = value === cut.value;
+                    return (
+                        <button
+                            key={cut.value}
+                            type="button"
+                            onClick={() => onChange(cut.value)}
+                            style={{
+                                padding: '16px 8px',
+                                borderRadius: '12px',
+                                border: isSelected ? '2px solid #D4AF37' : '1px solid #374151',
+                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : '#1a1f35',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
+                        >
+                            {/* SVG Icon */}
+                            <div style={{ width: '32px', height: '32px', marginBottom: '8px' }}>
+                                {getCutIcon(cut.value, isSelected)}
+                            </div>
 
-                        <p className={`
-              text-xs font-medium text-center
-              ${value === cut.value ? 'text-white' : 'text-gray-400'}
-            `}>
-                            {cut.label}
-                        </p>
-                    </button>
-                ))}
+                            <p style={{
+                                fontSize: '11px',
+                                fontWeight: 500,
+                                color: isSelected ? 'white' : '#9CA3AF',
+                                textAlign: 'center',
+                            }}>
+                                {cut.label}
+                            </p>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemCut')} value={value} />
 
-            <p className="text-xs text-gray-500">
+            <p style={{ fontSize: '12px', color: '#6B7280' }}>
                 Click on a shape that matches your gemstone
             </p>
 
             {errors.gemCut && (
-                <p className="text-sm text-red-500">{errors.gemCut.message}</p>
+                <p style={{ fontSize: '13px', color: '#EF4444' }}>{errors.gemCut.message}</p>
             )}
         </div>
     );
 };
 
-// SVG icons for each cut style
-function getCutIcon(cut: string) {
-    const iconProps = {
-        fill: 'none',
-        stroke: 'currentColor',
-        strokeWidth: 1.5,
-        strokeLinecap: 'round' as const,
-        strokeLinejoin: 'round' as const,
-        className: 'w-full h-full',
+// SVG icons matching mockup exactly - thin strokes
+function getCutIcon(cut: string, isSelected: boolean) {
+    const color = isSelected ? '#D4AF37' : '#9CA3AF';
+
+    const svgStyle = {
+        width: '100%',
+        height: '100%',
     };
 
     switch (cut) {
         case 'round-brilliant':
+            // Circle with cross pattern inside
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <circle cx="24" cy="24" r="18" />
-                    <circle cx="24" cy="24" r="10" />
-                    <line x1="24" y1="6" x2="24" y2="14" />
-                    <line x1="24" y1="34" x2="24" y2="42" />
-                    <line x1="6" y1="24" x2="14" y2="24" />
-                    <line x1="34" y1="24" x2="42" y2="24" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <circle cx="16" cy="16" r="12" stroke={color} strokeWidth="1.5" />
+                    <circle cx="16" cy="16" r="6" stroke={color} strokeWidth="1" />
+                    <line x1="16" y1="4" x2="16" y2="10" stroke={color} strokeWidth="1" />
+                    <line x1="16" y1="22" x2="16" y2="28" stroke={color} strokeWidth="1" />
+                    <line x1="4" y1="16" x2="10" y2="16" stroke={color} strokeWidth="1" />
+                    <line x1="22" y1="16" x2="28" y2="16" stroke={color} strokeWidth="1" />
+                    <line x1="7" y1="7" x2="11" y2="11" stroke={color} strokeWidth="1" />
+                    <line x1="21" y1="7" x2="25" y2="11" stroke={color} strokeWidth="1" />
+                    <line x1="7" y1="25" x2="11" y2="21" stroke={color} strokeWidth="1" />
+                    <line x1="21" y1="25" x2="25" y2="21" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'oval':
+            // Vertical oval with inner oval
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <ellipse cx="24" cy="24" rx="12" ry="18" />
-                    <ellipse cx="24" cy="24" rx="6" ry="10" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <ellipse cx="16" cy="16" rx="9" ry="12" stroke={color} strokeWidth="1.5" />
+                    <ellipse cx="16" cy="16" rx="5" ry="7" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'cushion':
+            // Rounded square with drop inside
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <rect x="8" y="8" width="32" height="32" rx="8" ry="8" />
-                    <rect x="14" y="14" width="20" height="20" rx="4" ry="4" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <rect x="5" y="5" width="22" height="22" rx="6" stroke={color} strokeWidth="1.5" />
+                    {/* Teardrop/water drop in center */}
+                    <path d="M16 10 C14 14, 12 18, 16 22 C20 18, 18 14, 16 10" stroke={color} strokeWidth="1" fill="none" />
                 </svg>
             );
         case 'pear':
+            // Teardrop shape
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <path d="M24 6 C12 18, 10 30, 24 42 C38 30, 36 18, 24 6" />
-                    <path d="M24 14 C18 22, 17 28, 24 36 C31 28, 30 22, 24 14" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <path d="M16 4 C10 12, 8 20, 16 28 C24 20, 22 12, 16 4" stroke={color} strokeWidth="1.5" />
+                    <path d="M16 9 C13 14, 12 18, 16 23 C20 18, 19 14, 16 9" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'emerald-cut':
+            // Octagon with clipped corners
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <polygon points="12,6 36,6 42,12 42,36 36,42 12,42 6,36 6,12" />
-                    <polygon points="16,12 32,12 36,16 36,32 32,36 16,36 12,32 12,16" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <polygon points="8,4 24,4 28,8 28,24 24,28 8,28 4,24 4,8" stroke={color} strokeWidth="1.5" />
+                    <polygon points="11,8 21,8 24,11 24,21 21,24 11,24 8,21 8,11" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'marquise':
+            // Pointed vertical oval (football shape)
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <ellipse cx="24" cy="24" rx="8" ry="20" />
-                    <ellipse cx="24" cy="24" rx="4" ry="12" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <path d="M16 3 C8 10, 8 22, 16 29 C24 22, 24 10, 16 3" stroke={color} strokeWidth="1.5" />
+                    <path d="M16 8 C12 12, 12 20, 16 24 C20 20, 20 12, 16 8" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'asscher':
+            // Square with chamfered corners and inner square
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <polygon points="14,6 34,6 42,14 42,34 34,42 14,42 6,34 6,14" />
-                    <polygon points="18,12 30,12 36,18 36,30 30,36 18,36 12,30 12,18" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <polygon points="10,4 22,4 28,10 28,22 22,28 10,28 4,22 4,10" stroke={color} strokeWidth="1.5" />
+                    <rect x="10" y="10" width="12" height="12" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'princess':
+            // Square with X pattern
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <rect x="8" y="8" width="32" height="32" />
-                    <rect x="14" y="14" width="20" height="20" />
-                    <line x1="8" y1="8" x2="14" y2="14" />
-                    <line x1="40" y1="8" x2="34" y2="14" />
-                    <line x1="8" y1="40" x2="14" y2="34" />
-                    <line x1="40" y1="40" x2="34" y2="34" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <rect x="5" y="5" width="22" height="22" stroke={color} strokeWidth="1.5" />
+                    <line x1="5" y1="5" x2="27" y2="27" stroke={color} strokeWidth="1" />
+                    <line x1="27" y1="5" x2="5" y2="27" stroke={color} strokeWidth="1" />
+                    <rect x="11" y="11" width="10" height="10" stroke={color} strokeWidth="1" />
                 </svg>
             );
         case 'radiant':
+            // Octagon with inner square
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <polygon points="12,6 36,6 42,12 42,36 36,42 12,42 6,36 6,12" />
-                    <rect x="14" y="14" width="20" height="20" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <polygon points="8,4 24,4 28,8 28,24 24,28 8,28 4,24 4,8" stroke={color} strokeWidth="1.5" />
+                    <rect x="10" y="10" width="12" height="12" stroke={color} strokeWidth="1" />
+                    <line x1="4" y1="8" x2="10" y2="10" stroke={color} strokeWidth="0.75" />
+                    <line x1="28" y1="8" x2="22" y2="10" stroke={color} strokeWidth="0.75" />
+                    <line x1="4" y1="24" x2="10" y2="22" stroke={color} strokeWidth="0.75" />
+                    <line x1="28" y1="24" x2="22" y2="22" stroke={color} strokeWidth="0.75" />
                 </svg>
             );
         case 'heart':
+            // Heart shape
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <path d="M24 42 L8 26 C4 20, 6 12, 14 10 C18 9, 22 11, 24 16 C26 11, 30 9, 34 10 C42 12, 44 20, 40 26 Z" />
-                    <path d="M24 34 L14 24 C12 21, 13 17, 17 16 C19 15.5, 21 16.5, 24 20 C27 16.5, 29 15.5, 31 16 C35 17, 36 21, 34 24 Z" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <path
+                        d="M16 28 L5 17 C2 13, 3 8, 8 7 C11 6, 14 8, 16 12 C18 8, 21 6, 24 7 C29 8, 30 13, 27 17 Z"
+                        stroke={color}
+                        strokeWidth="1.5"
+                    />
                 </svg>
             );
         default:
             return (
-                <svg viewBox="0 0 48 48" {...iconProps}>
-                    <circle cx="24" cy="24" r="16" />
+                <svg viewBox="0 0 32 32" fill="none" style={svgStyle}>
+                    <circle cx="16" cy="16" r="12" stroke={color} strokeWidth="1.5" />
                 </svg>
             );
     }
