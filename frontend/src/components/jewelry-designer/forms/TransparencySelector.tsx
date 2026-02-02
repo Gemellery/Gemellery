@@ -18,70 +18,79 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
     onChange,
 }) => {
     // Get icon for each transparency level
-    const getIcon = (transparencyValue: string) => {
+    const getIcon = (transparencyValue: string, isSelected: boolean) => {
+        const iconStyle = {
+            width: '24px',
+            height: '24px',
+            color: isSelected ? '#D4AF37' : '#9CA3AF',
+        };
+
         switch (transparencyValue) {
             case 'transparent':
-                return <Eye className="w-6 h-6" />;
+                return <Eye style={iconStyle} />;
             case 'semi-transparent':
-                return <Circle className="w-6 h-6" />;
+                return <Circle style={iconStyle} />;
             case 'opaque':
-                return <EyeOff className="w-6 h-6" />;
+                return <EyeOff style={iconStyle} />;
             default:
-                return <Circle className="w-6 h-6" />;
+                return <Circle style={iconStyle} />;
         }
     };
 
     return (
-        <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
-                How see-through is your gem? <span className="text-red-500">*</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <label style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
+                How see-through is your gem? <span style={{ color: '#EF4444' }}>*</span>
             </label>
 
-            <div className="grid grid-cols-3 gap-3">
-                {GEM_TRANSPARENCY.map((option) => (
-                    <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => onChange(option.value)}
-                        className={`
-              p-4 rounded-xl border-2 transition-all duration-200 text-center
-              hover:border-[#D4AF37] hover:bg-[#D4AF37]/5
-              ${value === option.value
-                                ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                : 'border-gray-700 bg-[#1a1f35]'
-                            }
-            `}
-                    >
-                        {/* Icon */}
-                        <div className={`
-              mx-auto mb-2
-              ${value === option.value ? 'text-[#D4AF37]' : 'text-gray-400'}
-            `}>
-                            {getIcon(option.value)}
-                        </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                {GEM_TRANSPARENCY.map((option) => {
+                    const isSelected = value === option.value;
+                    return (
+                        <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => onChange(option.value)}
+                            style={{
+                                padding: '16px',
+                                borderRadius: '12px',
+                                border: isSelected ? '2px solid #D4AF37' : '2px solid #374151',
+                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : '#1a1f35',
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            {/* Icon */}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                                {getIcon(option.value, isSelected)}
+                            </div>
 
-                        <p className={`
-              text-sm font-medium
-              ${value === option.value ? 'text-white' : 'text-gray-400'}
-            `}>
-                            {option.label}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                            {option.description}
-                        </p>
-                    </button>
-                ))}
+                            <p style={{
+                                fontSize: '13px',
+                                fontWeight: 500,
+                                color: isSelected ? 'white' : '#9CA3AF',
+                                marginBottom: '4px',
+                            }}>
+                                {option.label}
+                            </p>
+                            <p style={{ fontSize: '11px', color: '#6B7280' }}>
+                                {option.description}
+                            </p>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemTransparency')} value={value} />
 
-            <p className="text-xs text-gray-500">
+            <p style={{ fontSize: '12px', color: '#6B7280' }}>
                 This helps us render light and reflections accurately
             </p>
 
             {errors.gemTransparency && (
-                <p className="text-sm text-red-500">{errors.gemTransparency.message}</p>
+                <p style={{ fontSize: '13px', color: '#EF4444' }}>{errors.gemTransparency.message}</p>
             )}
         </div>
     );
