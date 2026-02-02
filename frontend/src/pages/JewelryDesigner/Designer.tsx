@@ -139,7 +139,7 @@ const JewelryDesigner: React.FC = () => {
 
     // Step indicator matching mockup
     const renderStepIndicator = () => (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '40px', gap: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', marginBottom: '40px', gap: '8px', maxWidth: '1200px', margin: '0 auto 40px auto' }}>
             {STEPS.map((step, index) => {
                 const isCompleted = currentStep > step.id;
                 const isCurrent = currentStep === step.id;
@@ -195,7 +195,7 @@ const JewelryDesigner: React.FC = () => {
                         {/* Connector Line */}
                         {index < STEPS.length - 1 && (
                             <div style={{
-                                width: '50px',
+                                width: '120px',
                                 height: '2px',
                                 marginTop: '22px',
                                 background: currentStep > step.id ? '#22C55E' : '#374151',
