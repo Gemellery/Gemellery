@@ -228,7 +228,7 @@ function AddNewGem() {
                             </div>
                         )}
 
-                        <div className="flex justify-end pt-6">
+                        <div className="flex justify-start pt-10">
                             <button
                                 type="button"
                                 onClick={handleSubmit}
