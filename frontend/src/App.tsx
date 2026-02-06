@@ -18,6 +18,7 @@ import AddNewGem from "./pages/Gem/AddNewGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
+import SellerSettings from "./pages/seller/SellerSettings";
 
 function App() {
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/jewelry_designer" element={<JewelryDesigner />} />
           <Route path="/jewelry-designer/results" element={<JewelryResults />} />
           <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+          <Route path="/seller/SellerSettings" element={<SellerSettings />} />
 
         </Routes>
       </BrowserRouter>

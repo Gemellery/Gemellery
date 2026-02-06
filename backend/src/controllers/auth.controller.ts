@@ -59,7 +59,7 @@ export const register = async (req: Request, res: Response) => {
 
         if (role === "seller") {
             const licenseUrl = req.file
-                ? `/uploads/licenses/${req.file.filename}`
+                ? `/uploads/seller_licenses/${req.file.filename}`
                 : null;
 
             await conn.query(
