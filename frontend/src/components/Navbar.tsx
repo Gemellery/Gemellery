@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logos/Elegance Jewelry.png";
-import { ShoppingCart, CircleUserRound, Search, Menu, X } from "lucide-react";
+import { ShoppingCart, CircleUserRound, Search, Menu, X, Sparkles } from "lucide-react";
 
 function Navbar() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -66,9 +66,11 @@ function Navbar() {
             Contact Us
           </button>
           <button
-            className="px-6 py-3 bg-[#cc000b] 
-             text-white font-semibold rounded-full shadow-lg 
-             hover:scale-105 hover:shadow-xl transition-all duration-300">
+            onClick={() => navigate("/jewelry-designer")}
+            className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#F5D061]
+             text-[#0A1128] font-semibold rounded-full shadow-lg 
+             hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
             Design With AI
           </button>
         </div>
@@ -137,9 +139,11 @@ function Navbar() {
             Contact Us
           </button>
           <button
-            className="px-6 py-3 bg-[#cc000b] 
-             text-white font-semibold rounded-full shadow-lg 
-             hover:scale-105 hover:shadow-xl transition-all duration-300">
+            onClick={() => { navigate("/jewelry-designer"); setMenuOpen(false); }}
+            className="w-full px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#F5D061]
+             text-[#0A1128] font-semibold rounded-full shadow-lg 
+             hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4" />
             Design With AI
           </button>
 

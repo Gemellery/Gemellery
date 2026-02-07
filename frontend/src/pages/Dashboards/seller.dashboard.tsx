@@ -1,9 +1,11 @@
 import { useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
 
 function SellerDashboardLayout() {
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -29,28 +31,72 @@ function SellerDashboardLayout() {
                     </div>
 
                     <button
+                        onClick={() => navigate("/add-new-gem")}
                         className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#1F7A73] text-white font-semibold rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
                         <Plus size={18} /> List New Gem
                     </button>
                 </div>
 
-                <div className="flex flex-col gap-5 md:flex-row md:gap-4 mb-6">
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex flex-col items-center justify-center gap-2">
-                        <BanknoteArrowDown className="text-[#1F7A73] size-10" />
-                        <h2 className="font-bold">Total Revenue</h2>
-                        <h2 className="font-bold text-2xl">5000$</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+
+                    {/* Total Revenue */}
+                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div className="p-4 rounded-xl bg-white">
+                            <BanknoteArrowDown className="text-[#1F7A73] size-7" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Total Revenue</span>
+                            <span className="text-2xl font-bold text-gray-900">$5,000</span>
+                            <span className="text-xs text-green-600 mt-1">
+                                +12% from last month
+                            </span>
+                        </div>
                     </div>
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex flex-col items-center justify-center gap-2">
-                        <Eye className="text-[#1F7A73] size-10" />
-                        <h2 className="font-bold">Profile Views</h2>
-                        <h2 className="font-bold text-2xl">456</h2>
+
+                    {/* Profile Views */}
+                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div className="p-4 rounded-xl bg-white">
+                            <Eye className="text-[#1F7A73] size-7" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Profile Views</span>
+                            <span className="text-2xl font-bold text-gray-900">456</span>
+                            <span className="text-xs text-green-600 mt-1">
+                                +8% this week
+                            </span>
+                        </div>
                     </div>
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex flex-col items-center justify-center gap-2">
-                        <MessageSquare className="text-[#1F7A73] size-10" />
-                        <h2 className="font-bold">Inquiry Rate</h2>
-                        <h2 className="font-bold text-2xl">25%</h2>
+
+                    {/* Inquiry Rate */}
+                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div className="p-4 rounded-xl bg-white">
+                            <MessageSquare className="text-[#1F7A73] size-7" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Inquiry Rate</span>
+                            <span className="text-2xl font-bold text-gray-900">25%</span>
+                            <span className="text-xs text-green-600 mt-1">
+                                High engagement
+                            </span>
+                        </div>
                     </div>
+
+                    {/* Wishlist Count */}
+                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
+                        <div className="p-4 rounded-xl bg-white">
+                            <Heart className="text-[#1F7A73] size-7" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-500">Wishlisted Gems</span>
+                            <span className="text-2xl font-bold text-gray-900">48</span>
+                            <span className="text-xs text-gray-500 mt-1">
+                                Across all listings
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
+
 
                 <div className="hidden md:flex flex-col gap-5 md:flex-row md:gap-4 mb-6 border-[#f5e2aa]">
                     <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
@@ -200,7 +246,7 @@ function SellerDashboardLayout() {
                         </div>
                     </div>
                 </div>
-                <Footer/>
+                <Footer />
             </main>
         </div>
     );

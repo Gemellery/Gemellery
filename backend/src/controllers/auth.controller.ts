@@ -3,6 +3,15 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import pool from "../database";
 
+import crypto from "crypto";
+import { createResetToken } from "../models/passwordReset.model";
+import { sendEmail } from "../utils/mailer";
+
+import {
+    findResetToken,
+    deleteResetToken
+} from "../models/passwordReset.model";
+
 const allowedRoles = ["buyer", "seller"];
 
 export const register = async (req: Request, res: Response) => {
@@ -50,7 +59,7 @@ export const register = async (req: Request, res: Response) => {
 
         if (role === "seller") {
             const licenseUrl = req.file
-                ? `/uploads/licenses/${req.file.filename}`
+                ? `/uploads/seller_licenses/${req.file.filename}`
                 : null;
 
             await conn.query(
@@ -60,7 +69,7 @@ export const register = async (req: Request, res: Response) => {
                 [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
             );
         }
-// edited pool to conn
+        // edited pool to conn
         if (address) {
             await conn.query(
                 `INSERT INTO address (address, user_id) VALUES (?, ?)`,
@@ -127,4 +136,64 @@ export const login = async (req: Request, res: Response) => {
         },
     });
 
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    const [users]: any = await pool.query(
+        "SELECT user_id FROM user WHERE email = ?",
+        [email]
+    );
+
+    if (users.length > 0) {
+        await pool.query(
+            "DELETE FROM password_resets WHERE email = ?",
+            [email]
+        );
+
+        const token = crypto.randomBytes(32).toString("hex");
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        await createResetToken(email, token, expiresAt);
+
+        const resetLink = `http://localhost:5173/reset-password/${token}`;
+
+        await sendEmail(
+            email,
+            "Reset your Gemellery password",
+            `Click the link below to reset your password:\n\n${resetLink}`
+        );
+    }
+
+    res.json({
+        message: "If this email exists, a reset link was sent."
+    });
+};
+
+
+
+export const resetPassword = async (req: Request, res: Response) => {
+    const { token, password } = req.body;
+
+    const reset = await findResetToken(token);
+
+    if (!reset || new Date(reset.expires_at) < new Date()) {
+        return res.status(400).json({
+            message: "Invalid or expired reset token"
+        });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+        "UPDATE user SET password = ? WHERE email = ?",
+        [hashedPassword, reset.email]
+    );
+
+    await deleteResetToken(token);
+
+    res.json({
+        message: "Password reset successful"
+    });
 };

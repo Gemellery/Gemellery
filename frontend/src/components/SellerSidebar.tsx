@@ -70,7 +70,7 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
 
                 <div className="p-6 border-t space-y-3">
                     <button
-                        onClick={() => navigate("/seller/settings")}
+                        onClick={() => navigate("/seller/SellerSettings")}
                         className="flex items-center gap-3 w-full text-left hover:underline">
                         <Settings className="w-4 h-4" />
                         Settings

@@ -16,14 +16,11 @@ function SignIn() {
   const [countries, setCountries] = useState<any[]>([]);
   const [countryId, setCountryId] = useState("");
   const [address, setAddress] = useState("");
-
   const [userType, setUserType] = useState<"buyer" | "seller">("buyer");
-
   const [businessName, setBusinessName] = useState("");
   const [businessRegNo, setBusinessRegNo] = useState("");
   const [ngjaRegNo, setNgjaRegNo] = useState("");
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
-
 
   useEffect(() => {
     const loadCountries = async () => {
@@ -55,8 +52,16 @@ function SignIn() {
       return;
     }
 
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    // localStorage.setItem("token", data.token);
+    // localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        ...data.user,
+        token: data.token,
+      })
+    );
+
 
     const userRole =
       data.user?.role ||
@@ -193,7 +198,7 @@ function SignIn() {
                         Don’t have an account? Register here
                       </button>
 
-                      <button className="text-xs text-teal-700 hover:underline">
+                      <button type='button' onClick={() => navigate("/forgot-password")} className="text-xs text-teal-700 hover:underline">
                         Forgot password?
                       </button>
                     </div>
