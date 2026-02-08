@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -8,6 +8,28 @@ function SellerDashboardLayout() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [seller, setSeller] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchSellerProfile = async () => {
+            try {
+                const res = await fetch("http://localhost:5001/api/seller/profile", {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                });
+
+                if (!res.ok) throw new Error("Failed to fetch seller profile");
+
+                const data = await res.json();
+                setSeller(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchSellerProfile();
+    }, []);
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -25,8 +47,9 @@ function SellerDashboardLayout() {
 
                     <div className="ml-4 md:ml-0">
                         <h3 className="font-bold text-2xl">Welcome back, {user.full_name}</h3>
-                        <p className="flex items-center text-sm text-gray-500">
-                            <BadgeCheck className="text-[#1F7A73] mr-2 size-5" /> Verified Seller
+                        <p className="flex items-center text-sm text-gray-500 gap-2">
+                            <BadgeCheck className="text-[#1F7A73] size-5" />
+                            {seller?.business_name || "Loading business..."}
                         </p>
                     </div>
 
