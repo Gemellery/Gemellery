@@ -3,6 +3,7 @@ import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { useNavigate } from "react-router-dom";
 import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
 
 function SellerDashboardLayout() {
 
@@ -197,10 +198,14 @@ function SellerDashboardLayout() {
                     )}
 
                     {!gemsLoading && gems.length === 0 && (
-                        <p className="col-span-full text-sm text-gray-500">
-                            No active listings found.
-                        </p>
+                        <EmptyState
+                            title="No active listings yet"
+                            description="Start selling by listing your first gemstone on Gemellery."
+                            ctaLabel="List your first gem"
+                            ctaLink="/add-new-gem"
+                        />
                     )}
+
 
                     {!gemsLoading && gems.map((gem) => (
                         <div
