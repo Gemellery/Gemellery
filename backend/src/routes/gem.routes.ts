@@ -13,7 +13,6 @@ router.post(
         { name: "certificate", maxCount: 1 },
         { name: "images", maxCount: 5 },
     ]),
-    validateGem,
     createGem
 );
 

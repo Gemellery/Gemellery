@@ -1,14 +1,26 @@
 import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
 
 function SellerDashboardLayout() {
+
+    interface Gem {
+        gem_id: number;
+        gem_name: string;
+        carat: number;
+        cut: string;
+        price: number;
+        image_url: string | null;
+    }
+
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [seller, setSeller] = useState<any>(null);
+    const [gems, setGems] = useState<Gem[]>([]);
+    const [gemsLoading, setGemsLoading] = useState(true);
 
     useEffect(() => {
         const fetchSellerProfile = async () => {
@@ -29,6 +41,33 @@ function SellerDashboardLayout() {
         };
 
         fetchSellerProfile();
+    }, []);
+
+    useEffect(() => {
+        const fetchRecentGems = async () => {
+            try {
+                setGemsLoading(true);
+
+                const res = await fetch("http://localhost:5001/api/seller/gems/recent", {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error("Failed to fetch recent gems");
+                }
+
+                const data = await res.json();
+                setGems(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setGemsLoading(false);
+            }
+        };
+
+        fetchRecentGems();
     }, []);
 
     return (
@@ -146,110 +185,61 @@ function SellerDashboardLayout() {
                     Active Listings <ArrowRight className="ml-2" />
                 </h3>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6 mt-6">
-                    <div className="rounded-2xl border border-[#e9dfc8] bg-white p-3">
-                        <div className="relative">
-                            <div className="rounded-2xl p-2">
-                                <img
-                                    src="/sample_gems/alexandrite_18.jpg"
-                                    alt="Pink Tourmaline"
-                                    className="w-full h-48 object-contain rounded-xl"
-                                />
-                            </div>
-                            <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
-                                <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
-                            </button>
-                        </div>
-                        <div className="mt-3 space-y-1">
-                            <h3 className="font-semibold text-sm text-gray-900">
-                                Pink Tourmaline
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                                1.2 ct • Cushion
-                            </p>
-                            <p className="font-bold text-red-500">
-                                $1,200
-                            </p>
-                        </div>
-                    </div>
 
-                    <div className="rounded-2xl border border-[#e9dfc8] bg-white p-3">
-                        <div className="relative">
-                            <div className="rounded-2xl p-2">
-                                <img
-                                    src="/sample_gems/sapphire blue_6.jpg"
-                                    alt="Pink Tourmaline"
-                                    className="w-full h-48 object-contain rounded-xl"
-                                />
-                            </div>
-                            <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
-                                <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
-                            </button>
-                        </div>
-                        <div className="mt-3 space-y-1">
-                            <h3 className="font-semibold text-sm text-gray-900">
-                                Pink Tourmaline
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                                1.2 ct • Cushion
-                            </p>
-                            <p className="font-bold text-red-500">
-                                $1,200
-                            </p>
-                        </div>
-                    </div>
+                    {gemsLoading && (
+                        <p className="col-span-full text-sm text-gray-500">
+                            Loading active listings...
+                        </p>
+                    )}
 
-                    <div className="rounded-2xl border border-[#e9dfc8] bg-white p-3">
-                        <div className="relative">
-                            <div className="rounded-2xl p-2">
-                                <img
-                                    src="/sample_gems/sapphire blue_6.jpg"
-                                    alt="Pink Tourmaline"
-                                    className="w-full h-48 object-contain rounded-xl"
-                                />
-                            </div>
-                            <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
-                                <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
-                            </button>
-                        </div>
-                        <div className="mt-3 space-y-1">
-                            <h3 className="font-semibold text-sm text-gray-900">
-                                Pink Tourmaline
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                                1.2 ct • Cushion
-                            </p>
-                            <p className="font-bold text-red-500">
-                                $1,200
-                            </p>
-                        </div>
-                    </div>
+                    {!gemsLoading && gems.length === 0 && (
+                        <p className="col-span-full text-sm text-gray-500">
+                            No active listings found.
+                        </p>
+                    )}
 
-                    <div className="rounded-2xl border border-[#e9dfc8] bg-white p-3">
-                        <div className="relative">
-                            <div className="rounded-2xl p-2">
-                                <img
-                                    src="/sample_gems/sapphire blue_6.jpg"
-                                    alt="Pink Tourmaline"
-                                    className="w-full h-48 object-contain rounded-xl"
-                                />
+                    {!gemsLoading && gems.map((gem) => (
+                        <div
+                            key={gem.gem_id}
+                            className="rounded-2xl border border-[#e9dfc8] bg-white p-3"
+                        >
+                            <div className="relative">
+                                <div className="rounded-2xl p-2">
+                                    <img
+                                        src={
+                                            gem.image_url
+                                                ? `http://localhost:5001/uploads/gem_images/${gem.image_url}`
+                                                : "/placeholder-gem.png"
+                                        }
+                                        alt={gem.gem_name}
+                                        className="w-full h-48 object-contain rounded-xl"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = "/placeholder-gem.png";
+                                        }}
+                                    />
+
+                                </div>
+
+                                <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
+                                    <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
+                                </button>
                             </div>
-                            <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
-                                <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
-                            </button>
+
+                            <div className="mt-3 space-y-1">
+                                <h3 className="font-semibold text-sm text-gray-900">
+                                    {gem.gem_name}
+                                </h3>
+                                <p className="text-xs text-gray-500">
+                                    {gem.carat} ct • {gem.cut}
+                                </p>
+                                <p className="font-bold text-red-500">
+                                    ${Number(gem.price).toLocaleString()}
+                                </p>
+                            </div>
                         </div>
-                        <div className="mt-3 space-y-1">
-                            <h3 className="font-semibold text-sm text-gray-900">
-                                Pink Tourmaline
-                            </h3>
-                            <p className="text-xs text-gray-500">
-                                1.2 ct • Cushion
-                            </p>
-                            <p className="font-bold text-red-500">
-                                $1,200
-                            </p>
-                        </div>
-                    </div>
+                    ))}
                 </div>
+
 
                 <h3 className="flex items-center text-lg font-bold underline mt-10 mb-6">
                     Performance Status <ArrowRight className="ml-2" />

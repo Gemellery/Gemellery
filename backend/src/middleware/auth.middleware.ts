@@ -21,16 +21,17 @@ export const authGuard = (
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(
+    const decoded: any = jwt.verify(
       token,
       process.env.JWT_SECRET as string
-    ) as JwtUserPayload;
+    );
 
     req.user = {
-      id: decoded.id,
+      id: decoded.id ?? decoded.user_id,
       email: decoded.email,
       role: decoded.role,
     };
+
 
     next();
   } catch {

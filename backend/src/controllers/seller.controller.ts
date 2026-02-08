@@ -67,3 +67,61 @@ export const updateSellerProfile = async (
 
     return res.json({ message: "Profile updated successfully" });
 };
+export const getSellerGems = async (req: Request, res: Response) => {
+    try {
+        const sellerId = (req.user as any).id;
+
+        const [rows]: any = await db.query(
+            `
+      SELECT
+        g.gem_id,
+        g.gem_name,
+        g.carat,
+        g.cut,
+        g.price,
+        MIN(gi.image_url) AS image_url
+      FROM gem g
+      LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+      WHERE g.seller_id = ?
+        AND g.status = 'Available'
+      GROUP BY g.gem_id
+      ORDER BY g.gem_id DESC
+      `,
+            [sellerId]
+        );
+
+        return res.json(rows);
+    } catch (err) {
+        return res.status(500).json({ error: "Failed to load gems" });
+    }
+};
+
+export const getRecentSellerGems = async (req: Request, res: Response) => {
+    try {
+        const sellerId = (req.user as any).id;
+
+        const [rows]: any = await db.query(
+            `
+      SELECT
+        g.gem_id,
+        g.gem_name,
+        g.carat,
+        g.cut,
+        g.price,
+        MIN(gi.image_url) AS image_url
+      FROM gem g
+      LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+      WHERE g.seller_id = ?
+        AND g.status = 'Available'
+      GROUP BY g.gem_id
+      ORDER BY g.gem_id DESC
+      LIMIT 4
+      `,
+            [sellerId]
+        );
+
+        return res.json(rows);
+    } catch {
+        return res.status(500).json({ error: "Failed to load recent gems" });
+    }
+};
