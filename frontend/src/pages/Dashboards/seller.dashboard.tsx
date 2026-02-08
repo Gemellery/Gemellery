@@ -181,9 +181,13 @@ function SellerDashboardLayout() {
                 </div>
 
                 {/* Active Listings */}
-                <h3 className="flex items-center text-lg font-bold underline mt-10">
+                <h3
+                    onClick={() => navigate("/seller/listings")}
+                    className="flex items-center text-lg font-bold underline mt-10 cursor-pointer hover:text-[#1F7A73]"
+                >
                     Active Listings <ArrowRight className="ml-2" />
                 </h3>
+
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6 mt-6">
 
                     {gemsLoading && (

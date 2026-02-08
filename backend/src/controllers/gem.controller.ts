@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import pool from "../database";
 
 export const createGem = async (req: Request, res: Response) => {
-    console.log("🔥 createGem reached");
     const conn = await pool.getConnection();
 
     try {
