@@ -1,8 +1,8 @@
-import Navbar from "../../components/Navbar";
-import AdvancedFooter from "../../components/AdvancedFooter";
+import BasicFooter from "../../components/BasicFooter";
 import { useState } from "react";
 import { Edit, ShieldCheck, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SellerSidebar from "../../components/SellerSidebar";
 
 function AddNewGem() {
     const [form, setForm] = useState({
@@ -24,6 +24,8 @@ function AddNewGem() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     const handleChange = (
         e: React.ChangeEvent<
@@ -122,12 +124,13 @@ function AddNewGem() {
 
     return (
         <>
-            <Navbar />
+            <SellerSidebar sellerName={user.full_name || user.email}
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 overflow-auto py-6">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                    <div className="lg:col-span-2 space-y-6">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                    <div className="lg:col-span-3 space-y-6">
                         <div>
                             <h1 className="text-3xl font-semibold mb-2">
                                 List New Gemstone in Marketplace
@@ -272,8 +275,8 @@ function AddNewGem() {
                         </section>
                     </aside>
                 </div>
+                <BasicFooter />
             </main>
-            <AdvancedFooter />
         </>
     );
 }
