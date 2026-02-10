@@ -4,7 +4,7 @@ import FilterSection from '../../components/FilterSection'
 import Navbar from '@/components/Navbar'
 import AdvancedFooter from '../../components/AdvancedFooter'
 import GemCard from '../../components/GemCard'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Filter, X } from 'lucide-react'
 
 interface Gem {
   id: number
@@ -20,6 +20,7 @@ interface Gem {
 
 const Marketplace = () => {
   const [currentPage, setCurrentPage] = useState(1)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
   const gemsPerPage = 12
 
   // Sample gem data - replace with API call
@@ -111,27 +112,56 @@ const Marketplace = () => {
     <div className="min-h-screen bg-white">
       <Navbar />
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-8 py-12">
-        <h1 className="text-5xl font-bold text-gray-900 mb-2">Discover Ceylon's Finest Gems</h1>
-        <p className="text-lg text-red-500 font-medium">Verified luxury gemstones from the heart of Sri Lanka.</p>
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-4 sm:px-6 md:px-8 py-8 sm:py-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2">Discover Ceylon's Finest Gems</h1>
+        <p className="text-sm sm:text-base md:text-lg text-red-500 font-medium">Verified luxury gemstones from the heart of Sri Lanka.</p>
       </div>
 
       {/* Search Bar */}
-      <div className="px-8 py-6">
+      <div className="px-4 sm:px-6 md:px-8 py-4 sm:py-6">
         <SearchBar />
       </div>
 
       {/* Main Content */}
-      <div className="px-8 pb-12">
-        <div className="flex gap-8">
-          {/* Filters Sidebar */}
-          <div className="w-72">
+      <div className="px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Filters Sidebar - Hidden on mobile and tablet, shown on large desktop */}
+          <div className="hidden lg:block lg:w-72 flex-shrink-0">
             <FilterSection />
           </div>
 
+          {/* Mobile and Tablet Filter Button */}
+          <button
+            onClick={() => setShowMobileFilters(!showMobileFilters)}
+            className="lg:hidden flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700 mb-4 w-full sm:w-auto justify-center mx-auto sm:mx-0"
+          >
+            <Filter size={18} />
+            Filters
+          </button>
+
+          {/* Mobile and Tablet Filters Modal */}
+          {showMobileFilters && (
+            <div className="fixed inset-0 bg-black/50 z-50 lg:hidden">
+              <div className="absolute inset-y-0 left-0 w-72 bg-white shadow-lg overflow-y-auto">
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                  <h3 className="font-bold text-lg">Filters</h3>
+                  <button
+                    onClick={() => setShowMobileFilters(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <FilterSection />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Gems Grid */}
-          <div className="flex-1">
-            <div className="grid grid-cols-3 gap-6 mb-8">
+          <div className="flex-1 flex flex-col items-center lg:items-start w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mb-8 w-full justify-items-center lg:justify-items-start">
               {displayedGems.map((gem) => (
                 <GemCard 
                   key={gem.id}
@@ -149,20 +179,20 @@ const Marketplace = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto pb-2 w-full">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} />
               </button>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-10 h-10 rounded-lg font-medium transition ${
+                  className={`min-w-10 h-10 rounded-lg font-medium transition text-sm ${
                     currentPage === page
                       ? 'bg-red-500 text-white'
                       : 'border border-gray-300 text-gray-700 hover:bg-gray-100'
@@ -175,9 +205,9 @@ const Marketplace = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} />
               </button>
             </div>
           </div>
