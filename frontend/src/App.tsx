@@ -19,6 +19,7 @@ import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
 import SellerSettings from "./pages/seller/SellerSettings";
+import SellerAllListings from "./pages/seller/SellerAllListings";
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/add-new-gem" element={<AddNewGem />} />
+          <Route path="/seller/listings" element={<SellerAllListings />} />
 
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />

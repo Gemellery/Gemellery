@@ -42,10 +42,10 @@ export const createGem = async (req: Request, res: Response) => {
 
         const [gemResult]: any = await conn.query(
             `INSERT INTO gem
-      (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
-       price, description, ngja_certificate_no, ngja_certificate_url,
-       updated_date, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
+            (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
+             price, description, ngja_certificate_no, ngja_certificate_url,
+             updated_date, status)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
             [
                 seller_id,
                 gem_name,
@@ -64,7 +64,6 @@ export const createGem = async (req: Request, res: Response) => {
 
         const gem_id = gemResult.insertId;
 
-        // Insert images
         if (images.length > 0) {
             const imageValues = images.map((filename: string) => [
                 gem_id,
@@ -72,15 +71,14 @@ export const createGem = async (req: Request, res: Response) => {
             ]);
 
             await conn.query(
-                `INSERT INTO gem_images (gem_id, image_url)
-         VALUES ?`,
+                `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
                 [imageValues]
             );
         }
 
         await conn.commit();
 
-        res.status(201).json({
+        return res.status(201).json({
             message: "Gem created successfully",
             gem_id,
         });
@@ -95,9 +93,12 @@ export const createGem = async (req: Request, res: Response) => {
             });
         }
 
-        res.status(500).json({
+        return res.status(500).json({
             error: "Failed to create gem",
         });
-    }
 
+    } finally {
+        conn.release(); 
+    }
 };
+

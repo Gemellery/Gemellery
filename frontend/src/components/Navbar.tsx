@@ -19,12 +19,17 @@ function Navbar() {
   }, []);
 
   const handleProfileRedirect = () => {
-    if (userRole === "Seller") {
+    if (!userRole) return;
+
+    const role = userRole.toLowerCase();
+
+    if (role === "seller") {
       navigate("/seller/dashboard");
-    } else if (userRole === "Buyer") {
+    } else if (role === "buyer") {
       navigate("/buyer/dashboard");
     }
   };
+
 
   // const handleLogout = () => {
   //   localStorage.removeItem("token");

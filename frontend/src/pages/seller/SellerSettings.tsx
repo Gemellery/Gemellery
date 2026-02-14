@@ -3,6 +3,18 @@ import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { Edit, Save, Menu } from "lucide-react";
 
+const Label = ({ text }: { text: string }) => (
+    <p className="text-sm font-semibold text-gray-800">{text}</p>
+);
+
+const Input = (props: any) => (
+    <input
+        {...props}
+        className={`input ${props.disabled ? "bg-gray-100" : ""}`}
+    />
+);
+
+
 interface SellerProfile {
     full_name: string;
     mobile: string;
@@ -226,15 +238,4 @@ function SellerSettings() {
 
 export default SellerSettings;
 
-/* ---------- Helpers ---------- */
 
-const Label = ({ text }: { text: string }) => (
-    <p className="text-sm font-semibold text-gray-800">{text}</p>
-);
-
-const Input = (props: any) => (
-    <input
-        {...props}
-        className={`input ${props.disabled ? "bg-gray-100" : ""}`}
-    />
-);
