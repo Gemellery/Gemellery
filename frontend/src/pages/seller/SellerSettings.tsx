@@ -51,6 +51,7 @@ function SellerSettings() {
 
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("token");
 
     // Load seller profile
     useEffect(() => {
@@ -58,7 +59,7 @@ function SellerSettings() {
             try {
                 const res = await fetch(`${API_URL}/api/seller/profile`, {
                     headers: {
-                        Authorization: `Bearer ${user.token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -84,11 +85,11 @@ function SellerSettings() {
     // Save changes
     const handleSave = async () => {
         try {
-            await fetch(`${API_URL}/api/seller/profile`, {
+            const res = await fetch(`${API_URL}/api/seller/profile`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${user.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     full_name: form.full_name,
@@ -97,11 +98,34 @@ function SellerSettings() {
                 }),
             });
 
+            if (!res.ok) throw new Error("Failed to update profile");
+
+            const updatedRes = await fetch(`${API_URL}/api/seller/profile`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const updatedData = await updatedRes.json();
+            setForm(updatedData);
+
+            const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    ...storedUser,
+                    full_name: updatedData.full_name,
+                })
+            );
+
             setIsEditing(false);
+
         } catch (error) {
             console.error(error);
         }
     };
+
 
     return (
         <div className="flex h-screen overflow-hidden">
