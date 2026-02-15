@@ -26,6 +26,7 @@ function AddNewGem() {
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("token");
 
     const handleChange = (
         e: React.ChangeEvent<
@@ -54,9 +55,7 @@ function AddNewGem() {
         if (!certificate)
             return showError("NGJA Certificate file is required.");
 
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-        if (!user?.token)
+        if (!token)
             return showError("You must be logged in to list a gem.");
 
         setIsSubmitting(true);
@@ -73,7 +72,7 @@ function AddNewGem() {
             const response = await fetch("http://localhost:5001/api/gems", {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${user.token}`,
+                    Authorization: `Bearer ${token}`,
                 },
                 body: formData,
             });

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import BasicFooter from '../../components/BasicFooter';
 
 function SignIn() {
-  const [role, setRole] = useState("buyer");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,7 +41,7 @@ function SignIn() {
     const res = await fetch("http://localhost:5001/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, role }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await res.json();
@@ -52,34 +51,20 @@ function SignIn() {
       return;
     }
 
-    // localStorage.setItem("token", data.token);
-    // localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        ...data.user,
-        token: data.token,
-      })
-    );
+    const role = data.user.role?.toLowerCase();
 
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
-    const userRole =
-      data.user?.role ||
-      data.user?.user_type ||
-      data.role;
-
-    if (!userRole) {
-      setError("User role not found");
-      return;
-    }
-
-    if (userRole.toLowerCase() === "buyer") {
-      navigate("/", { replace: true });
-    } else if (userRole.toLowerCase() === "seller") {
+    if (role === "seller") {
       navigate("/seller/dashboard", { replace: true });
+    } else if (role === "buyer") {
+      navigate("/", { replace: true });
+    } else {
+      console.log("Unexpected role:", role);
     }
-  };
 
+  };
 
   const handleRegister = async () => {
     setError("");
@@ -121,7 +106,6 @@ function SignIn() {
     }, 2000);
   };
 
-
   return (
     <>
       <div className="min-h-screen bg-[#fcfbf8] relative pb-24">
@@ -144,24 +128,7 @@ function SignIn() {
             <div className="p-6 space-y-5 bg-[#f3eee5]">
 
               {mode === "signin" ? (
-                /* ================= SIGN IN FORM ================= */
                 <>
-                  {/* Type */}
-                  <div>
-                    <h1 className='text-2xl font-bold text-center mb-8'>Log In</h1>
-                    <label className="block text-xs font-semibold text-black mb-1">
-                      ACCOUNT TYPE
-                    </label>
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      className="w-full px-3 py-2 rounded-md border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
-                    >
-                      <option value="buyer">Buyer</option>
-                      <option value="seller">Seller</option>
-                    </select>
-                  </div>
-
                   {/* Email */}
                   <div>
                     <label className="block text-xs font-semibold text-black mb-1">
@@ -236,7 +203,6 @@ function SignIn() {
                     </select>
                   </div>
 
-
                   <div>
                     <label className="block text-xs font-semibold text-black mb-1">
                       FULL NAME
@@ -248,7 +214,6 @@ function SignIn() {
                       onChange={(e) => setFullName(e.target.value)}
                       className="w-full px-3 py-2 rounded-md border bg-white text-sm"
                     />
-
                   </div>
 
                   {/* Email */}
@@ -380,7 +345,6 @@ function SignIn() {
                     </>
                   )}
 
-
                   {/* Submit */}
                   <button type='button' onClick={handleRegister} className="w-full bg-teal-700 text-white py-3 rounded-md font-semibold hover:bg-teal-800 transition">
                     Create Account →
@@ -417,7 +381,6 @@ function SignIn() {
         <div className="absolute bottom-0 left-0 w-full">
           <BasicFooter />
         </div>
-
       </div >
     </>
   )

@@ -17,7 +17,8 @@ function SellerDashboardLayout() {
     }
 
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const [user, setUser] = useState<any>(null);
+    const token = localStorage.getItem("token");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [seller, setSeller] = useState<any>(null);
     const [gems, setGems] = useState<Gem[]>([]);
@@ -28,7 +29,7 @@ function SellerDashboardLayout() {
             try {
                 const res = await fetch("http://localhost:5001/api/seller/profile", {
                     headers: {
-                        Authorization: `Bearer ${user.token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -51,7 +52,7 @@ function SellerDashboardLayout() {
 
                 const res = await fetch("http://localhost:5001/api/seller/gems/recent", {
                     headers: {
-                        Authorization: `Bearer ${user.token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -71,9 +72,14 @@ function SellerDashboardLayout() {
         fetchRecentGems();
     }, []);
 
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+        setUser(storedUser);
+    }, []);
+
     return (
         <div className="flex h-screen overflow-hidden">
-            <SellerSidebar sellerName={user.full_name || user.email}
+            <SellerSidebar sellerName={user?.full_name || user?.email}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
@@ -86,7 +92,9 @@ function SellerDashboardLayout() {
                     </button>
 
                     <div className="ml-4 md:ml-0">
-                        <h3 className="font-bold text-2xl">Welcome back, {user.full_name}</h3>
+                        <h3 className="font-bold text-2xl">
+                            Welcome back, {user?.full_name}
+                        </h3>
                         <p className="flex items-center text-sm text-gray-500 gap-2">
                             <BadgeCheck className="text-[#1F7A73] size-5" />
                             {seller?.business_name || "Loading business..."}

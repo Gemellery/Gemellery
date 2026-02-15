@@ -100,19 +100,23 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password required" });
+    }
 
     const [rows]: any = await pool.query(
-        "SELECT * FROM user WHERE LOWER(email) = LOWER(?) AND role = ?",
-        [email, role]
+        "SELECT * FROM user WHERE LOWER(email) = LOWER(?)",
+        [email]
     );
-
 
     if (rows.length === 0) {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const user = rows[0];
+
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
@@ -120,11 +124,14 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-        { id: user.user_id, role: user.role },
+        {
+            id: user.user_id,
+            role: user.role,
+            email: user.email
+        },
         process.env.JWT_SECRET as string,
         { expiresIn: "1d" }
     );
-
 
     res.json({
         token,
@@ -135,7 +142,6 @@ export const login = async (req: Request, res: Response) => {
             full_name: user.full_name,
         },
     });
-
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
@@ -170,8 +176,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
         message: "If this email exists, a reset link was sent."
     });
 };
-
-
 
 export const resetPassword = async (req: Request, res: Response) => {
     const { token, password } = req.body;

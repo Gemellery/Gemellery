@@ -38,3 +38,12 @@ export const authGuard = (
     return res.sendStatus(403);
   }
 };
+
+export const authorizeRole = (...allowedRoles: string[]) => {
+  return (req: any, res: any, next: any) => {
+    if (!req.user || !allowedRoles.includes(req.user.role.toLowerCase())) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    next();
+  };
+};

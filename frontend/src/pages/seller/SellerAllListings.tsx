@@ -17,11 +17,13 @@ function SellerAllListings() {
     useEffect(() => {
         const fetchAllGems = async () => {
             try {
+                if (!token) return;
+
                 setLoading(true);
 
                 const res = await fetch("http://localhost:5001/api/seller/gems", {
                     headers: {
-                        Authorization: `Bearer ${user.token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
@@ -31,18 +33,19 @@ function SellerAllListings() {
 
                 const data: Gem[] = await res.json();
                 setGems(data);
+
             } catch (err) {
                 console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchAllGems();
     }, []);
 
 
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("token");
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [gems, setGems] = useState<Gem[]>([]);
@@ -50,8 +53,7 @@ function SellerAllListings() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <SellerSidebar
-                sellerName={user.full_name || user.email}
+            <SellerSidebar sellerName={user?.full_name || user?.email}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
             />
