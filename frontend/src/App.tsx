@@ -22,6 +22,7 @@ import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboardLayout from './pages/Dashboards/admin.dashboard';
 
 function App() {
   return (
@@ -91,6 +92,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin Protected Routes */}
+        {/* <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <BuyerDashboardLayout />
+            </ProtectedRoute>
+          }
+        /> */}
+        <Route path="/admin/dashboard" element={<AdminDashboardLayout />} />
 
       </Routes>
     </BrowserRouter>
