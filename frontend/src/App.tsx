@@ -1,17 +1,17 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './index.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./index.css";
 
-import SignIn from './pages/Signin';
-import Home from './pages/Home';
-import SellerDashboard from './pages/Dashboards/seller.dashboard';
-import BuyerDashboardLayout from './pages/Dashboards/buyer.dashboard';
-import Marketplace from './pages/Marketplace';
-import ShippingForm from './components/ShippingForm';
-import ProductDetail from './pages/ProductDetail';
-import ProductSpecifications from './components/ProductSpecifications';
-import Cart from './components/Cart';
-import About from './pages/About';
-import Contact from './pages/Contact';
+import SignIn from "./pages/Signin";
+import Home from "./pages/Home";
+import SellerDashboard from "./pages/Dashboards/seller.dashboard";
+import BuyerDashboardLayout from "./pages/Dashboards/buyer.dashboard";
+import Marketplace from "./pages/Marketplace";
+import ShippingForm from "./components/ShippingForm";
+import ProductDetail from "./pages/ProductDetail";
+import ProductSpecifications from "./components/ProductSpecifications";
+import Cart from "./components/Cart";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
@@ -20,16 +20,16 @@ import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
 import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
+import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-import AdminDashboardLayout from './pages/Dashboards/admin.dashboard';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Public Routes */}
+        {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<Home />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/marketplace" element={<Marketplace />} />
@@ -46,11 +46,11 @@ function App() {
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
 
-        {/* Seller Protected Routes */}
+        {/* ================= SELLER PROTECTED ROUTES ================= */}
         <Route
           path="/seller/dashboard"
           element={
-            <ProtectedRoute allowedRole="seller">
+            <ProtectedRoute allowedRoles={["seller"]}>
               <SellerDashboard />
             </ProtectedRoute>
           }
@@ -59,7 +59,7 @@ function App() {
         <Route
           path="/add-new-gem"
           element={
-            <ProtectedRoute allowedRole="seller">
+            <ProtectedRoute allowedRoles={["seller"]}>
               <AddNewGem />
             </ProtectedRoute>
           }
@@ -68,7 +68,7 @@ function App() {
         <Route
           path="/seller/listings"
           element={
-            <ProtectedRoute allowedRole="seller">
+            <ProtectedRoute allowedRoles={["seller"]}>
               <SellerAllListings />
             </ProtectedRoute>
           }
@@ -77,32 +77,43 @@ function App() {
         <Route
           path="/seller/SellerSettings"
           element={
-            <ProtectedRoute allowedRole="seller">
+            <ProtectedRoute allowedRoles={["seller"]}>
               <SellerSettings />
             </ProtectedRoute>
           }
         />
 
-        {/* Buyer Protected Routes */}
+        {/* ================= BUYER PROTECTED ROUTES ================= */}
         <Route
           path="/buyer/dashboard"
           element={
-            <ProtectedRoute allowedRole="buyer">
+            <ProtectedRoute allowedRoles={["buyer"]}>
               <BuyerDashboardLayout />
             </ProtectedRoute>
           }
         />
 
-        {/* Admin Protected Routes */}
-        {/* <Route
+        {/* ================= ADMIN PROTECTED ROUTES ================= */}
+        <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute allowedRole="admin">
-              <BuyerDashboardLayout />
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <AdminDashboardLayout />
             </ProtectedRoute>
           }
-        /> */}
-        <Route path="/admin/dashboard" element={<AdminDashboardLayout />} />
+        />
+
+        {/* Example Super Admin Only Route (future use) */}
+        {/* 
+        <Route
+          path="/admin/manage-admins"
+          element={
+            <ProtectedRoute allowedRoles={["super_admin"]}>
+              <AdminManagement />
+            </ProtectedRoute>
+          }
+        />
+        */}
 
       </Routes>
     </BrowserRouter>
