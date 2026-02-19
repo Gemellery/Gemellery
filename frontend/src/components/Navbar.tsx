@@ -31,7 +31,7 @@ function Navbar() {
         break;
 
       case "buyer":
-        navigate("/");
+        navigate("/buyer/dashboard");
         break;
 
       case "admin":
@@ -43,6 +43,7 @@ function Navbar() {
         navigate("/");
     }
   };
+
 
   // const handleLogout = () => {
   //   localStorage.removeItem("token");
