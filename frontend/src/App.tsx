@@ -21,6 +21,7 @@ import JewelryRefine from "./pages/JewelryDesigner/Refine";
 import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
+import ManageAdmins from "./pages/Admin/ManageAdmins";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -28,6 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* <Route path="/admin/manage-admins" element={<ManageAdmins />} /> */}
 
         {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/" element={<Home />} />
@@ -103,17 +105,15 @@ function App() {
           }
         />
 
-        {/* Example Super Admin Only Route (future use) */}
-        {/* 
+        {/* Super Admin Only Route (future use) */}
         <Route
           path="/admin/manage-admins"
           element={
             <ProtectedRoute allowedRoles={["super_admin"]}>
-              <AdminManagement />
+              <ManageAdmins />
             </ProtectedRoute>
           }
         />
-        */}
 
       </Routes>
     </BrowserRouter>

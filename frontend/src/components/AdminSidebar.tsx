@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -10,6 +11,7 @@ import {
   FileText,
   X
 } from "lucide-react";
+import ReAuthModal from "./admin/ReAuthModal";
 
 interface AdminSidebarProps {
   adminName: string;
@@ -27,23 +29,22 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
     navigate("/");
   };
 
-  const isSuperAdmin = role === "super_admin";
+  const isSuperAdmin = role?.toLowerCase() === "super_admin";
+  const [showReAuthModal, setShowReAuthModal] = useState(false);
 
   return (
     <>
       {/* Overlay (mobile) */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
       />
 
       <aside
         className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between
-        transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0`}
+        transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -109,7 +110,7 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
                 </div>
 
                 <button
-                  onClick={() => navigate("/admin/manage-admins")}
+                  onClick={() => setShowReAuthModal(true)}
                   className="flex items-center gap-3 w-full text-left hover:underline"
                 >
                   <UserCog className="w-4 h-4" />
@@ -138,6 +139,15 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
           </button>
         </div>
       </aside>
+      {showReAuthModal && (
+        <ReAuthModal
+          onClose={() => setShowReAuthModal(false)}
+          onSuccess={() => {
+            setShowReAuthModal(false);
+            navigate("/admin/manage-admins");
+          }}
+        />
+      )}
     </>
   );
 }

@@ -9,7 +9,9 @@ const AdminDashboardLayout: React.FC = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     setAdminName(user.full_name || user.email);
-    setRole(user.role);
+    if (user.role) {
+      setRole(user.role.toLowerCase() as "admin" | "super_admin");
+    }
   }, []);
 
   return (
