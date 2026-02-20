@@ -165,3 +165,45 @@ export const getGems = async (req: any, res: any) => {
   }
 };
 
+// Get Gem by ID (with images)
+export const getGemById = async (req: any, res: any) => {
+  try {
+    //Extracting gem ID
+    const gemId = req.params.id;
+    
+    //Validating the ID
+    if (!gemId) {
+      return res.status(400).json({
+        success: false,
+        message: "Gem ID is required",
+      });
+    }
+    
+    // Fetching gem details from the model
+    const gem = await gemModel.getGemById(gemId);
+    
+    //Check if gem was found
+    if (!gem) {
+      return res.status(404).json({
+        success: false,
+        message: "Gem not found",
+      });
+    }
+    
+    //Send success response with gem details
+    res.json({
+      success: true,
+      data: gem,
+    });
+  } catch (error) {
+    console.error("Error fetching gem:", error);
+    
+    // Send error response
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch gem details",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
