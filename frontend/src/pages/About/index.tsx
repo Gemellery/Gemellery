@@ -278,7 +278,7 @@ function About() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
               {/* Member 1*/}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team1.jpeg"
                     alt="Samitha Bandara"
@@ -294,7 +294,7 @@ function About() {
 
               {/* Member 2 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team2.jpg"
                     alt="Pasindu Jayasekara"
@@ -310,7 +310,7 @@ function About() {
 
               {/* Member 3 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team3.jpeg"
                     alt="Pamuditha Silva"
@@ -326,7 +326,7 @@ function About() {
 
               {/* Member 4 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team4.jpg"
                     alt="Navindu Basnayake"
@@ -342,7 +342,7 @@ function About() {
 
               {/* Member 5 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team5.jpg"
                     alt="Akil Dikshan"
@@ -358,7 +358,7 @@ function About() {
 
               {/* Member 6 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200 border-4 border-[#C9A66B] shadow-md">
                   <img
                     src="/team/team6.jpg"
                     alt="Trivon Fernando"
@@ -375,7 +375,7 @@ function About() {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* Action Section*/}
         <section className="py-20 px-4 text-center bg-[#faf9f7]">
           <div className="max-w-3xl mx-auto">
             <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6">
