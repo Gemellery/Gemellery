@@ -1,7 +1,5 @@
-// About.tsx
 import { ArrowRight, Shield, Award, Sparkles, CheckCircle } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import AdvanedFooter from '../../components/AdvancedFooter';
 import AdvancedFooter from '../../components/AdvancedFooter';
 
 function About() {
@@ -14,11 +12,14 @@ function About() {
         {/* Hero Section */}
         <section className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200">
           <div className="absolute inset-0 opacity-10">
-            <div className="w-full h-full" style={{
-              backgroundImage: "url('/sample_gems/Image.png')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}></div>
+            <div
+              className="w-full h-full"
+              style={{
+                backgroundImage: "url('/sample_gems/Image.png')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            ></div>
           </div>
           
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
@@ -77,8 +78,8 @@ function About() {
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <div className="rounded-3xl overflow-hidden shadow-xl">
-                <img 
-                  src="/sample_gems/handfulgems.jpg" 
+                <img
+                  src="/sample_gems/handfulgems.jpg"
                   alt="Hands holding gemstones"
                   className="w-full h-[500px] object-cover"
                 />
@@ -242,8 +243,8 @@ function About() {
                   </div>
                 </div>
                 <div className="p-8">
-                  <img 
-                    src="/sample_gems/AIring.jpg" 
+                  <img
+                    src="/sample_gems/AIring.jpg"
                     alt="AI Ring Design"
                     className="w-full rounded-xl"
                   />
@@ -251,11 +252,124 @@ function About() {
                     <span className="text-sm text-gray-600">Generating design...</span>
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-teal-700 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-teal-700 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-teal-700 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div
+                        className="w-2 h-2 bg-teal-700 rounded-full animate-bounce"
+                        style={{ animationDelay: '0.1s' }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-teal-700 rounded-full animate-bounce"
+                        style={{ animationDelay: '0.2s' }}
+                      ></div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team Section */}
+        <section id="members" className="bg-[#FAF8F3] py-20">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-12">
+              Meet the Team
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
+              {/* Member 1*/}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team1.jpeg"
+                    alt="Samitha Bandara"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Samitha Bandara
+                </h3>
+                <p className="text-gray-600">Team Leader / Frontend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
+              </div>
+
+              {/* Member 2 */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team2.jpg"
+                    alt="Pasindu Jayasekara"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Pasindu Jayasekara
+                </h3>
+                <p className="text-gray-600">Backend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
+              </div>
+
+              {/* Member 3 */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team3.jpeg"
+                    alt="Pamuditha Silva"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Pamuditha Silva
+                </h3>
+                <p className="text-gray-600">Backend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
+              </div>
+
+              {/* Member 4 */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team4.jpg"
+                    alt="Navindu Basnayake"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Navindu Basnayake
+                </h3>
+                <p className="text-gray-600">Frontend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
+              </div>
+
+              {/* Member 5 */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team5.jpg"
+                    alt="Akil Dikshan"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Akil Dikshan
+                </h3>
+                <p className="text-gray-600">Backend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
+              </div>
+
+              {/* Member 6 */}
+              <div className="flex flex-col items-center">
+                <div className="w-40 h-40 rounded-full overflow-hidden mb-4 bg-gray-200">
+                  <img
+                    src="/team/team6.jpg"
+                    alt="Trivon Fernando"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-[#2F3B2F]">
+                  Trivon Fernando
+                </h3>
+                <p className="text-gray-600">Frontend Developer</p>
+                <div className="w-12 h-[3px] bg-[#C9A66B] mt-3"></div>
               </div>
             </div>
           </div>
