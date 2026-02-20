@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import pool from "../database";
+import { gemModel } from "../models/Gem.model";
 
 export const createGem = async (req: Request, res: Response) => {
     const conn = await pool.getConnection();
@@ -100,5 +101,67 @@ export const createGem = async (req: Request, res: Response) => {
     } finally {
         conn.release(); 
     }
+};
+
+// Model method to fetch gems with filters and pagination
+export const getGems = async (req: any, res: any) => {
+  try {
+    const page = parseInt(req.query.page) || 1;  
+    const limit = parseInt(req.query.limit) || 12;  
+    
+    // Calculate offset for SQL query
+    const offset = (page - 1) * limit;
+    
+    // Extract filters from query parameters
+    const filters: any = {};
+    
+    if (req.query.type) {
+      filters.type = req.query.type;
+    }
+    if (req.query.priceMin) {
+      filters.priceMin = parseFloat(req.query.priceMin);
+    }
+    if (req.query.priceMax) {
+      filters.priceMax = parseFloat(req.query.priceMax);
+    }
+    if (req.query.origin) {
+      filters.origin = req.query.origin;
+    }
+    if (req.query.clarity) {
+      filters.clarity = req.query.clarity;
+    }
+    if (req.query.search) {
+      filters.search = req.query.search; 
+    }
+    
+    // Fetch gems from the model with applied filters and pagination
+    const gems = await gemModel.getGems({ ...filters, offset, limit });
+    const total = await gemModel.getGemCount(filters);
+    
+    const totalPages = Math.ceil(total / limit);
+    
+    // Send response with gems and pagination info
+    res.json({
+      success: true,
+      data: gems,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching gems:", error);
+    
+    // Send error response
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch gems",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
 };
 
