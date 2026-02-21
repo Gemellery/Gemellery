@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response) => {
         await conn.beginTransaction();
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const [userResult]: any = await pool.query(
+        const [userResult]: any = await conn.query(
             `INSERT INTO user
             (email, password, role, full_name, mobile, joined_date, country_id)
             VALUES (?, ?, ?, ?, ?, CURDATE(), ?)`,
@@ -57,23 +57,72 @@ export const register = async (req: Request, res: Response) => {
 
         const user_id = userResult.insertId;
 
+        //     if (role === "seller") {
+        //         const licenseUrl = req.file
+        //             ? `/uploads/seller_licenses/${req.file.filename}`
+        //             : null;
+
+        //         await conn.query(
+        //             `INSERT INTO seller
+        //  (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url)
+        //  VALUES (?, ?, ?, ?, ?)`,
+        //             [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
+        //         );
+        //     }
+        //     // edited pool to conn
+        //     if (address) {
+        //         await conn.query(
+        //             `INSERT INTO address (address, user_id) VALUES (?, ?)`,
+        //             [address, user_id]
+        //         );
+        //     }
+
         if (role === "seller") {
+
+            const normalizedBusiness = business_name.trim().toUpperCase();
+            const normalizedNgja = ngja_registration_no.trim().toUpperCase();
+
+            // 1️⃣ Check if NGJA license already used
+            const [existingSeller]: any = await conn.query(
+                "SELECT * FROM seller WHERE ngja_registration_no = ?",
+                [normalizedNgja]
+            );
+
+            if (existingSeller.length > 0) {
+                await conn.rollback();
+                return res.status(400).json({
+                    message: "This NGJA license is already registered"
+                });
+            }
+
+            // 2️⃣ Check against NGJA official table
+            const [ngjaRows]: any = await conn.query(
+                `SELECT *
+         FROM ngja_registered_sellers
+         WHERE ngja_registration_no = ?
+         AND UPPER(business_name) = ?`,
+                [normalizedNgja, normalizedBusiness]
+            );
+
+            let verificationStatus = "pending";
+
+            if (ngjaRows.length > 0) {
+                // 3️⃣ Check license expiry
+                const expireDate = new Date(ngjaRows[0].license_expire_date);
+                if (expireDate >= new Date()) {
+                    verificationStatus = "approved"; // AUTO VERIFIED
+                }
+            }
+
             const licenseUrl = req.file
                 ? `/uploads/seller_licenses/${req.file.filename}`
                 : null;
 
             await conn.query(
                 `INSERT INTO seller
-     (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url)
-     VALUES (?, ?, ?, ?, ?)`,
-                [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
-            );
-        }
-        // edited pool to conn
-        if (address) {
-            await conn.query(
-                `INSERT INTO address (address, user_id) VALUES (?, ?)`,
-                [address, user_id]
+         (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url, verification_status)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+                [user_id, normalizedBusiness, business_reg_no, normalizedNgja, licenseUrl, verificationStatus]
             );
         }
 
@@ -121,6 +170,19 @@ export const login = async (req: Request, res: Response) => {
 
     if (!match) {
         return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (user.role.toLowerCase() === "seller") {
+        const [sellerRows]: any = await pool.query(
+            "SELECT verification_status FROM seller WHERE seller_id = ?",
+            [user.user_id]
+        );
+
+        if (!sellerRows.length || sellerRows[0].verification_status !== "approved") {
+            return res.status(403).json({
+                message: "Your seller account is pending admin approval"
+            });
+        }
     }
 
     const token = jwt.sign(
