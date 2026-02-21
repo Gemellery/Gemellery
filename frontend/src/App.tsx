@@ -24,6 +24,7 @@ import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import VerifySellers from "./pages/Admin/VerifySellers";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path="/jewelry_designer" element={<JewelryDesigner />} />
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+        <Route path="/admin/verify-sellers" element={<VerifySellers />} />
 
         {/* ================= SELLER PROTECTED ROUTES ================= */}
         <Route

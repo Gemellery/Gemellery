@@ -8,6 +8,7 @@ import path from "path";
 import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
 import superAdminRoutes from "./routes/superAdmin.routes";
+import adminSellerRoutes from "./routes/adminSeller.routes";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
 app.use("/api/super-admin", superAdminRoutes);
+app.use("/api/admin", adminSellerRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {

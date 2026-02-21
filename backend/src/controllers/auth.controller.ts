@@ -57,32 +57,11 @@ export const register = async (req: Request, res: Response) => {
 
         const user_id = userResult.insertId;
 
-        //     if (role === "seller") {
-        //         const licenseUrl = req.file
-        //             ? `/uploads/seller_licenses/${req.file.filename}`
-        //             : null;
-
-        //         await conn.query(
-        //             `INSERT INTO seller
-        //  (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url)
-        //  VALUES (?, ?, ?, ?, ?)`,
-        //             [user_id, business_name, business_reg_no, ngja_registration_no, licenseUrl]
-        //         );
-        //     }
-        //     // edited pool to conn
-        //     if (address) {
-        //         await conn.query(
-        //             `INSERT INTO address (address, user_id) VALUES (?, ?)`,
-        //             [address, user_id]
-        //         );
-        //     }
-
         if (role === "seller") {
 
             const normalizedBusiness = business_name.trim().toUpperCase();
             const normalizedNgja = ngja_registration_no.trim().toUpperCase();
 
-            // 1️⃣ Check if NGJA license already used
             const [existingSeller]: any = await conn.query(
                 "SELECT * FROM seller WHERE ngja_registration_no = ?",
                 [normalizedNgja]
@@ -95,7 +74,6 @@ export const register = async (req: Request, res: Response) => {
                 });
             }
 
-            // 2️⃣ Check against NGJA official table
             const [ngjaRows]: any = await conn.query(
                 `SELECT *
          FROM ngja_registered_sellers
@@ -107,10 +85,9 @@ export const register = async (req: Request, res: Response) => {
             let verificationStatus = "pending";
 
             if (ngjaRows.length > 0) {
-                // 3️⃣ Check license expiry
                 const expireDate = new Date(ngjaRows[0].license_expire_date);
                 if (expireDate >= new Date()) {
-                    verificationStatus = "approved"; // AUTO VERIFIED
+                    verificationStatus = "approved";
                 }
             }
 
