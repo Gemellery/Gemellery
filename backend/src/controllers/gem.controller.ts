@@ -103,148 +103,138 @@ export const createGem = async (req: Request, res: Response) => {
     }
 };
 
-// Model method to fetch gems with filters and pagination
+// Fetch gems with filters and pagination
 export const getGems = async (req: any, res: any) => {
   try {
-    //Query parameters for pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
     const offset = (page - 1) * limit;
-    
-    // Filter parameters
-    const gemType = req.query.gemType;             
-    const priceMin = parseFloat(req.query.priceMin);
-    const priceMax = parseFloat(req.query.priceMax);
-    const origin = req.query.origin;
-    const isCertified = req.query.isCertified;     
-    const color = req.query.color;                  
-    const clarity = req.query.clarity;              
-    const cut = req.query.cut;                      
 
-    let whereConditions = [];
-    let queryParams = [];
+    let whereConditions: string[] = [];
+    let queryParams: any[] = [];
 
     // Only show available gems
     whereConditions.push("g.status = ?");
     queryParams.push("Available");
 
     // Filter by gem type
-    if (gemType) {
+    if (req.query.gemType) {
       whereConditions.push("g.gem_type = ?");
-      queryParams.push(gemType);
+      queryParams.push(req.query.gemType);
     }
 
     // Filter by price range
-    if (!isNaN(priceMin)) {
+    if (req.query.priceMin !== undefined && !isNaN(parseFloat(req.query.priceMin))) {
       whereConditions.push("g.price >= ?");
-      queryParams.push(priceMin);
+      queryParams.push(parseFloat(req.query.priceMin));
     }
-    if (!isNaN(priceMax)) {
+    if (req.query.priceMax !== undefined && !isNaN(parseFloat(req.query.priceMax))) {
       whereConditions.push("g.price <= ?");
-      queryParams.push(priceMax);
+      queryParams.push(parseFloat(req.query.priceMax));
     }
 
     // Filter by origin
-    if (origin) {
+    if (req.query.origin) {
       whereConditions.push("g.origin = ?");
-      queryParams.push(origin);
+      queryParams.push(req.query.origin);
     }
 
     // Filter by certification status
-    if (isCertified === "true") {
+    if (req.query.isCertified === "true") {
       whereConditions.push("g.ngja_certificate_url IS NOT NULL");
-    } else if (isCertified === "false") {
+    } else if (req.query.isCertified === "false") {
       whereConditions.push("g.ngja_certificate_url IS NULL");
     }
 
     // Filter by color
-    if (color) {
+    if (req.query.color) {
       whereConditions.push("g.color = ?");
-      queryParams.push(color);
+      queryParams.push(req.query.color);
     }
 
     // Filter by clarity grade
-    if (clarity) {
+    if (req.query.clarity) {
       whereConditions.push("g.clarity = ?");
-      queryParams.push(clarity);
+      queryParams.push(req.query.clarity);
     }
 
     // Filter by cut
-    if (cut) {
+    if (req.query.cut) {
       whereConditions.push("g.cut = ?");
-      queryParams.push(cut);
+      queryParams.push(req.query.cut);
     }
 
-    //Combine all WHERE conditions with AND
+    // Combine all WHERE conditions with AND
     let whereClause = whereConditions.join(" AND ");
 
-    //Build main query to fetch gems
-    const query = `
+    // Build main query to fetch gems with SQL aliases
+    let query = `
       SELECT 
-        g.gem_id,
-        g.gem_name,
-        g.gem_type,
+        g.gem_id as id,
+        g.gem_name as name,
+        g.gem_type as type,
         g.price,
-        g.carat,
-        g.color,
+        g.carat as weight,
         g.cut,
         g.clarity,
+        g.color,
         g.origin,
         g.description,
-        g.ngja_certificate_no,
-        g.ngja_certificate_url,
-        g.verification_status,
-        g.status,
-        g.created_at,
+        g.ngja_certificate_no as certification,
+        g.ngja_certificate_url as certificateUrl,
+        JSON_ARRAYAGG(gi.image_url) as images,
         g.seller_id,
         u.full_name as seller_name,
-        u.mobile as seller_mobile,
-        JSON_ARRAYAGG(gi.image_url) as images
+        g.verification_status as verificationStatus,
+        CASE 
+          WHEN g.verification_status = 'verified' THEN true
+          ELSE false
+        END as verified,
+        g.status,
+        g.created_at as createdAt
       FROM gem g
-      LEFT JOIN user u ON g.seller_id = u.user_id
       LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+      LEFT JOIN user u ON g.seller_id = u.user_id
       WHERE ${whereClause}
+      GROUP BY g.gem_id, g.gem_name, g.gem_type, g.price, g.carat, g.cut, g.clarity, g.color, g.origin, g.description, g.ngja_certificate_no, g.ngja_certificate_url, g.seller_id, u.full_name, g.verification_status, g.status, g.created_at
       ORDER BY g.created_at DESC
       LIMIT ? OFFSET ?
     `;
 
-    // Add pagination parameters
+    // Add pagination params
     queryParams.push(limit, offset);
 
-    //Execute main query
-    const [gems]: any = await pool.query(query, queryParams);
+    // Execute query
+    const [gems] = await pool.query(query, queryParams) as any;
 
-    //Build count query to get total gems matching filters
+    // Get total count without limit/offset for pagination
+    const countQueryParams = queryParams.slice(0, -2);
     const countQuery = `
-      SELECT COUNT(*) as total
-      FROM gem gm
-      LEFT JOIN users u ON g.seller_id = u.id
+      SELECT COUNT(DISTINCT g.gem_id) as total
+      FROM gem g
+      LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+      LEFT JOIN user u ON g.seller_id = u.user_id
       WHERE ${whereClause}
     `;
-
-    // Execute count query with same filter params (without LIMIT/OFFSET)
-    const countQueryParams = queryParams.slice(0, -2);
     const [countResult]: any = await pool.query(countQuery, countQueryParams);
-    const total = countResult[0].total;
-    const totalPages = Math.ceil(total / limit);
-    
-    res.json({
+    const total = countResult[0]?.total || 0;
+
+    // Return response with aliased field names
+    return res.status(200).json({
       success: true,
       data: gems,
       pagination: {
-        currentPage: page,
-        totalPages: totalPages,
-        totalItems: total,
-        itemsPerPage: limit,
-      },
+        page,
+        limit,
+        total
+      }
     });
 
   } catch (error) {
     console.error("Error fetching gems:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Failed to fetch gems",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Failed to fetch gems"
     });
   }
 };
@@ -252,10 +242,9 @@ export const getGems = async (req: any, res: any) => {
 // Get Gem by ID (with images)
 export const getGemById = async (req: any, res: any) => {
   try {
-    //Extracting gem ID
     const gemId = req.params.id;
     
-    //Validating the ID
+    // Validate the ID
     if (!gemId) {
       return res.status(400).json({
         success: false,
@@ -263,10 +252,10 @@ export const getGemById = async (req: any, res: any) => {
       });
     }
     
-    // Fetching gem details from the model
+    // Fetch gem details from the model
     const gem = await gemModel.getGemById(gemId);
     
-    //Check if gem was found
+    // Check if gem was found
     if (!gem) {
       return res.status(404).json({
         success: false,
@@ -274,7 +263,7 @@ export const getGemById = async (req: any, res: any) => {
       });
     }
     
-    //Send success response with gem details
+    // Send success response with gem details
     res.json({
       success: true,
       data: gem,
