@@ -48,26 +48,27 @@ export const gemModel = {
     try {
       let query = `
         SELECT 
-          g.gem_id,
-          g.gem_name,
-          g.gem_type,
+          g.gem_id as id,
+          g.gem_name as name,
+          g.gem_type as type,
           g.price,
-          g.carat,
+          g.carat as weight,
           g.cut,
           g.clarity,
           g.color,
           g.origin,
           g.description,
-          g.ngja_certificate_no,
-          g.ngja_certificate_url,
-          gi.image_url,
+          g.ngja_certificate_no as certification,
+          g.ngja_certificate_url as certificateUrl,
+          gi.image_url as image,
           u.full_name as seller_name,
-          g.verification_status,
-          g.created_at,
+          g.verification_status as verificationStatus,
           CASE 
-            WHEN g.ngja_certificate_url IS NOT NULL THEN 1 
-            ELSE 0 
-          END as has_certificate
+            WHEN g.verification_status = 'verified' THEN true
+            ELSE false
+          END as verified,
+          g.status,
+          g.created_at as createdAt
         FROM gem g
         LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
         LEFT JOIN user u ON g.seller_id = u.user_id
