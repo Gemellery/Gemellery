@@ -24,6 +24,8 @@ import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import VerifySellers from "./pages/Admin/VerifySellers";
+import VerifyGems from "./pages/Admin/VerifyGems";
 
 function App() {
   return (
@@ -101,6 +103,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <AdminDashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-gems"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <VerifyGems />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/verify-sellers"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <VerifySellers />
             </ProtectedRoute>
           }
         />
