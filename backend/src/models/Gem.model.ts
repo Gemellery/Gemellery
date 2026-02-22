@@ -15,8 +15,6 @@ export interface GemRow extends RowDataPacket {
   description: string;
   ngia_certificate_no: string;
   ngia_certificate_url: string;
-  treatment?: string;
-  certification_body?: string;
   status: string;
   updated_date: Date;
 }
@@ -66,8 +64,6 @@ export const gemModel = {
         g.description,
         g.ngia_certificate_no,
         g.ngia_certificate_url,
-        g.treatment,
-        g.certification_body,
         g.status,
         g.updated_date,
         u.full_name as seller_name,
@@ -124,18 +120,6 @@ export const gemModel = {
       params.push(searchTerm, searchTerm, searchTerm);
     }
 
-    // Filter by certification body
-    if (filters?.certification) {
-      query += ' AND g.certification_body = ?';
-      params.push(filters.certification);
-    }
-
-    // Filter by treatment
-    if (filters?.treatment) {
-      query += ' AND g.treatment = ?';
-      params.push(filters.treatment);
-    }
-
     // Filter by seller verification status
     if (filters?.sellerVerification) {
       query += ' AND s.verification_status = ?';
@@ -176,8 +160,6 @@ export const gemModel = {
         g.description,
         g.ngia_certificate_no,
         g.ngia_certificate_url,
-        g.treatment,
-        g.certification_body,
         g.status,
         g.updated_date,
         g.created_at,
@@ -295,14 +277,6 @@ export const gemModel = {
       const searchTerm = `%${filters.search}%`;
       params.push(searchTerm, searchTerm, searchTerm);
     }
-    if (filters?.certification) {
-      query += ' AND g.certification_body = ?';
-      params.push(filters.certification);
-    }
-    if (filters?.treatment) {
-      query += ' AND g.treatment = ?';
-      params.push(filters.treatment);
-    }
     if (filters?.sellerVerification) {
       query += ' AND s.verification_status = ?';
       params.push(filters.sellerVerification);
@@ -317,16 +291,12 @@ export const gemModel = {
     const [types] = await pool.query<RowDataPacket[]>('SELECT DISTINCT gem_type FROM gem WHERE status = "Available"');
     const [origins] = await pool.query<RowDataPacket[]>('SELECT DISTINCT origin FROM gem WHERE status = "Available"');
     const [clarities] = await pool.query<RowDataPacket[]>('SELECT DISTINCT clarity FROM gem WHERE status = "Available"');
-    const [certifications] = await pool.query<RowDataPacket[]>('SELECT DISTINCT certification_body FROM gem WHERE status = "Available" AND certification_body IS NOT NULL');
-    const [treatments] = await pool.query<RowDataPacket[]>('SELECT DISTINCT treatment FROM gem WHERE status = "Available" AND treatment IS NOT NULL');
     const [priceRange] = await pool.query<RowDataPacket[]>('SELECT MIN(price) as minPrice, MAX(price) as maxPrice FROM gem WHERE status = "Available"');
 
     return {
       types: types.map((t: any) => t.gem_type).filter(Boolean),
       origins: origins.map((o: any) => o.origin).filter(Boolean),
       clarities: clarities.map((c: any) => c.clarity).filter(Boolean),
-      certifications: certifications.map((c: any) => c.certification_body).filter(Boolean),
-      treatments: treatments.map((t: any) => t.treatment).filter(Boolean),
       priceRange: priceRange[0]
     };
   }

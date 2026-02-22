@@ -112,7 +112,6 @@ export const getGems = async (req: any, res: any) => {
     // Calculate offset for SQL query
     const offset = (page - 1) * limit;
     
-    // Extract filters from query parameters
     const filters: any = {};
     
     if (req.query.type) {
@@ -133,9 +132,6 @@ export const getGems = async (req: any, res: any) => {
     if (req.query.search) {
       filters.search = req.query.search; 
     }
-    if (req.query.certification) {
-      filters.certification = req.query.certification;
-    }
     if (req.query.treatment) {
       filters.treatment = req.query.treatment;
     }
@@ -148,7 +144,6 @@ export const getGems = async (req: any, res: any) => {
     
     const totalPages = Math.ceil(total / limit);
     
-    // Send response with gems and pagination info
     res.json({
       success: true,
       data: gems,
@@ -163,8 +158,6 @@ export const getGems = async (req: any, res: any) => {
     });
   } catch (error) {
     console.error("Error fetching gems:", error);
-    
-    // Send error response
     res.status(500).json({
       success: false,
       message: "Failed to fetch gems",
