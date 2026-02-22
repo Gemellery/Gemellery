@@ -314,12 +314,12 @@ export const gemModel = {
 
   // Get available filters for marketplace UI
   async getFilterOptions(): Promise<any> {
-    const [types] = await pool.query('SELECT DISTINCT gem_type FROM gem WHERE status = "Available"');
-    const [origins] = await pool.query('SELECT DISTINCT origin FROM gem WHERE status = "Available"');
-    const [clarities] = await pool.query('SELECT DISTINCT clarity FROM gem WHERE status = "Available"');
-    const [certifications] = await pool.query('SELECT DISTINCT certification_body FROM gem WHERE status = "Available" AND certification_body IS NOT NULL');
-    const [treatments] = await pool.query('SELECT DISTINCT treatment FROM gem WHERE status = "Available" AND treatment IS NOT NULL');
-    const [priceRange] = await pool.query('SELECT MIN(price) as minPrice, MAX(price) as maxPrice FROM gem WHERE status = "Available"');
+    const [types] = await pool.query<RowDataPacket[]>('SELECT DISTINCT gem_type FROM gem WHERE status = "Available"');
+    const [origins] = await pool.query<RowDataPacket[]>('SELECT DISTINCT origin FROM gem WHERE status = "Available"');
+    const [clarities] = await pool.query<RowDataPacket[]>('SELECT DISTINCT clarity FROM gem WHERE status = "Available"');
+    const [certifications] = await pool.query<RowDataPacket[]>('SELECT DISTINCT certification_body FROM gem WHERE status = "Available" AND certification_body IS NOT NULL');
+    const [treatments] = await pool.query<RowDataPacket[]>('SELECT DISTINCT treatment FROM gem WHERE status = "Available" AND treatment IS NOT NULL');
+    const [priceRange] = await pool.query<RowDataPacket[]>('SELECT MIN(price) as minPrice, MAX(price) as maxPrice FROM gem WHERE status = "Available"');
 
     return {
       types: types.map((t: any) => t.gem_type).filter(Boolean),
