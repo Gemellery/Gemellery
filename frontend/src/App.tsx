@@ -107,18 +107,18 @@ function App() {
           }
         />
         <Route
-          path="/admin/manage-gems"
-          element={
-            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
-              <VerifyGems />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/admin/verify-sellers"
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <VerifySellers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-gems"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <VerifyGems />
             </ProtectedRoute>
           }
         />
