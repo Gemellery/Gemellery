@@ -25,6 +25,7 @@ import ManageAdmins from "./pages/Admin/ManageAdmins";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import VerifySellers from "./pages/Admin/VerifySellers";
+import VerifyGems from "./pages/Admin/VerifyGems";
 
 function App() {
   return (
@@ -48,7 +49,6 @@ function App() {
         <Route path="/jewelry_designer" element={<JewelryDesigner />} />
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
-        <Route path="/admin/verify-sellers" element={<VerifySellers />} />
 
         {/* ================= SELLER PROTECTED ROUTES ================= */}
         <Route
@@ -103,6 +103,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <AdminDashboardLayout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-gems"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <VerifyGems />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/verify-sellers"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <VerifySellers />
             </ProtectedRoute>
           }
         />
