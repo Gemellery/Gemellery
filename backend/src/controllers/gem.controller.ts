@@ -133,8 +133,16 @@ export const getGems = async (req: any, res: any) => {
     if (req.query.search) {
       filters.search = req.query.search; 
     }
+    if (req.query.certification) {
+      filters.certification = req.query.certification;
+    }
+    if (req.query.treatment) {
+      filters.treatment = req.query.treatment;
+    }
+    if (req.query.sellerVerification) {
+      filters.sellerVerification = req.query.sellerVerification;
+    }
     
-    // Fetch gems from the model with applied filters and pagination
     const gems = await gemModel.getGems({ ...filters, offset, limit });
     const total = await gemModel.getGemCount(filters);
     
