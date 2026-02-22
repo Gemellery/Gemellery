@@ -87,11 +87,11 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
             </button>
 
             <button
-              onClick={() => navigate("/admin/users")}
+              onClick={() => navigate("/admin/manage-usres")}
               className="flex items-center gap-3 w-full text-left hover:underline"
             >
               <Users className="w-4 h-4" />
-              Users
+              Manage Users
             </button>
 
             <button
