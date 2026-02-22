@@ -30,7 +30,6 @@ export interface Gem extends GemListItem {
 export const gemModel = {
   // Fetch gems with filters
   getGems: async (params: any) => {
-    // Destructure all filter parameters
     const { 
       limit, 
       offset, 
@@ -77,13 +76,13 @@ export const gemModel = {
       
       const queryParams: any[] = [];
       
-      //Gem Type
+      // Gem Type Filter
       if (type) {
         query += ` AND g.gem_type = ?`;
         queryParams.push(type);
       }
       
-      //Price Range
+      // Price Range Filter
       if (priceMin !== undefined) {
         query += ` AND g.price >= ?`;
         queryParams.push(priceMin);
@@ -93,43 +92,38 @@ export const gemModel = {
         queryParams.push(priceMax);
       }
       
-      //Origin (Country)
+      // Origin Filter
       if (origin) {
         query += ` AND g.origin = ?`;
         queryParams.push(origin);
       }
       
-      //Clarity Grade
+      // Clarity Filter
       if (clarity) {
         query += ` AND g.clarity = ?`;
         queryParams.push(clarity);
       }
       
-      //Color Grade
+      // Color Filter
       if (color) {
         query += ` AND g.color = ?`;
         queryParams.push(color);
       }
       
-      //Certificate Existence
+      // Certificate Filter
       if (hasCertificate === 'true') {
         query += ` AND g.ngja_certificate_url IS NOT NULL`;
       } else if (hasCertificate === 'false') {
         query += ` AND g.ngja_certificate_url IS NULL`;
       }
       
-      if (sellerVerified === 'true') {
-        query += ` AND s.verification_status = 'verified'`;
-      }
-      
-      //Search Term (across name, gem type, origin)
+      // Search Filter
       if (search) {
         query += ` AND (g.gem_name LIKE ? OR g.gem_type LIKE ? OR g.origin LIKE ?)`;
-        const searchTerm = `%${search}%`;
-        queryParams.push(searchTerm, searchTerm, searchTerm);
+        queryParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
       }
       
-      // Group and Paginate
+      // Group by gem and add pagination
       query += ` GROUP BY g.gem_id ORDER BY g.created_at DESC LIMIT ? OFFSET ?`;
       queryParams.push(limit, offset);
       

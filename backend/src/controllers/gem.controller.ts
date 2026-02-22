@@ -130,23 +130,23 @@ export const getGems = async (req: any, res: any) => {
 
     // Filter by gem type
     if (gemType) {
-      whereConditions.push("gm.gem_type = ?");
+      whereConditions.push("g.gem_type = ?");
       queryParams.push(gemType);
     }
 
     // Filter by price range
     if (!isNaN(priceMin)) {
-      whereConditions.push("gm.price >= ?");
+      whereConditions.push("g.price >= ?");
       queryParams.push(priceMin);
     }
     if (!isNaN(priceMax)) {
-      whereConditions.push("gm.price <= ?");
+      whereConditions.push("g.price <= ?");
       queryParams.push(priceMax);
     }
 
     // Filter by origin
     if (origin) {
-      whereConditions.push("gm.origin = ?");
+      whereConditions.push("g.origin = ?");
       queryParams.push(origin);
     }
 
