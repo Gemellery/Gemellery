@@ -152,7 +152,13 @@ function AdminUserManagement() {
                         <Menu className="w-6 h-6" />
                     </button>
                     <h1 className="text-xl font-semibold">
-                        User Management Dashboard
+                        User Management
+                    </h1>
+                </div>
+
+                <div className="hidden md:flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-semibold">
+                        User Management
                     </h1>
                 </div>
 

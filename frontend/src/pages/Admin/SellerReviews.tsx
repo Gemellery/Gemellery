@@ -111,6 +111,8 @@ function ManageSellerReviews() {
         indexOfLastRow
     );
 
+    const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
     return (
         <div className="flex h-screen bg-gray-100">
             <AdminSidebar
@@ -176,7 +178,8 @@ function ManageSellerReviews() {
                             {paginatedReviews.map((r) => (
                                 <tr
                                     key={r.review_id}
-                                    className="border-t hover:bg-gray-50 transition"
+                                    onClick={() => setSelectedReview(r)}
+                                    className="border-t hover:bg-gray-50 transition cursor-pointer"
                                 >
                                     <td className="p-4">
                                         <div className="font-medium">
@@ -211,8 +214,12 @@ function ManageSellerReviews() {
                                         </div>
                                     </td>
 
-                                    <td className="p-4 max-w-xs truncate">
-                                        {r.review || "-"}
+                                    <td className="p-4 max-w-xs">
+                                        {r.review
+                                            ? r.review.length > 80
+                                                ? r.review.substring(0, 80) + "..."
+                                                : r.review
+                                            : "-"}
                                     </td>
 
                                     <td className="p-4">
@@ -223,7 +230,10 @@ function ManageSellerReviews() {
 
                                     <td className="p-4">
                                         <button
-                                            onClick={() => deleteReview(r.review_id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteReview(r.review_id);
+                                            }}
                                             className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
                                         >
                                             <Trash2 size={14} />
@@ -294,6 +304,78 @@ function ManageSellerReviews() {
                             >
                                 Next
                             </button>
+                        </div>
+                    </div>
+                )}
+
+                {selectedReview && (
+                    <div className="fixed inset-0 bg-gray-200/60 flex items-center justify-center z-50">
+                        <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 relative">
+
+                            <button
+                                onClick={() => setSelectedReview(null)}
+                                className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                            >
+                                ✕
+                            </button>
+
+                            <h2 className="text-xl font-semibold mb-4">
+                                Review Details
+                            </h2>
+
+                            <div className="space-y-4 text-sm">
+
+                                <div>
+                                    <h3 className="font-semibold">Seller</h3>
+                                    <p>{selectedReview.business_name}</p>
+                                    <p className="text-gray-500">
+                                        {selectedReview.seller_full_name} ({selectedReview.seller_email})
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Buyer</h3>
+                                    <p>{selectedReview.buyer_name}</p>
+                                    <p className="text-gray-500">
+                                        {selectedReview.buyer_email}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Rating</h3>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        {[...Array(selectedReview.rating)].map((_, i) => (
+                                            <Star
+                                                key={i}
+                                                size={16}
+                                                className="text-yellow-500 fill-yellow-500"
+                                            />
+                                        ))}
+                                        <span className="ml-2 text-gray-500">
+                                            ({selectedReview.rating})
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Review</h3>
+                                    <p className="mt-1 text-gray-700 whitespace-pre-wrap">
+                                        {selectedReview.review || "-"}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold">Date</h3>
+                                    <p>
+                                        {selectedReview.review_date
+                                            ? new Date(
+                                                selectedReview.review_date
+                                            ).toLocaleDateString("en-GB")
+                                            : "-"}
+                                    </p>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 )}

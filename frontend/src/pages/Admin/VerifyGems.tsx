@@ -156,6 +156,11 @@ function VerifyGems() {
                         Gem Verification Dashboard
                     </h1>
                 </div>
+                <div className="hidden md:flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-semibold">
+                       Gem Verification Dashboard
+                    </h1>
+                </div>
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-4 mb-6">
