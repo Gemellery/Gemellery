@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/AdminSidebar";
 import toast from "react-hot-toast";
+import { Menu } from "lucide-react";
 
 interface Seller {
   seller_id: number;
@@ -47,6 +48,7 @@ function VerifySellers() {
   const [reviewSeller, setReviewSeller] = useState<Seller | null>(null);
   const [verifiedCheck, setVerifiedCheck] = useState(false);
   const [loadingId, setLoadingId] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -119,17 +121,24 @@ function VerifySellers() {
 
   return (
     <div className="flex h-screen bg-gray-100">
+
       <AdminSidebar
         adminName={user.full_name || user.email}
         role={user.role}
-        isOpen={false}
-        onClose={() => {}}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
       />
 
-      <div className="flex-1 p-8 ml-0 md:ml-64 overflow-y-auto">
-        <h1 className="text-2xl font-semibold mb-6">
-          Seller Verification Dashboard
-        </h1>
+      <div className="flex-1 overflow-y-auto p-6 md:ml-64">
+        {/* Mobile Header */}
+        <div className="flex items-center gap-4 mb-6 md:hidden">
+          <button onClick={() => setIsOpen(true)}>
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl font-semibold">
+            Seller Verification Dashboard
+          </h1>
+        </div>
 
         {/* Summary */}
         <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
@@ -175,7 +184,7 @@ function VerifySellers() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow border overflow-hidden">
+        <div className="bg-white rounded-xl shadow border overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
@@ -191,11 +200,10 @@ function VerifySellers() {
               {paginated.map((s) => (
                 <tr
                   key={s.seller_id}
-                  className={`border-t hover:bg-gray-50 ${
-                    s.verification_status === "pending"
-                      ? "bg-yellow-50"
-                      : ""
-                  }`}
+                  className={`border-t hover:bg-gray-50 ${s.verification_status === "pending"
+                    ? "bg-yellow-50"
+                    : ""
+                    }`}
                 >
                   <td className="p-4 font-medium text-teal-700">
                     {s.business_name}
@@ -229,7 +237,7 @@ function VerifySellers() {
         {reviewSeller && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white w-[1100px] max-w-[95vw] h-[85vh] rounded-xl shadow-xl flex overflow-hidden">
-              
+
               {/* Left */}
               <div className="w-1/2 p-6 overflow-y-auto border-r">
                 <h2 className="text-xl font-semibold mb-6">

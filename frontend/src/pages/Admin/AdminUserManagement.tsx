@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/AdminSidebar";
 import toast from "react-hot-toast";
+import { Menu } from "lucide-react";
 
 interface User {
     user_id: number;
@@ -55,6 +56,7 @@ function AdminUserManagement() {
     const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
     const [currentPage, setCurrentPage] = useState(1);
     const [reviewUser, setReviewUser] = useState<User | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -139,14 +141,20 @@ function AdminUserManagement() {
             <AdminSidebar
                 adminName={user.full_name || user.email}
                 role={user.role}
-                isOpen={false}
-                onClose={() => { }}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
             />
 
-            <div className="flex-1 p-8 ml-0 md:ml-64 overflow-y-auto">
-                <h1 className="text-2xl font-semibold mb-6">
-                    User Management Dashboard
-                </h1>
+            <div className="flex-1 overflow-y-auto p-6 md:ml-64">
+                {/* Mobile Header */}
+                <div className="flex items-center gap-4 mb-6 md:hidden">
+                    <button onClick={() => setIsOpen(true)}>
+                        <Menu className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-semibold">
+                        User Management Dashboard
+                    </h1>
+                </div>
 
                 {/* Filters */}
                 <div className="flex flex-wrap gap-4 mb-6">
@@ -185,7 +193,7 @@ function AdminUserManagement() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white rounded-xl shadow border overflow-hidden">
+                <div className="bg-white rounded-xl shadow border overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50">
                             <tr>
