@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import FilterSection from '../../components/FilterSection'
 import Navbar from '@/components/Navbar'
@@ -112,7 +112,7 @@ const Marketplace = () => {
     <div className="min-h-screen bg-white">
       <Navbar />
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 px-4 sm:px-6 md:px-8 py-8 sm:py-12">
+      <div className="bg-linear-to-r from-amber-50 to-orange-50 px-4 sm:px-6 md:px-8 py-8 sm:py-12">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2">Discover Ceylon's Finest Gems</h1>
         <p className="text-sm sm:text-base md:text-lg text-red-500 font-medium">Verified luxury gemstones from the heart of Sri Lanka.</p>
       </div>
@@ -126,7 +126,7 @@ const Marketplace = () => {
       <div className="px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Filters Sidebar - Hidden on mobile and tablet, shown on large desktop */}
-          <div className="hidden lg:block lg:w-72 flex-shrink-0">
+          <div className="hidden lg:block lg:w-72 shrink-0">
             <FilterSection />
           </div>
 
@@ -183,7 +183,7 @@ const Marketplace = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -205,7 +205,7 @@ const Marketplace = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
               >
                 <ChevronRight size={18} />
               </button>
