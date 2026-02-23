@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -9,7 +9,8 @@ import {
   LogOut,
   UserCog,
   FileText,
-  X
+  Package,
+  X,
 } from "lucide-react";
 import ReAuthModal from "./admin/ReAuthModal";
 
@@ -20,10 +21,33 @@ interface AdminSidebarProps {
   onClose: () => void;
 }
 
-function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
+function AdminSidebar({
+  adminName,
+  role,
+  isOpen,
+  onClose,
+}: AdminSidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const isSuperAdmin = role?.toLowerCase() === "super_admin";
   const [showReAuthModal, setShowReAuthModal] = useState(false);
+
+  const isActive = (path: string) =>
+    location.pathname.startsWith(path);
+
+  const navItem = (path: string, label: string, Icon: any) => (
+    <button
+      onClick={() => navigate(path)}
+      className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-all duration-200 text-left
+      ${isActive(path)
+          ? "bg-black text-white shadow-sm"
+          : "text-gray-600 hover:bg-gray-100 hover:text-black"
+        }`}
+    >
+      <Icon className="w-4 h-4 shrink-0" />
+      <span className="text-sm font-medium">{label}</span>
+    </button>
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -33,119 +57,96 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Overlay (mobile) */}
+      {/* Mobile Overlay */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
       />
 
       <aside
-        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between overflow-hidden
-        transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0`}
+        className={`fixed top-0 left-0 z-50 w-64 h-screen 
+        bg-[#fcfbf8] border-r border-gray-200
+        flex flex-col justify-between
+        transform transition-transform duration-300
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0`}
       >
         {/* Top Section */}
         <div className="p-6">
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-semibold">{adminName}</h2>
+              <h2 className="text-lg font-semibold tracking-tight">
+                {adminName}
+              </h2>
               <p className="text-xs text-gray-500 capitalize">
                 {role.replace("_", " ")} Dashboard
               </p>
             </div>
+
             <button onClick={onClose}>
-              <X className="w-5 h-5 md:hidden" />
+              <X className="w-5 h-5 md:hidden text-gray-500" />
             </button>
           </div>
 
-          <nav className="mt-8 space-y-4">
-            <button
-              onClick={() => navigate("/admin/dashboard")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/verify-sellers")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Verify Sellers
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/manage-gems")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <Gem className="w-4 h-4" />
-              Manage Gems
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/manage-users")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <Users className="w-4 h-4" />
-              Manage Users
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/review-moderation")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <Users className="w-4 h-4" />
-              Review Moderation
-            </button>
-
-            <button
-              onClick={() => navigate("/admin/reports")}
-              className="flex items-center gap-3 text-left w-full hover:underline"
-            >
-              <FileText className="w-4 h-4" />
-              Reports
-            </button>
+          {/* Navigation */}
+          <nav className="mt-6 space-y-2">
+            {navItem("/admin/dashboard", "Dashboard", LayoutDashboard)}
+            {navItem("/admin/verify-sellers", "Verify Sellers", ShieldCheck)}
+            {navItem("/admin/manage-gems", "Manage Gems", Gem)}
+            {navItem("/admin/manage-users", "Manage Users", Users)}
+            {navItem("/admin/manage-orders", "Manage Orders", Package)}
+            {navItem(
+              "/admin/review-moderation",
+              "Review Moderation",
+              Users
+            )}
+            {navItem("/admin/reports", "Reports", FileText)}
 
             {isSuperAdmin && (
               <>
-                <div className="border-t pt-4 mt-4 text-xs text-gray-400 uppercase">
+                <div className="border-t pt-4 mt-4 text-xs text-gray-400 uppercase tracking-wider">
                   System Controls
                 </div>
 
-                <button
-                  onClick={() => setShowReAuthModal(true)}
-                  className="flex items-center gap-3 text-left w-full hover:underline"
-                >
-                  <UserCog className="w-4 h-4" />
-                  Admin Management
-                </button>
+                <div className="space-y-2 mt-2">
+                  <button
+                    onClick={() => setShowReAuthModal(true)}
+                    className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-left
+                    text-gray-600 hover:bg-gray-100 hover:text-black transition-all duration-200"
+                  >
+                    <UserCog className="w-4 h-4 shrink-0" />
+                    <span className="text-sm font-medium">
+                      Admin Management
+                    </span>
+                  </button>
 
-                <button
-                  onClick={() => navigate("/admin/settings")}
-                  className="flex items-center gap-3 text-left w-full hover:underline"
-                >
-                  <Settings className="w-4 h-4" />
-                  System Settings
-                </button>
+                  {navItem(
+                    "/admin/settings",
+                    "System Settings",
+                    Settings
+                  )}
+                </div>
               </>
             )}
           </nav>
         </div>
 
         {/* Bottom Section */}
-        <div className="p-6 border-t space-y-3">
+        <div className="p-6 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full text-left text-red-600"
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg
+            text-red-600 hover:bg-red-50 transition-all duration-200 text-left"
           >
-            <LogOut className="w-4 h-4" />
-            Logout
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span className="text-sm font-medium">Logout</span>
           </button>
         </div>
       </aside>
 
+      {/* ReAuth Modal */}
       {showReAuthModal && (
         <ReAuthModal
           onClose={() => setShowReAuthModal(false)}
