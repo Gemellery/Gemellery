@@ -139,6 +139,11 @@ function VerifySellers() {
             Seller Verification Dashboard
           </h1>
         </div>
+        <div className="hidden md:flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold">
+            Seller Verification Dashboard
+          </h1>
+        </div>
 
         {/* Summary */}
         <div className="flex justify-between items-center mb-4 text-sm text-gray-600">
