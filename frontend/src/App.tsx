@@ -28,6 +28,7 @@ import VerifySellers from "./pages/Admin/VerifySellers";
 import VerifyGems from "./pages/Admin/VerifyGems";
 import ManageUsers from "./pages/Admin/AdminUserManagement";
 import SellerReviews from "./pages/Admin/SellerReviews";
+import AdminOrders from "./pages/Admin/AdminOrderManagement";
 
 function App() {
   return (
@@ -137,6 +138,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <SellerReviews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-orders"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <AdminOrders />
             </ProtectedRoute>
           }
         />
