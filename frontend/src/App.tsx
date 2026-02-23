@@ -27,6 +27,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import VerifySellers from "./pages/Admin/VerifySellers";
 import VerifyGems from "./pages/Admin/VerifyGems";
 import ManageUsers from "./pages/Admin/AdminUserManagement";
+import SellerReviews from "./pages/Admin/SellerReviews";
 
 function App() {
   return (
@@ -124,10 +125,18 @@ function App() {
           }
         />
         <Route
-          path="/admin/manage-usres"
+          path="/admin/manage-users"
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/review-moderation"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <SellerReviews />
             </ProtectedRoute>
           }
         />

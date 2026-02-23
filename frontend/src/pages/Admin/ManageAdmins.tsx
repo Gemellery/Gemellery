@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/AdminSidebar";
 import toast from "react-hot-toast";
-import { Edit, Lock, Power } from "lucide-react";
+import { Edit, Lock, Power, Menu } from "lucide-react";
 
 interface Admin {
     user_id: number;
@@ -27,6 +27,7 @@ function ManageAdmins() {
     const [countries, setCountries] = useState<Country[]>([]);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
     const [search, setSearch] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -201,20 +202,30 @@ function ManageAdmins() {
 
     return (
         <div className="flex h-screen bg-gray-100">
-
-            {/* IMPORTANT: Keep sidebar always visible */}
             <AdminSidebar
                 adminName={user.full_name || user.email}
                 role={user.role}
-                isOpen={true}
-                onClose={() => { }}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
             />
 
-            <div className="flex-1 p-8 ml-64 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto p-6 md:ml-64">
 
-                {/* HEADER */}
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold">Admin Management</h1>
+                {/* Mobile Header */}
+                <div className="flex items-center gap-4 mb-6 md:hidden">
+                    <button onClick={() => setIsOpen(true)}>
+                        <Menu className="w-6 h-6" />
+                    </button>
+                    <h1 className="text-xl font-semibold">
+                        Admin Management
+                    </h1>
+                </div>
+
+                {/* Desktop Header */}
+                <div className="hidden md:flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-semibold">
+                        Admin Management
+                    </h1>
 
                     <button
                         type="button"
@@ -249,7 +260,7 @@ function ManageAdmins() {
                 </div>
 
                 {/* TABLE */}
-                <div className="bg-white rounded-xl shadow border overflow-hidden">
+                <div className="bg-white rounded-xl shadow border overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50">
                             <tr>

@@ -22,15 +22,14 @@ interface AdminSidebarProps {
 
 function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
   const navigate = useNavigate();
+  const isSuperAdmin = role?.toLowerCase() === "super_admin";
+  const [showReAuthModal, setShowReAuthModal] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
-
-  const isSuperAdmin = role?.toLowerCase() === "super_admin";
-  const [showReAuthModal, setShowReAuthModal] = useState(false);
 
   return (
     <>
@@ -42,10 +41,11 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
       />
 
       <aside
-        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between
+        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between overflow-hidden
         transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0`}
       >
+        {/* Top Section */}
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -60,11 +60,9 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
           </div>
 
           <nav className="mt-8 space-y-4">
-
-            {/* Common Admin Features */}
             <button
               onClick={() => navigate("/admin/dashboard")}
-              className="flex items-center gap-3 w-full text-left hover:underline"
+              className="flex items-center gap-3 text-left w-full hover:underline"
             >
               <LayoutDashboard className="w-4 h-4" />
               Dashboard
@@ -72,7 +70,7 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
 
             <button
               onClick={() => navigate("/admin/verify-sellers")}
-              className="flex items-center gap-3 w-full text-left hover:underline"
+              className="flex items-center gap-3 text-left w-full hover:underline"
             >
               <ShieldCheck className="w-4 h-4" />
               Verify Sellers
@@ -80,29 +78,36 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
 
             <button
               onClick={() => navigate("/admin/manage-gems")}
-              className="flex items-center gap-3 w-full text-left hover:underline"
+              className="flex items-center gap-3 text-left w-full hover:underline"
             >
               <Gem className="w-4 h-4" />
               Manage Gems
             </button>
 
             <button
-              onClick={() => navigate("/admin/manage-usres")}
-              className="flex items-center gap-3 w-full text-left hover:underline"
+              onClick={() => navigate("/admin/manage-users")}
+              className="flex items-center gap-3 text-left w-full hover:underline"
             >
               <Users className="w-4 h-4" />
               Manage Users
             </button>
 
             <button
+              onClick={() => navigate("/admin/review-moderation")}
+              className="flex items-center gap-3 text-left w-full hover:underline"
+            >
+              <Users className="w-4 h-4" />
+              Review Moderation
+            </button>
+
+            <button
               onClick={() => navigate("/admin/reports")}
-              className="flex items-center gap-3 w-full text-left hover:underline"
+              className="flex items-center gap-3 text-left w-full hover:underline"
             >
               <FileText className="w-4 h-4" />
               Reports
             </button>
 
-            {/* Super Admin Only Section */}
             {isSuperAdmin && (
               <>
                 <div className="border-t pt-4 mt-4 text-xs text-gray-400 uppercase">
@@ -111,7 +116,7 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
 
                 <button
                   onClick={() => setShowReAuthModal(true)}
-                  className="flex items-center gap-3 w-full text-left hover:underline"
+                  className="flex items-center gap-3 text-left w-full hover:underline"
                 >
                   <UserCog className="w-4 h-4" />
                   Admin Management
@@ -119,7 +124,7 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
 
                 <button
                   onClick={() => navigate("/admin/settings")}
-                  className="flex items-center gap-3 w-full text-left hover:underline"
+                  className="flex items-center gap-3 text-left w-full hover:underline"
                 >
                   <Settings className="w-4 h-4" />
                   System Settings
@@ -129,7 +134,8 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
           </nav>
         </div>
 
-        <div className="p-6 border-t">
+        {/* Bottom Section */}
+        <div className="p-6 border-t space-y-3">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full text-left text-red-600"
@@ -139,6 +145,7 @@ function AdminSidebar({ adminName, role, isOpen, onClose }: AdminSidebarProps) {
           </button>
         </div>
       </aside>
+
       {showReAuthModal && (
         <ReAuthModal
           onClose={() => setShowReAuthModal(false)}
