@@ -18,9 +18,9 @@ import AddNewGem from "./pages/Gem/AddNewGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
-import SellerSettings from "./pages/Seller/SellerSettings";
-import SellerAllListings from "./pages/Seller/SellerAllListings";
-import SellerProfile from "./pages/Seller/SellerProfile";
+import SellerSettings from "./pages/seller/SellerSettings";
+import SellerAllListings from "./pages/seller/SellerAllListings";
+import SellerProfile from "./pages/seller/SellerProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -45,6 +45,8 @@ function App() {
         <Route path="/jewelry_designer" element={<JewelryDesigner />} />
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+
+        {/* Seller Profile - Public */}
         <Route path="/seller/:id" element={<SellerProfile />} />
 
         {/* Seller Protected Routes */}
@@ -76,7 +78,7 @@ function App() {
         />
 
         <Route
-          path="/seller/SellerSettings"
+          path="/seller/settings"
           element={
             <ProtectedRoute allowedRole="seller">
               <SellerSettings />
