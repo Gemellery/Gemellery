@@ -11,6 +11,7 @@ import superAdminRoutes from "./routes/superAdmin.routes";
 import adminSellerRoutes from "./routes/adminSeller.routes";
 import adminGemRoutes from "./routes/adminGem.routes";
 import adminUserRoutes from "./routes/adminUser.routes";
+import adminReviewRoutes from "./routes/adminReview.routes";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/super-admin", superAdminRoutes);
 app.use("/api/admin", adminSellerRoutes);
 app.use("/api/admin", adminGemRoutes);
 app.use("/api/admin", adminUserRoutes);
+app.use("/api/admin", adminReviewRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {
