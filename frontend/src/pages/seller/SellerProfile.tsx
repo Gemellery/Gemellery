@@ -10,7 +10,7 @@ type ActiveTab = "gems" | "reviews";
 
 const PLACEHOLDER_BANNER =
   "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80";
-const PLACEHOLDER_AVATAR = "https://i.pravatar.cc/300?img=47";
+const PLACEHOLDER_AVATAR = "";
 const PLACEHOLDER_IMAGE = "/sample_gems/handfulgems.jpg";
 
 const SellerProfile: React.FC = () => {
