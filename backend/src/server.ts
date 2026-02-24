@@ -7,6 +7,7 @@ import jewelryDesignRoutes from "./routes/jewelry-design.routes";
 import path from "path";
 import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
+import buyerRoutes from "./routes/buyer.routes";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/api/jewelry-design", jewelryDesignRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
+app.use("/api/buyer", buyerRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {
