@@ -9,13 +9,28 @@ import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
 import cartRoutes from "./routes/cart.routes";
 import orderRoutes from "./routes/order.routes";
+import buyerRoutes from "./routes/buyer.routes";
+import superAdminRoutes from "./routes/superAdmin.routes";
+import adminSellerRoutes from "./routes/adminSeller.routes";
+import adminGemRoutes from "./routes/adminGem.routes";
+import adminUserRoutes from "./routes/adminUser.routes";
+import adminReviewRoutes from "./routes/adminReview.routes";
+import adminOrderRoutes from "./routes/adminOrder.routes";
+import adminBlogRoutes from "./routes/adminBlog.routes";
+
 
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
+
 app.use("/api/auth", authRoutes);
 app.use("/api/countries", countryRoutes);
 app.use("/api/jewelry-design", jewelryDesignRoutes);
@@ -24,6 +39,15 @@ app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/buyer", buyerRoutes);
+app.use("/api/super-admin", superAdminRoutes);
+app.use("/api/admin", adminSellerRoutes);
+app.use("/api/admin", adminGemRoutes);
+app.use("/api/admin", adminUserRoutes);
+app.use("/api/admin", adminReviewRoutes);
+app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/admin/blogs", adminBlogRoutes);
+
 
 const PORT = 5001;
 app.listen(PORT, () => {

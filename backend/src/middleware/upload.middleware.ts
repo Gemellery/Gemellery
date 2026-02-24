@@ -13,6 +13,9 @@ const getDestination = (fieldname: string) => {
         case "images":
             return "uploads/gem_images";
 
+        case "blog_image":
+            return "uploads/blog_images";
+
         default:
             return "uploads/others";
     }
@@ -55,6 +58,12 @@ const fileFilter: multer.Options["fileFilter"] = (req, file, cb) => {
         return /pdf|jpg|jpeg|png/.test(file.mimetype)
             ? cb(null, true)
             : cb(new Error("Invalid seller license file"));
+    }
+
+    if (file.fieldname === "blog_image") {
+        return /jpg|jpeg|png|webp/.test(file.mimetype)
+            ? cb(null, true)
+            : cb(new Error("Invalid blog image file"));
     }
 
     cb(new Error("Unsupported file field"));
