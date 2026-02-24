@@ -212,7 +212,7 @@ const SellerProfile: React.FC = () => {
                     <div key={gem.id} className="group flex flex-col rounded-[var(--radius-lg)] overflow-hidden border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200 max-w-[260px] w-full mx-auto">
                       <div className="relative overflow-hidden bg-background" style={{ height: "180px" }}>
                         <img
-                          src={gem.imageUrl ? `http://localhost:5001${gem.imageUrl}` : PLACEHOLDER_IMAGE}
+                         src={gem.imageUrl ? `http://localhost:5001/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : PLACEHOLDER_IMAGE}
                           alt={gem.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
