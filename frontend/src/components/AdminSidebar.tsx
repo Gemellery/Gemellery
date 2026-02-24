@@ -11,6 +11,7 @@ import {
   FileText,
   Package,
   X,
+  FileCog,
 } from "lucide-react";
 import ReAuthModal from "./admin/ReAuthModal";
 
@@ -102,6 +103,7 @@ function AdminSidebar({
               "Review Moderation",
               Users
             )}
+            {navItem("/admin/blog-posts", "Content Management", FileCog)}
             {navItem("/admin/reports", "Reports", FileText)}
 
             {isSuperAdmin && (
