@@ -29,6 +29,7 @@ import VerifyGems from "./pages/Admin/VerifyGems";
 import ManageUsers from "./pages/Admin/AdminUserManagement";
 import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
+import AdminBlogs from "./pages/Admin/ManageBlogPosts";
 
 function App() {
   return (
@@ -146,6 +147,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
               <AdminOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/blog-posts"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+              <AdminBlogs />
             </ProtectedRoute>
           }
         />
