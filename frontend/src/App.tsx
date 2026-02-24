@@ -22,6 +22,7 @@ import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
+import SellerProfile from "./pages/seller/SellerProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import VerifySellers from "./pages/Admin/VerifySellers";
@@ -54,6 +55,9 @@ function App() {
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
 
+        {/* Seller Profile - Public */}
+        <Route path="/seller/:id" element={<SellerProfile />} />
+
         {/* ================= SELLER PROTECTED ROUTES ================= */}
         <Route
           path="/seller/dashboard"
@@ -83,7 +87,7 @@ function App() {
         />
 
         <Route
-          path="/seller/SellerSettings"
+          path="/seller/settings"
           element={
             <ProtectedRoute allowedRoles={["seller"]}>
               <SellerSettings />
