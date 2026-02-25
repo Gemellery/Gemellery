@@ -1,5 +1,5 @@
 import React from 'react'
-import { Star, CheckCircle, MapPin } from 'lucide-react'
+import {CheckCircle, MapPin } from 'lucide-react'
 
 interface ProductInfoProps {
   badge?: string
@@ -40,36 +40,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
 }) => {
   const discountPercentage = discount || Math.round(((originalPrice - currentPrice) / originalPrice) * 100)
 
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-1">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="relative">
-            <Star
-              size={16}
-              className="text-gray-300 fill-gray-300"
-            />
-            {i < Math.floor(rating) && (
-              <div className="absolute top-0 left-0 overflow-hidden" style={{ width: '100%' }}>
-                <Star
-                  size={16}
-                  className="text-yellow-400 fill-yellow-400"
-                />
-              </div>
-            )}
-            {i === Math.floor(rating) && rating % 1 !== 0 && (
-              <div className="absolute top-0 left-0 overflow-hidden" style={{ width: `${(rating % 1) * 100}%` }}>
-                <Star
-                  size={16}
-                  className="text-yellow-400 fill-yellow-400"
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    )
-  }
+
 
   return (
     <div className="bg-white p-8 rounded-lg">
