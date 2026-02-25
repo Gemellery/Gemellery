@@ -1,4 +1,4 @@
-import API_CONFIG from '@/lib/api.config';
+import { API_CONFIG } from '@/lib/api.config';
 import type { GemFilters, GemListResponse, GemDetailResponse } from '@/lib/gems/types';
 
 // ──────────────────────────────────────────────
