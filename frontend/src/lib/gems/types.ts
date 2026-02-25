@@ -10,15 +10,15 @@ export interface GemListItem {
   color: string;
   origin: string;
   description: string;
-  certification: string | null;   
-  certificateUrl: string | null;  
-  images: (string | null)[];      
+  certification: string;
+  certificateUrl: string | null;
+  images: string[] | string | null;
   seller_id: number;
   seller_name: string;
   verificationStatus: string;
-  verified: boolean;             
+  verified: boolean | number;
   status: string;
-  createdAt: string;             
+  createdAt: string;
 }
 
 // ──────────────────────────────────────────────
@@ -27,9 +27,9 @@ export interface GemListItem {
 export interface GemFilters {
   page?: number;
   limit?: number;
-  search?: string;        
-  gemName?: string;       
-  gemType?: string;       
+  search?: string;
+  gemType?: string;
+  gemName?: string;
   priceMin?: number;
   priceMax?: number;
   caratMin?: number;
@@ -38,7 +38,7 @@ export interface GemFilters {
   cut?: string;
   clarity?: string;
   origin?: string;
-  isCertified?: string;   
+  isCertified?: string;
 }
 
 // ──────────────────────────────────────────────
