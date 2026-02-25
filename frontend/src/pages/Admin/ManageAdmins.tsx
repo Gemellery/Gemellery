@@ -20,7 +20,7 @@ interface Country {
 }
 
 type StatusFilter = "active" | "inactive" | "frozen" | "all";
-type ActionType = "toInactive" | "toActive" | "toFrozen" | null;
+
 
 function ManageAdmins() {
     const [admins, setAdmins] = useState<Admin[]>([]);
@@ -31,11 +31,6 @@ function ManageAdmins() {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
-
-    const [confirmAction, setConfirmAction] = useState<{
-        type: ActionType;
-        admin: Admin | null;
-    }>({ type: null, admin: null });
 
     const [form, setForm] = useState({
         email: "",
