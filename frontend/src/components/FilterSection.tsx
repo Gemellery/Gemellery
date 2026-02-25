@@ -70,9 +70,9 @@ const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
 function convertToGemFilters(filters: FiltersType): GemFilters {
   const gemFilters: GemFilters = {};
   if (filters.gemName.length === 1) {
-    gemFilters.search = filters.gemName[0];
+    gemFilters.gemName = filters.gemName[0];
   } else if (filters.gemName.length > 1) {
-    gemFilters.search = filters.gemName[0];
+    gemFilters.gemName = filters.gemName[0];
   }
 
   // Carat weight range
@@ -115,6 +115,15 @@ function convertToGemFilters(filters: FiltersType): GemFilters {
   // Treatment → maps to gem_type column
   if (filters.treatment.length > 0) {
     gemFilters.gemType = filters.treatment[0];
+  }
+
+  // ── Certification ──
+  if (filters.certification.length > 0) {
+    if (filters.certification.includes('certified') && !filters.certification.includes('uncertified')) {
+      gemFilters.isCertified = 'true';
+    } else if (filters.certification.includes('uncertified') && !filters.certification.includes('certified')) {
+      gemFilters.isCertified = 'false';
+    }
   }
 
   return gemFilters;
