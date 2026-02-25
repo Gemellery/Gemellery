@@ -55,10 +55,10 @@ export function formatDate(dateString: string | undefined | null): string {
 }
 
 // ──────────────────────────────────────────────
-// isVerified
+// isVerified — Check if a gem has been approved
 // ──────────────────────────────────────────────
 export function isVerified(verificationStatus: string | undefined | null): boolean {
-  return verificationStatus === 'approved';
+  return verificationStatus === 'verified';
 }
 
 // ──────────────────────────────────────────────
