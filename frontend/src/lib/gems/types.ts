@@ -10,65 +10,26 @@ export interface GemListItem {
   color: string;
   origin: string;
   description: string;
-  certification: string;
-  certificateUrl: string;
-  images: string[];
+  certification: string | null;   
+  certificateUrl: string | null;  
+  images: (string | null)[];      
   seller_id: number;
   seller_name: string;
   verificationStatus: string;
-  verified: number;
+  verified: boolean;             
   status: string;
-  createdAt: string;
+  createdAt: string;             
 }
 
-// GemDetail — single gem from the detail endpoint
-export interface GemDetail {
-  id: number;
-  name: string;
-  type: string;
-  price: string;
-  weight: string;
-  cut: string;
-  clarity: string;
-  color: string;
-  origin: string;
-  description: string;
-  certification: string;
-  certificateUrl: string;
-  images: string[];
-  seller_id: number;
-  seller_name: string;
-  verificationStatus: string;
-  verified: number;
-  status: string;
-  createdAt: string;
-}
-
-// Pagination metadata
-export interface GemPagination {
-  page: number;
-  limit: number;
-  total: number;
-}
-
-// API response wrappers
-export interface GemListResponse {
-  success: boolean;
-  data: GemListItem[];
-  pagination: GemPagination;
-}
-
-export interface GemDetailResponse {
-  success: boolean;
-  data: GemDetail;
-}
-
-// Query parameters for GET /api/gems
+// ──────────────────────────────────────────────
+// GemFilters — query params sent to GET /api/gems
+// ──────────────────────────────────────────────
 export interface GemFilters {
   page?: number;
   limit?: number;
-  search?: string;
-  gemType?: string;
+  search?: string;        
+  gemName?: string;       
+  gemType?: string;       
   priceMin?: number;
   priceMax?: number;
   caratMin?: number;
@@ -77,4 +38,19 @@ export interface GemFilters {
   cut?: string;
   clarity?: string;
   origin?: string;
+  isCertified?: string;   
+}
+
+// ──────────────────────────────────────────────
+// GemApiResponse — shape of the GET /api/gems response
+// ──────────────────────────────────────────────
+
+export interface GemApiResponse {
+  success: boolean;
+  data: GemListItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+  };
 }
