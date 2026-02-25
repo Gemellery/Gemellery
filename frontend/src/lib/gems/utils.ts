@@ -25,8 +25,8 @@ export function formatPrice(
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(numericPrice);
 }
 
@@ -108,6 +108,31 @@ export function getAllImages(images: string[] | undefined | null): string[] {
 }
 
 // ──────────────────────────────────────────────
+// parseImages — Safely parse the images field
+// ──────────────────────────────────────────────
+export function parseImages(images: any): string[] {
+  if (!images) return [];
+
+  if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((img: any) => img !== null && img !== undefined && img !== '');
+      }
+      return [];
+    } catch {
+      return [images];
+    }
+  }
+
+  if (Array.isArray(images)) {
+    return images.filter((img: any) => img !== null && img !== undefined && img !== '');
+  }
+
+  return [];
+}
+
+// ──────────────────────────────────────────────
 // Display-ready gem type
 // ──────────────────────────────────────────────
 export interface GemCardDisplay {
@@ -136,6 +161,8 @@ export interface GemCardDisplay {
 // transformGemForCard
 // ──────────────────────────────────────────────
 export function transformGemForCard(gem: GemListItem): GemCardDisplay {
+  const normalizedImages = parseImages(gem.images);
+
   return {
     id: gem.id,
     name: gem.name,
@@ -148,8 +175,8 @@ export function transformGemForCard(gem: GemListItem): GemCardDisplay {
     color: gem.color,
     origin: gem.origin,
     description: gem.description,
-    imageUrl: getFirstImage(gem.images),
-    allImageUrls: getAllImages(gem.images),
+    imageUrl: getFirstImage(normalizedImages),
+    allImageUrls: getAllImages(normalizedImages),
     sellerName: gem.seller_name,
     isVerified: isVerified(gem.verificationStatus),
     isCertified: isCertified(gem.certification),
