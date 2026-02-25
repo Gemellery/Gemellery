@@ -70,9 +70,9 @@ const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
 function convertToGemFilters(filters: FiltersType): GemFilters {
   const gemFilters: GemFilters = {};
   if (filters.gemName.length === 1) {
-    gemFilters.gemName = filters.gemName[0];
+    gemFilters.search = filters.gemName[0];
   } else if (filters.gemName.length > 1) {
-    gemFilters.gemName = filters.gemName[0];
+    gemFilters.search = filters.gemName[0];
   }
 
   // Carat weight range
@@ -92,7 +92,7 @@ function convertToGemFilters(filters: FiltersType): GemFilters {
     }
   }
 
-  // Color — exact match (send first selected)
+  // Color — exact match
   if (filters.color.length > 0) {
     gemFilters.color = filters.color[0];
   }
