@@ -106,8 +106,8 @@ export const createGem = async (req: Request, res: Response) => {
 // Fetch gems with filters and pagination
 export const getGems = async (req: any, res: any) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 12;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 12;
     const offset = (page - 1) * limit;
 
     let whereConditions: string[] = [];
@@ -162,6 +162,28 @@ export const getGems = async (req: any, res: any) => {
     if (req.query.cut) {
       whereConditions.push("g.cut = ?");
       queryParams.push(req.query.cut);
+    }
+
+    // Filter by search
+    if (req.query.search) {
+      whereConditions.push("g.gem_name LIKE ?");
+      queryParams.push(`%${req.query.search}%`);
+    }
+
+    // Filter by gem name
+    if (req.query.gemName) {
+      whereConditions.push("g.gem_name = ?");
+      queryParams.push(req.query.gemName);
+    }
+
+    // Filter by carat range
+    if (req.query.caratMin) {
+      whereConditions.push("g.carat >= ?");
+      queryParams.push(parseFloat(req.query.caratMin));
+    }
+    if (req.query.caratMax) {
+      whereConditions.push("g.carat <= ?");
+      queryParams.push(parseFloat(req.query.caratMax));
     }
 
     // Combine all WHERE conditions with AND
