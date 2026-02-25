@@ -1,36 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
+import type { GemFilters } from '@/lib/gems/types'
 
+// ──────────────────────────────────────────────
+// Props — what the parent (Marketplace) passes in
+// ──────────────────────────────────────────────
+interface FilterSectionProps {
+  onFilterChange: (filters: GemFilters) => void;
+}
+
+// ──────────────────────────────────────────────
+// Internal filter state shape
+// ──────────────────────────────────────────────
 interface FiltersType {
-  gemType: (string | number)[];
-  caratWeight: (string | number)[];
-  price: (string | number)[];
-  color: (string | number)[];
-  cutShape: (string | number)[];
-  clarity: (string | number)[];
-  origin: (string | number)[];
-  treatment: (string | number)[];
-  certification: (string | number)[];
-  sellerDelivery: (string | number)[];
+  gemName: string[];           
+  caratWeight: number[];       
+  priceRange: string[];        
+  color: string[];            
+  cutShape: string[];          
+  clarity: string[];           
+  origin: string[];            
+  treatment: string[];         
+  certification: string[];     
 }
 
 interface ExpandedSectionsType {
-  gemType: boolean;
+  gemName: boolean;
   caratWeight: boolean;
-  price: boolean;
+  priceRange: boolean;
   color: boolean;
   cutShape: boolean;
   clarity: boolean;
   origin: boolean;
   treatment: boolean;
   certification: boolean;
-  sellerDelivery: boolean;
 }
 
 interface FilterCheckboxProps {
   label: string;
   section: keyof FiltersType;
-  value: string | number;
+  value: string;
 }
 
 interface FilterSectionComponentProps {
@@ -45,18 +54,86 @@ interface CutShapeOption {
   image: string;
 }
 
-const FilterSection = () => {
+// ──────────────────────────────────────────────
+// Price buckets — maps UI labels to actual number ranges
+// ──────────────────────────────────────────────
+const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
+  under100k:   { max: 100000 },
+  '100kto250k': { min: 100000, max: 250000 },
+  '250kto500k': { min: 250000, max: 500000 },
+  above500k:   { min: 500000 },
+};
+
+// ──────────────────────────────────────────────
+// Convert internal filter state → GemFilters for the API
+// ──────────────────────────────────────────────
+function convertToGemFilters(filters: FiltersType): GemFilters {
+  const gemFilters: GemFilters = {};
+  if (filters.gemName.length === 1) {
+    gemFilters.search = filters.gemName[0];
+  } else if (filters.gemName.length > 1) {
+    gemFilters.search = filters.gemName[0];
+  }
+
+  // Carat weight range
+  if (filters.caratWeight[0] > 0.5) {
+    gemFilters.caratMin = filters.caratWeight[0];
+  }
+  if (filters.caratWeight[1] < 50) {
+    gemFilters.caratMax = filters.caratWeight[1];
+  }
+
+  // Price range — convert bucket string to min/max numbers
+  if (filters.priceRange.length > 0) {
+    const bucket = PRICE_BUCKETS[filters.priceRange[0]];
+    if (bucket) {
+      if (bucket.min !== undefined) gemFilters.priceMin = bucket.min;
+      if (bucket.max !== undefined) gemFilters.priceMax = bucket.max;
+    }
+  }
+
+  // Color — exact match (send first selected)
+  if (filters.color.length > 0) {
+    gemFilters.color = filters.color[0];
+  }
+
+  // Cut/Shape — exact match
+  if (filters.cutShape.length > 0) {
+    gemFilters.cut = filters.cutShape[0];
+  }
+
+  // Clarity — exact match
+  if (filters.clarity.length > 0) {
+    gemFilters.clarity = filters.clarity[0];
+  }
+
+  // Origin — exact match
+  if (filters.origin.length > 0) {
+    gemFilters.origin = filters.origin[0];
+  }
+
+  // Treatment → maps to gem_type column
+  if (filters.treatment.length > 0) {
+    gemFilters.gemType = filters.treatment[0];
+  }
+
+  return gemFilters;
+}
+
+// ──────────────────────────────────────────────
+// FilterSection Component
+// ──────────────────────────────────────────────
+const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
   const [expandedSections, setExpandedSections] = useState<ExpandedSectionsType>({
-    gemType: true,
+    gemName: true,
     caratWeight: true,
-    price: false,
+    priceRange: false,
     color: false,
     cutShape: false,
     clarity: false,
     origin: false,
     treatment: false,
     certification: false,
-    sellerDelivery: false,
   })
 
   const toggleSection = (section: keyof ExpandedSectionsType) => {
@@ -67,60 +144,81 @@ const FilterSection = () => {
   }
 
   const [filters, setFilters] = useState<FiltersType>({
-    gemType: [],
-    caratWeight: [0.5, 5.0],
-    price: [],
+    gemName: [],
+    caratWeight: [0.5, 50],
+    priceRange: [],
     color: [],
     cutShape: [],
     clarity: [],
     origin: [],
     treatment: [],
     certification: [],
-    sellerDelivery: [],
   })
 
+  // ──────────────────────────────────────────
+  // Notify parent whenever filters change
+  // ──────────────────────────────────────────
+  useEffect(() => {
+    const gemFilters = convertToGemFilters(filters);
+    onFilterChange(gemFilters);
+  }, [filters, onFilterChange])
+
+  // ──────────────────────────────────────────
+  // Cut/Shape options — values MATCH the database
+  // ──────────────────────────────────────────
   const cutShapeOptions: CutShapeOption[] = [
-    { id: 'oval', label: 'Oval', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'round', label: 'Round', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'cushion', label: 'Cushion', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'emerald', label: 'Emerald', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'pear', label: 'Pear', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'heart', label: 'Heart', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Oval', label: 'Oval', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Round', label: 'Round', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Cushion', label: 'Cushion', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Emerald', label: 'Emerald', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Pear', label: 'Pear', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    { id: 'Heart', label: 'Heart', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
   ]
 
-  const handleCheckboxChange = (section: keyof FiltersType, value: string | number) => {
-    setFilters(prev => ({
-      ...prev,
-      [section]: prev[section].includes(value)
-        ? prev[section].filter(item => item !== value)
-        : [...prev[section], value]
-    }))
+  // ──────────────────────────────────────────
+  // Checkbox handler — toggles a value in an array
+  // ──────────────────────────────────────────
+  const handleCheckboxChange = (section: keyof FiltersType, value: string) => {
+    setFilters(prev => {
+      const currentValues = prev[section] as string[];
+      return {
+        ...prev,
+        [section]: currentValues.includes(value)
+          ? currentValues.filter(item => item !== value)
+          : [...currentValues, value]
+      }
+    })
   }
 
   const handleCutShapeSelect = (value: string) => {
     handleCheckboxChange('cutShape', value)
   }
 
+  // ──────────────────────────────────────────
+  // Reset all filters to defaults
+  // ──────────────────────────────────────────
   const handleResetAll = () => {
     setFilters({
-      gemType: [],
-      caratWeight: [0.5, 10],
-      price: [],
+      gemName: [],
+      caratWeight: [0.5, 50],
+      priceRange: [],
       color: [],
       cutShape: [],
       clarity: [],
       origin: [],
       treatment: [],
       certification: [],
-      sellerDelivery: [],
     })
   }
 
+  // ──────────────────────────────────────────
+  // Reusable sub-components
+  // ──────────────────────────────────────────
   const FilterCheckbox: React.FC<FilterCheckboxProps> = ({ label, section, value }) => (
     <label className="flex items-center gap-3 py-2 cursor-pointer hover:bg-gray-50 px-2 rounded">
       <input
         type="checkbox"
-        checked={filters[section].includes(value)}
+        checked={(filters[section] as string[]).includes(value)}
         onChange={() => handleCheckboxChange(section, value)}
         className="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer accent-red-500"
       />
@@ -135,7 +233,7 @@ const FilterSection = () => {
           key={shape.id}
           onClick={() => handleCutShapeSelect(shape.id)}
           className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
-            filters.cutShape.includes(shape.id)
+            (filters.cutShape as string[]).includes(shape.id)
               ? 'border-red-500 bg-red-50'
               : 'border-gray-200 bg-white hover:border-gray-300'
           }`}
@@ -183,121 +281,139 @@ const FilterSection = () => {
         </button>
       </div>
 
-      {/* Gem Type */}
-      <FilterSection_Component title="Gem Type" sectionKey="gemType">
+      {/* Gem Name */}
+      <FilterSection_Component title="Gem Type" sectionKey="gemName">
         <div className="space-y-1">
-          <FilterCheckbox label="Blue Sapphire" section="gemType" value="Blue Sapphire" />
-          <FilterCheckbox label="Ruby" section="gemType" value="Ruby" />
-          <FilterCheckbox label="Padparadscha" section="gemType" value="Padparadscha" />
-          <FilterCheckbox label="Spinel" section="gemType" value="Spinel" />
-          <FilterCheckbox label="Other" section="gemType" value="Other" />
+          <FilterCheckbox label="Blue Sapphire" section="gemName" value="Blue Sapphire" />
+          <FilterCheckbox label="Sapphire" section="gemName" value="Sapphire" />
+          <FilterCheckbox label="Ruby" section="gemName" value="Ruby" />
+          <FilterCheckbox label="Alexandrite" section="gemName" value="Alexandrite" />
+          <FilterCheckbox label="Tourmaline" section="gemName" value="Tourmaline" />
+          <FilterCheckbox label="Spinel" section="gemName" value="Spinel" />
+          <FilterCheckbox label="Padparadscha" section="gemName" value="Padparadscha" />
         </div>
       </FilterSection_Component>
 
-      {/* Carat Weight */}
+      {/* ─── Carat Weight ─── */}
       <FilterSection_Component title="Carat Weight" sectionKey="caratWeight">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-red-500 text-sm font-medium">{filters.caratWeight[0]} ct</span>
-            <span className="text-red-500 text-sm font-medium">{filters.caratWeight[1]}+ ct</span>
+            <span className="text-red-500 text-sm font-medium">{filters.caratWeight[1]} ct</span>
           </div>
-          <input
-            type="range"
-            min="0.5"
-            max="10"
-            step="0.1"
-            value={filters.caratWeight[0]}
-            onChange={(e) => setFilters(prev => ({
-              ...prev,
-              caratWeight: [parseFloat(e.target.value), prev.caratWeight[1]]
-            }))}
-            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500"
-          />
+
+          {/* Min slider */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Minimum</label>
+            <input
+              type="range"
+              min="0.5"
+              max="50"
+              step="0.5"
+              value={filters.caratWeight[0]}
+              onChange={(e) => {
+                const newMin = parseFloat(e.target.value);
+                setFilters(prev => ({
+                  ...prev,
+                  // Ensure min doesn't exceed max
+                  caratWeight: [
+                    Math.min(newMin, prev.caratWeight[1] - 0.5),
+                    prev.caratWeight[1]
+                  ]
+                }))
+              }}
+              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500"
+            />
+          </div>
+
+          {/* Max slider */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Maximum</label>
+            <input
+              type="range"
+              min="0.5"
+              max="50"
+              step="0.5"
+              value={filters.caratWeight[1]}
+              onChange={(e) => {
+                const newMax = parseFloat(e.target.value);
+                setFilters(prev => ({
+                  ...prev,
+                  // Ensure max doesn't go below min
+                  caratWeight: [
+                    prev.caratWeight[0],
+                    Math.max(newMax, prev.caratWeight[0] + 0.5)
+                  ]
+                }))
+              }}
+              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500"
+            />
+          </div>
+
           <div className="flex gap-3">
-            <button className="flex-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium text-gray-700 transition">
-              Min: {filters.caratWeight[0]}
-            </button>
-            <button className="flex-1 py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium text-gray-700 transition">
-              Max: {filters.caratWeight[1]}
-            </button>
+            <div className="flex-1 py-2 px-3 bg-gray-100 rounded-full text-sm font-medium text-gray-700 text-center">
+              Min: {filters.caratWeight[0]} ct
+            </div>
+            <div className="flex-1 py-2 px-3 bg-gray-100 rounded-full text-sm font-medium text-gray-700 text-center">
+              Max: {filters.caratWeight[1]} ct
+            </div>
           </div>
         </div>
       </FilterSection_Component>
 
-      {/* Price */}
-      <FilterSection_Component title="Price" sectionKey="price">
+      {/* ─── Price ─── */}
+      <FilterSection_Component title="Price" sectionKey="priceRange">
         <div className="space-y-1">
-          <FilterCheckbox label="Under $100" section="price" value="under100" />
-          <FilterCheckbox label="$100 - $500" section="price" value="100to500" />
-          <FilterCheckbox label="$500 - $1000" section="price" value="500to1000" />
-          <FilterCheckbox label="$1000+" section="price" value="above1000" />
+          <FilterCheckbox label="Under $100,000" section="priceRange" value="under100k" />
+          <FilterCheckbox label="$100,000 - $250,000" section="priceRange" value="100kto250k" />
+          <FilterCheckbox label="$250,000 - $500,000" section="priceRange" value="250kto500k" />
+          <FilterCheckbox label="$500,000+" section="priceRange" value="above500k" />
         </div>
       </FilterSection_Component>
 
-      {/* Color */}
+      {/* ─── Color ─── */}
       <FilterSection_Component title="Color" sectionKey="color">
         <div className="space-y-1">
-          <FilterCheckbox label="Deep Blue" section="color" value="deepBlue" />
-          <FilterCheckbox label="Medium Blue" section="color" value="mediumBlue" />
-          <FilterCheckbox label="Light Blue" section="color" value="lightBlue" />
-          <FilterCheckbox label="Colorless" section="color" value="colorless" />
-          <FilterCheckbox label="Fancy" section="color" value="fancy" />
+          <FilterCheckbox label="Blue" section="color" value="Blue" />
+          <FilterCheckbox label="Light Blue" section="color" value="Light blue" />
+          <FilterCheckbox label="Red" section="color" value="Red" />
+          <FilterCheckbox label="Natural Red" section="color" value="Natural Red" />
         </div>
       </FilterSection_Component>
 
-      {/* Cut / Shape */}
+      {/* ─── Cut / Shape ─── */}
       <FilterSection_Component title="Cut / Shape" sectionKey="cutShape">
         <CutShapeSelector />
       </FilterSection_Component>
 
-      {/* Clarity */}
+      {/* ─── Clarity ─── */}
       <FilterSection_Component title="Clarity" sectionKey="clarity">
         <div className="space-y-1">
-          <FilterCheckbox label="Included" section="clarity" value="included" />
-          <FilterCheckbox label="Slightly Included" section="clarity" value="slightlyIncluded" />
-          <FilterCheckbox label="Eye Clean" section="clarity" value="eyeClean" />
-          <FilterCheckbox label="Flawless" section="clarity" value="flawless" />
+          <FilterCheckbox label="Opaque" section="clarity" value="Opaque" />
         </div>
       </FilterSection_Component>
 
-      {/* Origin */}
-      {/* <FilterSection_Component title="Origin" sectionKey="origin">
+      {/* ─── Origin ─── */}
+      <FilterSection_Component title="Origin" sectionKey="origin">
         <div className="space-y-1">
-          <FilterCheckbox label="Kashmir" section="origin" value="kashmir" />
-          <FilterCheckbox label="Ceylon" section="origin" value="ceylon" />
-          <FilterCheckbox label="Burmese" section="origin" value="burmese" />
-          <FilterCheckbox label="Thai" section="origin" value="thai" />
-          <FilterCheckbox label="African" section="origin" value="african" />
+          <FilterCheckbox label="Sri Lankan" section="origin" value="Sri Lankan" />
+          <FilterCheckbox label="Natural" section="origin" value="Natural" />
         </div>
-      </FilterSection_Component> */}
+      </FilterSection_Component>
 
-      {/* Treatment */}
+      {/* ─── Treatment ─── */}
       <FilterSection_Component title="Treatment" sectionKey="treatment">
         <div className="space-y-1">
-          <FilterCheckbox label="Untreated" section="treatment" value="untreated" />
-          <FilterCheckbox label="Heat Treated" section="treatment" value="heatTreated" />
-          <FilterCheckbox label="Treated (Other)" section="treatment" value="treatedOther" />
+          <FilterCheckbox label="Unheated" section="treatment" value="Unheated" />
+          <FilterCheckbox label="Natural" section="treatment" value="Natural" />
         </div>
       </FilterSection_Component>
 
-      {/* Certification */}
+      {/* ─── Certification ─── */}
       <FilterSection_Component title="Certification" sectionKey="certification">
         <div className="space-y-1">
-          <FilterCheckbox label="GIA" section="certification" value="gia" />
-          <FilterCheckbox label="SSEF" section="certification" value="ssef" />
-          <FilterCheckbox label="AGL" section="certification" value="agl" />
+          <FilterCheckbox label="NGJA Certified" section="certification" value="certified" />
           <FilterCheckbox label="Uncertified" section="certification" value="uncertified" />
-        </div>
-      </FilterSection_Component>
-
-      {/* Seller / Delivery */}
-      <FilterSection_Component title="Seller / Delivery" sectionKey="sellerDelivery">
-        <div className="space-y-1">
-          <FilterCheckbox label="Verified Seller" section="sellerDelivery" value="verifiedSeller" />
-          <FilterCheckbox label="NGJA Verified" section="sellerDelivery" value="ngjaVerified" />
-          <FilterCheckbox label="Top Rated Seller" section="sellerDelivery" value="topRatedSeller" />
-          <FilterCheckbox label="Ready to Ship" section="sellerDelivery" value="readyToShip" />
-          <FilterCheckbox label="International Shipping" section="sellerDelivery" value="internationalShipping" />
         </div>
       </FilterSection_Component>
     </div>
