@@ -1,12 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 
-const SearchBar = () => {
+// ──────────────────────────────────────────────
+// Props — what the parent (Marketplace) passes in
+// ──────────────────────────────────────────────
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+  onSortChange: (sort: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onSortChange }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('Newest')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  // ──────────────────────────────────────────
+  // Close dropdown when clicking outside
+  // ──────────────────────────────────────────
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -23,12 +34,35 @@ const SearchBar = () => {
     }
   }, [isDropdownOpen])
 
+  // ──────────────────────────────────────────
+  // Debounced search — wait 300ms after user stops typing
+  // ──────────────────────────────────────────
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      onSearch(searchQuery)
+    }, 300)
+
+    // Cleanup: cancel the timer if searchQuery changes before 300ms
+    return () => {
+      clearTimeout(debounceTimer)
+    }
+  }, [searchQuery, onSearch])
+
+  // ──────────────────────────────────────────
+  // Sort change handler — immediate, no debounce needed
+  // ──────────────────────────────────────────
+  const handleSortChange = (option: string) => {
+    setSortBy(option)
+    setIsDropdownOpen(false)
+    onSortChange(option)   
+  }
+
   const sortOptions = ['Newest', 'Price: Low to High', 'Price: High to Low', 'Most Popular']
 
   return (
     <div className="w-full bg-gray-50 p-6 rounded-lg">
       <div className="flex items-center gap-4">
-        {/* Search Input */}
+        {/* Search Input — unchanged UI, same styling */}
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           <input
@@ -40,7 +74,7 @@ const SearchBar = () => {
           />
         </div>
 
-        {/* Sort Dropdown */}
+        {/* Sort Dropdown — unchanged UI, wired to handleSortChange */}
         <div className="flex items-center gap-3" ref={dropdownRef}>
           <span className="text-sm font-medium text-gray-700">Sort by:</span>
           <div className="relative">
@@ -58,10 +92,7 @@ const SearchBar = () => {
                 {sortOptions.map((option) => (
                   <button
                     key={option}
-                    onClick={() => {
-                      setSortBy(option)
-                      setIsDropdownOpen(false)
-                    }}
+                    onClick={() => handleSortChange(option)}
                     className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg ${
                       sortBy === option ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'
                     }`}
