@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 
 const SearchBar = () => {

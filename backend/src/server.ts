@@ -7,6 +7,8 @@ import jewelryDesignRoutes from "./routes/jewelry-design.routes";
 import path from "path";
 import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
+import cartRoutes from "./routes/cart.routes";
+import orderRoutes from "./routes/order.routes";
 import buyerRoutes from "./routes/buyer.routes";
 import superAdminRoutes from "./routes/superAdmin.routes";
 import adminSellerRoutes from "./routes/adminSeller.routes";
@@ -15,6 +17,7 @@ import adminUserRoutes from "./routes/adminUser.routes";
 import adminReviewRoutes from "./routes/adminReview.routes";
 import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
+
 
 dotenv.config();
 
@@ -34,6 +37,8 @@ app.use("/api/jewelry-design", jewelryDesignRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api/buyer", buyerRoutes);
 app.use("/api/super-admin", superAdminRoutes);
 app.use("/api/admin", adminSellerRoutes);
@@ -42,6 +47,7 @@ app.use("/api/admin", adminUserRoutes);
 app.use("/api/admin", adminReviewRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
+
 
 const PORT = 5001;
 app.listen(PORT, () => {
