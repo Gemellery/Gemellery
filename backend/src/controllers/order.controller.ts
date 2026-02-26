@@ -3,16 +3,30 @@ import pool from "../database";
 
 export const checkoutOrder = async (req: any, res: Response) => {
   const user_id = req.user.id;
-  const { payment_method } = req.body;
+  const { payment_method, shipping_address_id } = req.body;
 
   if (!payment_method) {
     return res.status(400).json({ message: "Payment method required" });
+  }
+
+  if (!shipping_address_id) {
+    return res.status(400).json({ message: "Shipping address required" });
   }
 
   const conn = await pool.getConnection();
 
   try {
     await conn.beginTransaction();
+
+    // Verify shipping address belongs to user
+    const [addressCheck]: any = await conn.query(
+      "SELECT address_id FROM shipping_addresses WHERE address_id = ? AND user_id = ?",
+      [shipping_address_id, user_id]
+    );
+
+    if (addressCheck.length === 0) {
+      return res.status(400).json({ message: "Invalid shipping address" });
+    }
 
     // Get cart
     const [cartRows]: any = await conn.query(
@@ -47,9 +61,9 @@ export const checkoutOrder = async (req: any, res: Response) => {
 
     // Create order
     const [orderResult]: any = await conn.query(
-      `INSERT INTO orders (user_id, total_amount, payment_method)
-       VALUES (?, ?, ?)`,
-      [user_id, total_amount, payment_method]
+      `INSERT INTO orders (user_id, total_amount, payment_method, shipping_address_id)
+       VALUES (?, ?, ?, ?)`,
+      [user_id, total_amount, payment_method, shipping_address_id]
     );
 
     const order_id = orderResult.insertId;
