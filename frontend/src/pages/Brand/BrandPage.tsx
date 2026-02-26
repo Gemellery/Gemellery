@@ -154,7 +154,7 @@ const GemCard = ({ gem }: { gem: Gemstone }) => (
     </div>
 
     {/* Details */}
-    <div className="px-2 flex flex-col flex-grow">
+    <div className="px-2 flex flex-col grow">
       <div className="flex gap-2 text-[10px] font-bold tracking-widest text-red-500 uppercase mb-2 font-sans">
         <span>{gem.type}</span>
         <span>•</span>
@@ -177,7 +177,7 @@ const GemCard = ({ gem }: { gem: Gemstone }) => (
 );
 
 const ReviewCard = ({ review }: { review: Review }) => (
-  <div className="bg-[#F9F4EC] p-8 rounded-[2.5rem] flex flex-col justify-between h-full min-h-[320px]">
+  <div className="bg-[#F9F4EC] p-8 rounded-[2.5rem] flex flex-col justify-between h-full min-h-80">
     <div>
       <div className="flex gap-1 text-red-500 mb-6">
         {[...Array(review.rating)].map((_, i) => (
@@ -204,7 +204,7 @@ export default function BrandPage() {
     <div className="min-h-screen bg-white pb-32">
       
       {/* Breadcrumbs */}
-      <div className="max-w-[1400px] mx-auto px-6 py-8 text-xs font-bold tracking-widest text-gray-400 uppercase font-sans">
+      <div className="max-w-350 mx-auto px-6 py-8 text-xs font-bold tracking-widest text-gray-400 uppercase font-sans">
         <span className="hover:text-red-500 cursor-pointer transition-colors">Home</span>
         <span className="mx-3">/</span>
         <span className="hover:text-red-500 cursor-pointer transition-colors">Sellers</span>
@@ -213,7 +213,7 @@ export default function BrandPage() {
       </div>
 
       {/* Hero Section Container */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+      <div className="max-w-350 mx-auto px-4 sm:px-6">
         <div className="bg-[#F9F4EC] rounded-[3rem] p-8 md:p-12 lg:p-16 relative overflow-hidden">
             
             {/* Top Row: Brand Header */}
@@ -312,7 +312,7 @@ export default function BrandPage() {
       </div>
 
       {/* Gemstones Section */}
-      <div className="max-w-[1400px] mx-auto px-6 mt-24 mb-24">
+      <div className="max-w-350 mx-auto px-6 mt-24 mb-24">
          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
                <h2 className="text-4xl font-bold text-gray-900 font-serif mb-2">Available Gemstones</h2>
@@ -342,7 +342,7 @@ export default function BrandPage() {
       </div>
 
       {/* Reviews Section */}
-      <div className="max-w-[1400px] mx-auto px-6">
+      <div className="max-w-350 mx-auto px-6">
          <div className="flex justify-between items-end mb-12">
             <div>
                <h2 className="text-4xl font-bold text-gray-900 font-serif mb-3">Customer Reviews</h2>
