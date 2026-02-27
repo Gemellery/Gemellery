@@ -93,6 +93,11 @@ const BlogList: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#FAFAF7]">
       <Navbar />
       <section className="bg-gradient-to-br from-[#1a1209] via-[#2d1f0a] to-[#1a1209] text-white px-6 py-20 text-center relative overflow-hidden">
+        <img
+        src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80"
+        alt="Gemstone Banner"
+        className="absolute inset-0 w-full h-full object-cover opacity-20"
+        />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-20 w-40 h-40 rounded-full bg-amber-400 blur-3xl" />
           <div className="absolute bottom-10 right-20 w-60 h-60 rounded-full bg-amber-600 blur-3xl" />
