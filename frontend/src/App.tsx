@@ -32,7 +32,7 @@ import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
 import BlogList from "./pages/Blog/BlogList";
-
+import BlogDetail from "./pages/Blog/BlogDetail";
 
 function App() {
   return (
