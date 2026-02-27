@@ -69,10 +69,10 @@ const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
 // ──────────────────────────────────────────────
 function convertToGemFilters(filters: FiltersType): GemFilters {
   const gemFilters: GemFilters = {};
-  if (filters.gemName.length === 1) {
-    gemFilters.search = filters.gemName[0];
-  } else if (filters.gemName.length > 1) {
-    gemFilters.search = filters.gemName[0];
+
+  // Gem name/type — can be multiple, join with commas
+  if (filters.gemName.length > 0) {
+    gemFilters.gemName = filters.gemName.join(',');
   }
 
   // Carat weight range
