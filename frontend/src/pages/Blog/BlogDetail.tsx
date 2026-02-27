@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
-import { BlogPost } from "../../types/blog.types";
+import type { BlogPost } from "../../types/blog.types";
 import { fetchBlogById, fetchBlogs } from "../../services/blogService";
 import { Calendar, User, ArrowLeft, BookOpen } from "lucide-react";
 import BlogCard from "../../components/blog/BlogCard";
