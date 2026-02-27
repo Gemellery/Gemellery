@@ -8,13 +8,9 @@ import {
 
 const router = Router();
 
-// Public routes - no auth needed
 router.get("/", getAllBlogs);
 router.get("/:id", getBlogById);
-
-// Protected routes
 router.post("/", createBlog);
 router.delete("/:id", deleteBlog);
 
 export default router;
-

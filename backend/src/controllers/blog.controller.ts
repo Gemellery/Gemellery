@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import pool from "../database";
+import db from "../database";
 
 // GET /api/blogs - Get all blog posts with author name
 export const getAllBlogs = async (req: Request, res: Response) => {
   try {
-    const [rows]: any = await pool.query(
+    const [rows]: any = await db.query(
       `SELECT bp.blog_id, bp.user_id, bp.blog_title, bp.blog_content,
               bp.blog_image_url, bp.created_at,
               u.full_name AS author_name, u.email AS author_email
@@ -23,7 +23,7 @@ export const getAllBlogs = async (req: Request, res: Response) => {
 export const getBlogById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const [rows]: any = await pool.query(
+    const [rows]: any = await db.query(
       `SELECT bp.blog_id, bp.user_id, bp.blog_title, bp.blog_content,
               bp.blog_image_url, bp.created_at,
               u.full_name AS author_name, u.email AS author_email
@@ -49,7 +49,7 @@ export const createBlog = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "user_id, blog_title, and blog_content are required" });
   }
   try {
-    const [result]: any = await pool.query(
+    const [result]: any = await db.query(
       `INSERT INTO blog_posts (user_id, blog_title, blog_content, blog_image_url, created_at)
        VALUES (?, ?, ?, ?, NOW())`,
       [user_id, blog_title, blog_content, blog_image_url || null]
@@ -65,7 +65,7 @@ export const createBlog = async (req: Request, res: Response) => {
 export const deleteBlog = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const [result]: any = await pool.query(
+    const [result]: any = await db.query(
       `DELETE FROM blog_posts WHERE blog_id = ?`,
       [id]
     );
