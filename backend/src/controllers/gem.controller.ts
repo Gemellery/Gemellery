@@ -172,8 +172,15 @@ export const getGems = async (req: any, res: any) => {
 
     // Filter by gem name
     if (req.query.gemName) {
-      whereConditions.push("g.gem_name = ?");
-      queryParams.push(req.query.gemName);
+      const names = (req.query.gemName as string).split(',').map(n => n.trim()).filter(n => n);
+      if (names.length === 1) {
+        whereConditions.push("g.gem_name = ?");
+        queryParams.push(names[0]);
+      } else if (names.length > 1) {
+        const placeholders = names.map(() => '?').join(', ');
+        whereConditions.push(`g.gem_name IN (${placeholders})`);
+        queryParams.push(...names);
+      }
     }
 
     // Filter by carat range
