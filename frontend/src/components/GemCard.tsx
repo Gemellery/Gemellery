@@ -26,6 +26,7 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
       navigate(`/product-detail/${id}`)
     }
   }
+
   return (
     <div 
       onClick={handleCardClick}
@@ -34,8 +35,11 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
       {/* Image Container */}
       <div className="relative bg-linear-to-br from-amber-50 to-amber-100 h-56 sm:h-64 md:h-72 shrink-0 flex items-center justify-center overflow-hidden group">
         <img 
-          src={image} 
+          src={image || `https://placehold.co/400x300/fff8e1/b45309?text=${encodeURIComponent(name)}`} 
           alt={name}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = `https://placehold.co/400x300/fff8e1/b45309?text=${encodeURIComponent(name)}`
+          }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
         />
         
@@ -61,7 +65,7 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
           <span className="text-xl sm:text-2xl font-bold text-red-600 whitespace-nowrap">{price}</span>
         </div>
 
-        {/* Details Grid - More Responsive */}
+        {/* Details Grid*/}
         <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-4 sm:mb-5 grow">
           <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition">
             <span className="text-base sm:text-lg shrink-0"><MdOutlineScale /></span>
