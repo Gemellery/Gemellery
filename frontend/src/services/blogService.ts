@@ -1,4 +1,4 @@
-import { BlogListResponse, BlogDetailResponse } from "../types/blog.types";
+import type { BlogListResponse, BlogDetailResponse } from "../types/blog.types";
 
 const API_BASE = "http://localhost:5001/api";
 
