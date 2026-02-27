@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { BlogPost } from "../../types/blog.types";
-import { Calendar, User } from "lucide-react";
+import { User } from "lucide-react";
 
 interface BlogCardProps {
   blog: BlogPost;
