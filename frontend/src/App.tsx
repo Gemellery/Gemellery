@@ -56,6 +56,8 @@ function App() {
         <Route path="/jewelry_designer" element={<JewelryDesigner />} />
         <Route path="/jewelry-designer/results" element={<JewelryResults />} />
         <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+        <Route path="/blog" element={<BlogList />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
 
         {/* Seller Profile - Public */}
         <Route path="/seller/:id" element={<SellerProfile />} />
