@@ -51,7 +51,7 @@ interface FilterSectionComponentProps {
 interface CutShapeOption {
   id: string;
   label: string;
-  image: string;
+  icon: React.ReactNode;
 }
 
 // ──────────────────────────────────────────────
@@ -176,12 +176,80 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
   // Cut/Shape options — values MATCH the database
   // ──────────────────────────────────────────
   const cutShapeOptions: CutShapeOption[] = [
-    { id: 'Oval', label: 'Oval', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'Round', label: 'Round', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'Cushion', label: 'Cushion', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'Emerald', label: 'Emerald', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'Pear', label: 'Pear', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
-    { id: 'Heart', label: 'Heart', image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop' },
+    {
+      id: 'Oval', label: 'Oval', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <ellipse cx="24" cy="24" rx="14" ry="19" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <ellipse cx="24" cy="24" rx="7" ry="10" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="24" y1="5" x2="24" y2="14" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="24" y1="34" x2="24" y2="43" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="10" y1="24" x2="17" y2="24" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="31" y1="24" x2="38" y2="24" stroke="currentColor" strokeWidth="0.8" />
+        </svg>
+      )
+    },
+    {
+      id: 'Round', label: 'Round', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="24" y1="4" x2="24" y2="16" stroke="currentColor" strokeWidth="1" />
+          <line x1="24" y1="32" x2="24" y2="44" stroke="currentColor" strokeWidth="1" />
+          <line x1="4" y1="24" x2="16" y2="24" stroke="currentColor" strokeWidth="1" />
+          <line x1="32" y1="24" x2="44" y2="24" stroke="currentColor" strokeWidth="1" />
+          <line x1="9" y1="9" x2="18" y2="18" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="39" y1="9" x2="30" y2="18" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="9" y1="39" x2="18" y2="30" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="39" y1="39" x2="30" y2="30" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        </svg>
+      )
+    },
+    {
+      id: 'Cushion', label: 'Cushion', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <rect x="6" y="6" width="36" height="36" rx="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <rect x="14" y="14" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="6" y1="14" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="14" y1="6" x2="14" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="34" y1="6" x2="34" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="34" y1="14" x2="42" y2="14" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="6" y1="34" x2="14" y2="34" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="14" y1="34" x2="14" y2="42" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="34" y1="34" x2="34" y2="42" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+          <line x1="34" y1="34" x2="42" y2="34" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        </svg>
+      )
+    },
+    {
+      id: 'Emerald', label: 'Emerald', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <polygon points="12,6 36,6 44,14 44,34 36,42 12,42 4,34 4,14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <polygon points="16,12 32,12 38,18 38,30 32,36 16,36 10,30 10,18" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <line x1="4" y1="14" x2="10" y2="18" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="44" y1="14" x2="38" y2="18" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="4" y1="34" x2="10" y2="30" stroke="currentColor" strokeWidth="0.8" />
+          <line x1="44" y1="34" x2="38" y2="30" stroke="currentColor" strokeWidth="0.8" />
+        </svg>
+      )
+    },
+    {
+      id: 'Pear', label: 'Pear', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <path d="M24 4 C14 14 10 26 14 34 C18 42 30 42 34 34 C38 26 34 14 24 4 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M24 12 C19 18 17 26 19 31 C21 35 27 35 29 31 C31 26 29 18 24 12 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+          <line x1="24" y1="4" x2="24" y2="12" stroke="currentColor" strokeWidth="0.8" />
+        </svg>
+      )
+    },
+    {
+      id: 'Heart', label: 'Heart', icon: (
+        <svg viewBox="0 0 48 48" className="w-10 h-10">
+          <path d="M24 44 C8 30 4 20 10 12 C14 8 20 8 24 14 C28 8 34 8 38 12 C44 20 40 30 24 44 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M24 36 C14 28 12 22 15 17 C17 14 20 14 24 18 C28 14 31 14 33 17 C36 22 34 28 24 36 Z" fill="none" stroke="currentColor" strokeWidth="1" />
+          <line x1="24" y1="14" x2="24" y2="22" stroke="currentColor" strokeWidth="0.8" />
+        </svg>
+      )
+    },
   ]
 
   // ──────────────────────────────────────────
@@ -243,15 +311,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
           onClick={() => handleCutShapeSelect(shape.id)}
           className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
             (filters.cutShape as string[]).includes(shape.id)
-              ? 'border-red-500 bg-red-50'
-              : 'border-gray-200 bg-white hover:border-gray-300'
+              ? 'border-red-500 bg-red-50 text-red-500'
+              : 'border-gray-200 bg-white hover:border-gray-300 text-gray-400'
           }`}
         >
-          <img
-            src={shape.image}
-            alt={shape.label}
-            className="w-16 h-16 object-cover rounded-md"
-          />
+          {shape.icon}
           <span className="text-xs font-medium text-center text-gray-700">{shape.label}</span>
         </button>
       ))}
