@@ -42,6 +42,7 @@ app.use("/api/admin", adminUserRoutes);
 app.use("/api/admin", adminReviewRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
+app.use("/api/blogs", blogRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {
