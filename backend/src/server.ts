@@ -15,7 +15,7 @@ import adminUserRoutes from "./routes/adminUser.routes";
 import adminReviewRoutes from "./routes/adminReview.routes";
 import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
-
+import blogRoutes from "./routes/blog.routes";
 dotenv.config();
 
 const app = express();
