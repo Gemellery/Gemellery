@@ -31,6 +31,8 @@ import ManageUsers from "./pages/Admin/AdminUserManagement";
 import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
+import BlogList from "./pages/Blog/BlogList";
+
 
 function App() {
   return (
