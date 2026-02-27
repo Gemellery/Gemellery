@@ -40,7 +40,7 @@ function AdvancedFooter() {
                             </li>
 
                             <li>
-                                <a href="#blog" className="text-gray-700 hover:text-gray-900 cursor-pointer">
+                                <a href="/blog" className="text-gray-700 hover:text-gray-900 cursor-pointer">
                                     Blog
                                 </a>
                             </li>
