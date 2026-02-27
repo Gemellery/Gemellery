@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
 import BlogCard from "../../components/blog/BlogCard";
-import { BlogPost } from "../../types/blog.types";
+import type { BlogPost } from "../../types/blog.types";
 import { fetchBlogs } from "../../services/blogService";
 import { Search, BookOpen } from "lucide-react";
 
