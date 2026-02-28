@@ -26,7 +26,7 @@ const GemPassport: React.FC<GemPassportProps> = ({
     certificationDate: '2024-01-15',
     gemType: 'Natural Blue Sapphire'
   },
-  onViewDetails
+  
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 

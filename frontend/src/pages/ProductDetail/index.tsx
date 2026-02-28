@@ -1,5 +1,3 @@
-import React from 'react'
-import { useParams } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import ProductGallery from '../../components/ProductGallery'
 import ProductInfo from '../../components/ProductInfo'
@@ -10,7 +8,7 @@ import GemPassport from '../../components/GemPassport'
 import ProductAIDesignStudio from '../../components/ProductAIDesignStudio'
 
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>()
+
   const handleAddToCart = (quantity: number) => {
     console.log(`Added ${quantity} items to cart`)
   }

@@ -18,10 +18,13 @@ import AddNewGem from "./pages/Gem/AddNewGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
+import DesignDetail from "./pages/JewelryDesigner/DesignDetail";
+import DesignHistoryLayout from "./components/jewelry-designer/history/DesignHistoryLayout";
 import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
+import SellerProfile from "./pages/seller/SellerProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import VerifySellers from "./pages/Admin/VerifySellers";
@@ -50,10 +53,20 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/jewelry-designer" element={<JewelryDesigner />} />
-        <Route path="/jewelry_designer" element={<JewelryDesigner />} />
-        <Route path="/jewelry-designer/results" element={<JewelryResults />} />
-        <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+
+        {/* ================= AI JEWELRY DESIGNER (with sidebar) ================= */}
+        <Route path="/jewelry-designer" element={<DesignHistoryLayout />}>
+          <Route index element={<JewelryDesigner />} />
+          <Route path="results" element={<JewelryResults />} />
+          <Route path="refine/:id" element={<JewelryRefine />} />
+          <Route path="design/:id" element={<DesignDetail />} />
+        </Route>
+        <Route path="/jewelry_designer" element={<DesignHistoryLayout />}>
+          <Route index element={<JewelryDesigner />} />
+        </Route>
+
+        {/* Seller Profile - Public */}
+        <Route path="/seller/:id" element={<SellerProfile />} />
 
         {/* ================= SELLER PROTECTED ROUTES ================= */}
         <Route
@@ -93,7 +106,7 @@ function App() {
         />
 
         <Route
-          path="/seller/SellerSettings"
+          path="/seller/settings"
           element={
             <ProtectedRoute allowedRoles={["seller"]}>
               <SellerSettings />

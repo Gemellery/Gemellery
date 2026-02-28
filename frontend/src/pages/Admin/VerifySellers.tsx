@@ -47,7 +47,7 @@ function VerifySellers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [reviewSeller, setReviewSeller] = useState<Seller | null>(null);
   const [verifiedCheck, setVerifiedCheck] = useState(false);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -91,7 +91,7 @@ function VerifySellers() {
     );
   }
 
-  const totalPages = Math.ceil(filtered.length / ROWS_PER_PAGE);
+
   const paginated = filtered.slice(
     (currentPage - 1) * ROWS_PER_PAGE,
     currentPage * ROWS_PER_PAGE
@@ -101,7 +101,7 @@ function VerifySellers() {
     sellers.filter((s) => s.verification_status === status).length;
 
   const updateStatus = async (id: number, status: Status) => {
-    setLoadingId(id);
+    
 
     await fetch(`http://localhost:5001/api/admin/seller/${id}/status`, {
       method: "PUT",
@@ -115,7 +115,7 @@ function VerifySellers() {
     toast.success(`Seller ${status}`);
     setReviewSeller(null);
     setVerifiedCheck(false);
-    setLoadingId(null);
+    
     loadSellers();
   };
 

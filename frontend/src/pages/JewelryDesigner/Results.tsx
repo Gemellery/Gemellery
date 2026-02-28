@@ -8,11 +8,23 @@ import { DesignGallery } from '../../components/jewelry-designer/results/DesignG
 const JewelryResults: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const design = location.state?.design as JewelryDesign | undefined;
+    // Try location.state first, then sessionStorage fallback (for back-navigation)
+    const design = (location.state?.design ||
+        (() => {
+            try { return JSON.parse(sessionStorage.getItem('lastJewelryDesign') || ''); } catch { return null; }
+        })()
+    ) as JewelryDesign | undefined;
 
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
+
+    // Persist design to sessionStorage whenever it changes
+    useEffect(() => {
+        if (design) {
+            try { sessionStorage.setItem('lastJewelryDesign', JSON.stringify(design)); } catch { /* quota exceeded */ }
+        }
+    }, [design]);
 
     useEffect(() => {
         if (!design) {
@@ -21,8 +33,17 @@ const JewelryResults: React.FC = () => {
     }, [design, navigate]);
 
     if (!design) {
-        return null;
+        return (
+            <div style={{ minHeight: '100vh', background: '#FAFAF8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Market Sans', sans-serif" }}>
+                <p style={{ color: '#6B7280' }}>Redirecting...</p>
+            </div>
+        );
     }
+
+    // Safe access for potentially missing fields
+    const generatedImages = design.generatedImages || [];
+    const metals = design.materials?.metals || [];
+
 
     const handleSelectDesign = async (image: GeneratedImage) => {
         setSaving(true);
@@ -63,13 +84,13 @@ const JewelryResults: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0A1128]">
+        <div className="min-h-screen" style={{ background: '#FAFAF8', fontFamily: "'Market Sans', sans-serif" }}>
             <div className="max-w-6xl mx-auto py-12 px-4">
                 {/* Header */}
                 <div className="mb-8">
                     <Link
                         to="/jewelry-designer"
-                        className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-6"
+                        className="inline-flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-6"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Back to Designer
@@ -77,16 +98,16 @@ const JewelryResults: React.FC = () => {
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-serif text-[#D4AF37] mb-2">
-                                Your Designs are Ready! ✨
+                            <h1 className="text-3xl md:text-4xl mb-2 text-gray-900" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>
+                                Your Designs are Ready
                             </h1>
-                            <p className="text-gray-400">
-                                We created {design.generatedImages.length} unique concept{design.generatedImages.length > 1 ? 's' : ''} based on your specifications
+                            <p className="text-gray-500">
+                                We created {generatedImages.length} unique concept{generatedImages.length !== 1 ? 's' : ''} based on your specifications
                             </p>
                         </div>
                         <button
                             onClick={handleShare}
-                            className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+                            className="flex items-center space-x-2 px-4 py-2 rounded-lg border border-gray-300 text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
                         >
                             <Share2 className="w-4 h-4" />
                             <span>Share</span>
@@ -95,42 +116,42 @@ const JewelryResults: React.FC = () => {
                 </div>
 
                 {/* Design Summary */}
-                <div className="bg-[#111827] rounded-2xl border border-gray-800 p-6 mb-8">
-                    <h2 className="text-lg font-medium text-white mb-4">
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
                         Design Specifications
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div className="p-3 rounded-lg bg-[#1a1f35]">
-                            <p className="text-xs text-gray-500 mb-1">Gem Type</p>
-                            <p className="text-white font-medium">{design.gemType}</p>
+                        <div className="p-3 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-400 mb-1">Gem Type</p>
+                            <p className="text-gray-900 font-medium">{design.gemType}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-[#1a1f35]">
-                            <p className="text-xs text-gray-500 mb-1">Cut</p>
-                            <p className="text-white font-medium">{design.gemCut}</p>
+                        <div className="p-3 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-400 mb-1">Cut</p>
+                            <p className="text-gray-900 font-medium">{design.gemCut}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-[#1a1f35]">
-                            <p className="text-xs text-gray-500 mb-1">Color</p>
-                            <p className="text-white font-medium">{design.gemColor}</p>
+                        <div className="p-3 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-400 mb-1">Color</p>
+                            <p className="text-gray-900 font-medium">{design.gemColor}</p>
                         </div>
-                        <div className="p-3 rounded-lg bg-[#1a1f35]">
-                            <p className="text-xs text-gray-500 mb-1">Materials</p>
-                            <p className="text-white font-medium text-sm">
-                                {design.materials.metals.length > 0 ? design.materials.metals.join(', ') : 'Not specified'}
+                        <div className="p-3 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-400 mb-1">Materials</p>
+                            <p className="text-gray-900 font-medium text-sm">
+                                {metals.length > 0 ? metals.join(', ') : 'Not specified'}
                             </p>
                         </div>
                     </div>
-                    <div className="p-3 rounded-lg bg-[#1a1f35]">
-                        <p className="text-xs text-gray-500 mb-1">Your Prompt</p>
-                        <p className="text-white text-sm">{design.designPrompt}</p>
+                    <div className="p-3 rounded-lg bg-gray-50">
+                        <p className="text-xs text-gray-400 mb-1">Your Prompt</p>
+                        <p className="text-gray-700 text-sm">{design.designPrompt}</p>
                     </div>
                 </div>
 
                 {/* Success Message */}
                 {saved && (
-                    <div className="mb-6 p-4 rounded-xl bg-green-900/30 border border-green-700/50">
+                    <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200">
                         <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                            <p className="text-green-200">
+                            <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                            <p className="text-green-800">
                                 Design saved successfully! Redirecting to refinement...
                             </p>
                         </div>
@@ -139,52 +160,56 @@ const JewelryResults: React.FC = () => {
 
                 {/* Saving State */}
                 {saving && !saved && (
-                    <div className="mb-6 p-4 rounded-xl bg-blue-900/30 border border-blue-700/50">
+                    <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200">
                         <div className="flex items-center">
                             <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-3" />
-                            <p className="text-blue-200">Saving your design...</p>
+                            <p className="text-blue-800">Saving your design...</p>
                         </div>
                     </div>
                 )}
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-6 p-4 rounded-xl bg-red-900/30 border border-red-700/50">
+                    <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
                         <div className="flex items-center">
                             <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
-                            <p className="text-red-200">{error}</p>
+                            <p className="text-red-700">{error}</p>
                         </div>
                     </div>
                 )}
 
                 {/* Gallery */}
-                <DesignGallery images={design.generatedImages} onSelectDesign={handleSelectDesign} />
+                <DesignGallery
+                    images={generatedImages}
+                    refinements={design.refinements || []}
+                    onSelectDesign={handleSelectDesign}
+                />
 
                 {/* Call to Action */}
                 <div className="mt-12 text-center">
-                    <h3 className="text-xl text-white mb-2">
+                    <h3 className="text-xl text-gray-900 mb-2 font-semibold">
                         Love your design? Take the next step!
                     </h3>
-                    <p className="text-gray-400 mb-6">
+                    <p className="text-gray-500 mb-6">
                         Select your favorite design to refine it further, or create a new design from scratch.
                     </p>
                     <Link
                         to="/jewelry-designer"
-                        className="inline-flex items-center px-6 py-3 rounded-xl border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+                        className="inline-flex items-center px-6 py-3 rounded-xl border border-gray-300 text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
                     >
                         Create New Design
                     </Link>
                 </div>
 
                 {/* Disclaimer */}
-                <div className="mt-12 p-6 rounded-xl bg-amber-900/20 border border-amber-700/30">
+                <div className="mt-12 p-6 rounded-xl bg-amber-50 border border-amber-200">
                     <div className="flex items-start">
-                        <AlertTriangle className="w-6 h-6 text-amber-500 mr-4 flex-shrink-0 mt-1" />
+                        <AlertTriangle className="w-6 h-6 text-amber-600 mr-4 flex-shrink-0 mt-1" />
                         <div>
-                            <h4 className="text-amber-200 font-medium mb-2">
+                            <h4 className="text-amber-800 font-semibold mb-2">
                                 Important: These are AI-Generated Concept Renderings
                             </h4>
-                            <p className="text-amber-200/80 text-sm leading-relaxed">
+                            <p className="text-amber-700 text-sm leading-relaxed">
                                 The jewelry designs created by this tool are AI-generated concept visualizations for inspiration and reference purposes only.
                                 They are NOT production-ready technical drawings, guaranteed to be structurally sound or manufacturable, or accurate representations
                                 of gem color, clarity, or cut. Before manufacturing any jewelry based on these designs, please consult with a licensed professional

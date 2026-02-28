@@ -1,9 +1,6 @@
--- ============================================
+
 -- AI Jewelry Designer - Database Schema
--- ============================================
--- Run this SQL in your MySQL database to create
--- the jewelry_designs table for the AI feature.
--- ============================================
+
 
 CREATE TABLE IF NOT EXISTS jewelry_designs (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,7 +28,5 @@ CREATE TABLE IF NOT EXISTS jewelry_designs (
   INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================
+
 -- Verify table was created
--- ============================================
--- DESCRIBE jewelry_designs;
