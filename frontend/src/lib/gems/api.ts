@@ -82,6 +82,7 @@ export async function fetchGems(
   if (filters.caratMin !== undefined) params.append('caratMin', filters.caratMin.toString());
   if (filters.caratMax !== undefined) params.append('caratMax', filters.caratMax.toString());
   if (filters.color) params.append('color', filters.color);
+  if (filters.specialColors) params.append('specialColors', filters.specialColors);
   if (filters.cut) params.append('cut', filters.cut);
   if (filters.clarity) params.append('clarity', filters.clarity);
   if (filters.origin) params.append('origin', filters.origin);

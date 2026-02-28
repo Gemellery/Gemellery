@@ -170,8 +170,18 @@ function convertToGemFilters(
     }
   }
 
+  // Color — separate normal colors from "Special Colors"
   if (filters.color.length > 0) {
-    gemFilters.color = filters.color.join(',');
+    const normalColors = filters.color.filter(c => c !== 'Special Colors');
+    const wantsSpecial = filters.color.includes('Special Colors');
+
+    if (normalColors.length > 0) {
+      gemFilters.color = normalColors.join(',');
+    }
+
+    if (wantsSpecial) {
+      gemFilters.specialColors = 'true';
+    }
   }
 
   if (filters.cutShape.length > 0) {
@@ -637,9 +647,16 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
         <div className="space-y-1">
           {[
             { label: 'Blue', value: 'Blue' },
-            { label: 'Light Blue', value: 'Light blue' },
             { label: 'Red', value: 'Red' },
-            { label: 'Natural Red', value: 'Natural Red' },
+            { label: 'Green', value: 'Green' },
+            { label: 'Yellow', value: 'Yellow' },
+            { label: 'Pink', value: 'Pink' },
+            { label: 'Purple', value: 'Purple' },
+            { label: 'Orange', value: 'Orange' },
+            { label: 'Brown', value: 'Brown' },            
+            { label: 'Black', value: 'Black' },
+            { label: 'White/Colorless', value: 'White/Colorless' },
+            { label: 'Special Colors', value: 'Special Colors' },
           ].map(item => (
             <FilterCheckbox
               key={item.value}

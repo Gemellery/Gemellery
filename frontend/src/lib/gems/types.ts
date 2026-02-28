@@ -40,6 +40,7 @@ export interface GemFilters {
   clarity?: string;
   origin?: string;
   isCertified?: string;
+  specialColors?: string;
 }
 
 // ──────────────────────────────────────────────
