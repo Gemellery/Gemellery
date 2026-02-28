@@ -234,28 +234,28 @@ export const getGems = async (req: any, res: any) => {
     // Build main query
     let query = `
       SELECT 
-        g.gem_id as id,
-        g.gem_name as name,
-        g.gem_type as type,
-        g.price,
-        g.carat as weight,
-        g.cut,
-        g.clarity,
-        g.color,
-        g.origin,
-        g.description,
-        g.ngja_certificate_no as certification,
-        g.ngja_certificate_url as certificateUrl,
-        JSON_ARRAYAGG(gi.image_url) as images,
-        g.seller_id,
-        u.full_name as seller_name,
-        g.verification_status as verificationStatus,
-        CASE 
-          WHEN g.verification_status = 'verified' THEN true
-          ELSE false
-        END as verified,
-        g.status,
-        g.created_at as createdAt
+      g.gem_id as id,
+      g.gem_name as name,
+      g.gem_type as type,
+      g.price,
+      g.carat as weight,
+      g.cut,
+      g.clarity,
+      g.color,
+      g.origin,
+      g.description,
+      g.ngja_certificate_no as certification,
+      g.ngja_certificate_url as certificateUrl,
+      JSON_ARRAYAGG(gi.image_url) as images,
+      g.seller_id,
+      u.full_name as seller_name,
+      g.verification_status as verificationStatus,
+      CASE 
+        WHEN LOWER(g.verification_status) = 'approved' THEN 1
+        ELSE 0
+      END as verified,
+      g.status,
+      g.created_at as createdAt
       FROM gem g
       LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
       LEFT JOIN user u ON g.seller_id = u.user_id
