@@ -27,6 +27,9 @@ export interface Gem extends GemListItem {
   created_at: string;
 }
 
+// Basic colors
+const BASIC_COLOR_KEYWORDS = ['Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Purple', 'Orange', 'Black', 'White', 'Colorless'];
+
 export const gemModel = {
   // Fetch gems with filters
   getGems: async (params: any) => {
@@ -39,6 +42,7 @@ export const gemModel = {
       origin, 
       clarity, 
       color,
+      specialColors,
       search, 
       hasCertificate,  
       sellerVerified   
@@ -105,11 +109,30 @@ export const gemModel = {
       }
       
       // Color Filter
+      const colorParts: string[] = [];
+
       if (color) {
-        query += ` AND g.color = ?`;
-        queryParams.push(color);
+        const colors = color.split(',');
+        const conditions = colors.map(() => `g.color LIKE ?`).join(' OR ');
+        colorParts.push(`(${conditions})`);
+        colors.forEach((c: string) => {
+          queryParams.push(`%${c.trim()}%`);
+        });
       }
-      
+
+      // Special Colors Filter
+      if (specialColors === 'true') {
+        const excludeConditions = BASIC_COLOR_KEYWORDS.map(() => `g.color NOT LIKE ?`).join(' AND ');
+        colorParts.push(`(${excludeConditions})`);
+        BASIC_COLOR_KEYWORDS.forEach(c => {
+          queryParams.push(`%${c}%`);
+        });
+      }
+
+      if (colorParts.length > 0) {
+        query += ` AND (${colorParts.join(' OR ')})`;
+      }
+
       // Certificate Filter
       if (hasCertificate === 'true') {
         query += ` AND g.ngja_certificate_url IS NOT NULL`;
@@ -138,11 +161,11 @@ export const gemModel = {
   
   // Count total gems matching filters
   getGemCount: async (params: any) => {
-    const { type, priceMin, priceMax, origin, clarity, search, treatment, sellerVerification } = params;
+    const { type, priceMin, priceMax, origin, clarity, color, specialColors, search, treatment, sellerVerification } = params;
     
     try {
       let query = `
-        SELECT COUNT(*) as total
+        SELECT COUNT(DISTINCT g.gem_id) as total
         FROM gem g
         WHERE g.status = 'Available'
       `;
@@ -174,6 +197,30 @@ export const gemModel = {
         queryParams.push(clarity);
       }
       
+      // ========= Color Filter ==========
+      const colorParts: string[] = [];
+
+      if (color) {
+        const colors = color.split(',');
+        const conditions = colors.map(() => `g.color LIKE ?`).join(' OR ');
+        colorParts.push(`(${conditions})`);
+        colors.forEach((c: string) => {
+          queryParams.push(`%${c.trim()}%`);
+        });
+      }
+
+      if (specialColors === 'true') {
+        const excludeConditions = BASIC_COLOR_KEYWORDS.map(() => `g.color NOT LIKE ?`).join(' AND ');
+        colorParts.push(`(${excludeConditions})`);
+        BASIC_COLOR_KEYWORDS.forEach(c => {
+          queryParams.push(`%${c}%`);
+        });
+      }
+
+      if (colorParts.length > 0) {
+        query += ` AND (${colorParts.join(' OR ')})`;
+      }
+      
       if (search) {
         query += ` AND g.gem_name LIKE ?`;
         queryParams.push(`%${search}%`);
@@ -182,11 +229,6 @@ export const gemModel = {
       if (treatment) {
         query += ` AND g.gem_type LIKE ?`;
         queryParams.push(`%${treatment}%`);
-      }
-      
-      if (sellerVerification) {
-        query += ` AND s.verification_status = ?`;
-        queryParams.push(sellerVerification);
       }
       
       const [result]: any = await pool.query(query, queryParams);

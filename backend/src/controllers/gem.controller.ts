@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import pool from "../database";
 import { gemModel } from "../models/Gem.model";
 
+const BASIC_COLOR_KEYWORDS = ['Blue', 'Red', 'Green', 'Yellow', 'Pink', 'Purple', 'Orange', 'Brown', 'Black', 'White', 'Colorless'];
+
 export const createGem = async (req: Request, res: Response) => {
     const conn = await pool.getConnection();
 
@@ -137,10 +139,7 @@ export const getGems = async (req: any, res: any) => {
     // Filter by gem name 
     addInClause(req.query.gemName, 'g.gem_name');
 
-    // Filter by color 
-    addInClause(req.query.color, 'g.color');
-
-    // Filter by cut 
+    // Filter by cut (exact match)
     addInClause(req.query.cut, 'g.cut');
 
     // Filter by clarity
@@ -148,6 +147,32 @@ export const getGems = async (req: any, res: any) => {
 
     // Filter by origin 
     addInClause(req.query.origin, 'g.origin');
+
+    const colorParts: string[] = [];
+
+    if (req.query.color) {
+      const colors = (req.query.color as string).split(',').map((c: string) => c.trim()).filter((c: string) => c);
+
+      if (colors.length > 0) {
+        const likeConditions = colors.map(() => `g.color LIKE ?`).join(' OR ');
+        colorParts.push(`(${likeConditions})`);
+        colors.forEach((c: string) => {
+          queryParams.push(`%${c}%`);
+        });
+      }
+    }
+
+    if (req.query.specialColors === 'true') {
+      const excludeConditions = BASIC_COLOR_KEYWORDS.map(() => `g.color NOT LIKE ?`).join(' AND ');
+      colorParts.push(`(${excludeConditions})`);
+      BASIC_COLOR_KEYWORDS.forEach(c => {
+        queryParams.push(`%${c}%`);
+      });
+    }
+
+    if (colorParts.length > 0) {
+      whereConditions.push(`(${colorParts.join(' OR ')})`);
+    }
 
     // Filter by price range
     if (req.query.priceRanges) {
