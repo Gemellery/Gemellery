@@ -5,18 +5,14 @@
 import { getGemImageUrl } from '@/lib/gems/api';
 import type { GemListItem } from '@/lib/gems/types';
 
-// ──────────────────────────────────────────────
-// parsePrice
-// ──────────────────────────────────────────────
+/* === parsePrice === */
 export function parsePrice(price: string | undefined | null): number {
   if (!price) return 0;
   const parsed = parseFloat(price);
   return isNaN(parsed) ? 0 : parsed;
 }
 
-// ──────────────────────────────────────────────
-// formatPrice
-// ──────────────────────────────────────────────
+/* === formatPrice === */
 export function formatPrice(
   price: string | undefined | null,
   currency: string = 'USD'
@@ -30,9 +26,7 @@ export function formatPrice(
   }).format(numericPrice);
 }
 
-// ──────────────────────────────────────────────
-// formatWeight
-// ──────────────────────────────────────────────
+/* === formatWeight === */
 export function formatWeight(weight: string | undefined | null): string {
   if (!weight) return '0.00 ct';
   const parsed = parseFloat(weight);
@@ -40,9 +34,7 @@ export function formatWeight(weight: string | undefined | null): string {
   return `${parsed.toFixed(2)} ct`;
 }
 
-// ──────────────────────────────────────────────
-// formatDate
-// ──────────────────────────────────────────────
+/* === formatDate === */
 export function formatDate(dateString: string | undefined | null): string {
   if (!dateString) return 'Unknown date';
   const date = new Date(dateString);
@@ -54,16 +46,12 @@ export function formatDate(dateString: string | undefined | null): string {
   }).format(date);
 }
 
-// ──────────────────────────────────────────────
-// isVerified — Check if a gem has been approved
-// ──────────────────────────────────────────────
+/* === isVerified — Check if a gem has been approved === */
 export function isVerified(verificationStatus: string | undefined | null): boolean {
-  return verificationStatus === 'verified';
+  return verificationStatus === 'approved';
 }
 
-// ──────────────────────────────────────────────
-// isCertified / getCertificationLabel
-// ──────────────────────────────────────────────
+/* === isCertified / getCertificationLabel === */
 export function isCertified(certification: string | undefined | null): boolean {
   if (!certification) return false;
   const trimmed = certification.trim();
@@ -74,9 +62,7 @@ export function getCertificationLabel(certification: string | undefined | null):
   return isCertified(certification) ? 'Certified' : 'Not Certified';
 }
 
-// ──────────────────────────────────────────────
-// Image helpers
-// ──────────────────────────────────────────────
+/* === Image helpers === */
 const PLACEHOLDER_IMAGE = '/sample_gems/placeholder.jpg';
 
 export function getFirstImage(images: string[] | undefined | null): string {
@@ -107,9 +93,7 @@ export function getAllImages(images: string[] | undefined | null): string[] {
   return validImages.length > 0 ? validImages : [PLACEHOLDER_IMAGE];
 }
 
-// ──────────────────────────────────────────────
-// parseImages — Safely parse the images field
-// ──────────────────────────────────────────────
+/* === parseImages — Safely parse the images field === */
 export function parseImages(images: any): string[] {
   if (!images) return [];
 
@@ -132,9 +116,7 @@ export function parseImages(images: any): string[] {
   return [];
 }
 
-// ──────────────────────────────────────────────
-// Display-ready gem type
-// ──────────────────────────────────────────────
+/* === Display-ready gem type === */
 export interface GemCardDisplay {
   id: number;
   name: string;
@@ -151,17 +133,17 @@ export interface GemCardDisplay {
   allImageUrls: string[];
   sellerName: string;
   isVerified: boolean;
+  verified: boolean;
   isCertified: boolean;
   certificationLabel: string;
   status: string;
   createdAt: string;
 }
 
-// ──────────────────────────────────────────────
-// transformGemForCard
-// ──────────────────────────────────────────────
+/* === transformGemForCard === */
 export function transformGemForCard(gem: GemListItem): GemCardDisplay {
   const normalizedImages = parseImages(gem.images);
+  const gemIsVerified = isVerified(gem.verificationStatus);
 
   return {
     id: gem.id,
@@ -178,7 +160,8 @@ export function transformGemForCard(gem: GemListItem): GemCardDisplay {
     imageUrl: getFirstImage(normalizedImages),
     allImageUrls: getAllImages(normalizedImages),
     sellerName: gem.seller_name,
-    isVerified: isVerified(gem.verificationStatus),
+    isVerified: gemIsVerified,
+    verified: gemIsVerified,
     isCertified: isCertified(gem.certification),
     certificationLabel: getCertificationLabel(gem.certification),
     status: gem.status,

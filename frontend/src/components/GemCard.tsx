@@ -14,12 +14,21 @@ interface GemCardProps {
   cut: string
   origin: string
   certification: string
-  verified: boolean
+  verified: boolean | number | string
   image: string
 }
 
 const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin, certification, verified, image }) => {
   const navigate = useNavigate()
+
+  // Normalize verified to a real boolean
+  const isVerified = 
+    verified === true || 
+    verified === 1 || 
+    verified === '1' || 
+    verified === 'true' || 
+    verified === 'approved' || 
+    verified === 'verified'
 
   const handleCardClick = () => {
     if (id) {
@@ -44,7 +53,7 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
         />
         
         {/* Verified Badge */}
-        {verified && (
+        {isVerified && (
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white/95 rounded-full px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center gap-1.5 shadow-md hover:shadow-lg transition backdrop-blur-sm">
             <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
             <span className="text-xs sm:text-sm font-semibold text-gray-800">Verified</span>

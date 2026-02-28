@@ -1,16 +1,12 @@
 import { API_CONFIG } from '@/lib/api.config';
 import type { GemListItem, GemFilters, GemApiResponse } from '@/lib/gems/types';
 
-// ──────────────────────────────────────────────
-// Image URL builder
-// ──────────────────────────────────────────────
+/* === Image URL builder === */
 export function getGemImageUrl(filename: string): string {
   return `${API_CONFIG.BASE_URL}/uploads/gem_images/${filename}`;
 }
 
-// ──────────────────────────────────────────────
-// parseImages — safely parse the images field
-// ──────────────────────────────────────────────
+/* === parseImages — safely parse the images field === */
 function parseImages(images: any): string[] {
   if (!images) return [];
 
@@ -36,9 +32,7 @@ function parseImages(images: any): string[] {
   return [];
 }
 
-// ──────────────────────────────────────────────
-// normalizeGem — convert raw API row → GemListItem
-// ──────────────────────────────────────────────
+/* === normalizeGem — convert raw API row → GemListItem === */
 function normalizeGem(raw: any): GemListItem {
   return {
     id: raw.id,
@@ -63,9 +57,7 @@ function normalizeGem(raw: any): GemListItem {
   };
 }
 
-// ──────────────────────────────────────────────
-// fetchGems — fetch gems from GET /api/gems
-// ──────────────────────────────────────────────
+/* === fetchGems — fetch gems from GET /api/gems === */
 export async function fetchGems(
   filters: GemFilters = {}
 ): Promise<GemApiResponse> {
