@@ -1,8 +1,6 @@
 import pool from "../database";
 
-// ============================================
-// TypeScript Interfaces
-// ============================================
+
 
 export interface GeneratedImage {
   id: string;
@@ -14,6 +12,7 @@ export interface GeneratedImage {
 export interface Refinement {
   id: string;
   prompt: string;
+  baseImageId?: string;  // ID of the original GeneratedImage
   baseImageUrl: string;
   imageUrl: string;
   thumbnailUrl?: string;
@@ -67,14 +66,8 @@ export interface JewelryDesignInput {
   generated_images: GeneratedImage[];
 }
 
-// ============================================
-// Database Helper Functions
-// ============================================
 
-/**
- * Create a new jewelry design
- * @returns The inserted design ID
- */
+
 export const createDesign = async (
   data: JewelryDesignInput
 ): Promise<number> => {
@@ -107,9 +100,6 @@ export const createDesign = async (
   return result.insertId;
 };
 
-/**
- * Get a design by ID (only if it belongs to the user)
- */
 export const getDesignById = async (
   id: number,
   userId: number
@@ -126,9 +116,6 @@ export const getDesignById = async (
   return parseDesignRow(rows[0]);
 };
 
-/**
- * Get all designs for a user
- */
 export const getUserDesigns = async (
   userId: number
 ): Promise<JewelryDesignAttributes[]> => {
@@ -140,9 +127,6 @@ export const getUserDesigns = async (
   return rows.map(parseDesignRow);
 };
 
-/**
- * Update a design
- */
 export const updateDesign = async (
   id: number,
   userId: number,
@@ -184,9 +168,6 @@ export const updateDesign = async (
   return result.affectedRows > 0;
 };
 
-/**
- * Delete a design
- */
 export const deleteDesign = async (
   id: number,
   userId: number
@@ -199,13 +180,8 @@ export const deleteDesign = async (
   return result.affectedRows > 0;
 };
 
-// ============================================
-// Helper Functions
-// ============================================
 
-/**
- * Parse a database row into a JewelryDesignAttributes object
- */
+
 const parseDesignRow = (row: any): JewelryDesignAttributes => {
   return {
     id: row.id,

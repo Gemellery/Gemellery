@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
-import { authGuard } from "../middleware/auth.middleware";
+import { authGuard, optionalAuthGuard } from "../middleware/auth.middleware";
 import {
     getUserDesigns,
     getDesignByIdController,
@@ -33,26 +33,19 @@ const upload = multer({
 // Public route - Get AI status (no auth required)
 router.get("/status", getAIStatus);
 
+// Design routes - use optionalAuthGuard to parse JWT if present
+// Controllers handle auth enforcement (return 401 if login required)
+router.post("/generate", optionalAuthGuard, generateDesign);
+router.put("/:id/save", optionalAuthGuard, saveDesign);
+router.post("/:id/refine", optionalAuthGuard, refineDesign);
+router.get("/user-designs", optionalAuthGuard, getUserDesigns);
+router.get("/:id", optionalAuthGuard, getDesignByIdController);
+
 // All other routes require authentication
 router.use(authGuard);
 
-// GET /api/jewelry-design/user-designs - Get all designs for current user
-router.get("/user-designs", getUserDesigns);
-
-// GET /api/jewelry-design/:id - Get single design by ID
-router.get("/:id", getDesignByIdController);
-
-// POST /api/jewelry-design/generate - Generate new jewelry designs
-router.post("/generate", generateDesign);
-
 // POST /api/jewelry-design/upload-gem-image - Upload a gem image
 router.post("/upload-gem-image", upload.single("image"), uploadGemImage);
-
-// PUT /api/jewelry-design/:id/save - Save/select a design image
-router.put("/:id/save", saveDesign);
-
-// POST /api/jewelry-design/:id/refine - Refine an existing design
-router.post("/:id/refine", refineDesign);
 
 // DELETE /api/jewelry-design/:id - Delete a design
 router.delete("/:id", deleteDesignController);

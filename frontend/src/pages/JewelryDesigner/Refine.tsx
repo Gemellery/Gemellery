@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, Download, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle, AlertCircle, Save } from 'lucide-react';
 import { getDesignById, refineDesign } from '../../lib/jewelry-designer/api';
 import type { JewelryDesign, GeneratedImage } from '../../lib/jewelry-designer/types';
 import { RefinementPrompt } from '../../components/jewelry-designer/refinement/RefinementPrompt';
@@ -26,6 +26,7 @@ const JewelryRefine: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showComparison, setShowComparison] = useState(false);
     const [previousImageUrl, setPreviousImageUrl] = useState('');
+    const [refinedDesign, setRefinedDesign] = useState<JewelryDesign | null>(null);
 
     // Fetch design if not in state
     useEffect(() => {
@@ -69,18 +70,18 @@ const JewelryRefine: React.FC = () => {
                 parseInt(id),
                 prompt,
                 baseImageUrl,
-                strength
+                strength,
+                selectedImage?.id // pass original image ID for gallery matching
             );
 
-            // Update design with new refinement
+            // Update design + show refined image
             setDesign(result.design);
             setCurrentImageUrl(result.refinement.imageUrl);
-            setBaseImageUrl(result.refinement.imageUrl);
-            setSuccess('Design refined successfully!');
+            // Do NOT update baseImageUrl — keep it pointing to original for consistent gallery matching
+            setRefinedDesign(result.design);
+            setSuccess('Design refined successfully! Click "Save & View in Gallery" to see it.');
             setShowComparison(true);
 
-            // Hide success message after 3 seconds
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err: unknown) {
             console.error('Refinement error:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to refine design';
@@ -96,18 +97,30 @@ const JewelryRefine: React.FC = () => {
         setShowComparison(false);
     };
 
-    const downloadImage = async (url: string) => {
+    const downloadImage = (url: string, filename?: string) => {
         try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `refined-design-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(downloadUrl);
+            link.download = filename || `jewelry-design-${Date.now()}.png`;
+
+            if (url.startsWith('data:')) {
+                // data URI — link directly
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // Regular URL — fetch as blob
+                fetch(url)
+                    .then(r => r.blob())
+                    .then(blob => {
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        link.href = blobUrl;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                    });
+            }
         } catch (error) {
             console.error('Download failed:', error);
             alert('Failed to download image');
@@ -116,8 +129,8 @@ const JewelryRefine: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0A1128] flex items-center justify-center">
-                <div className="flex items-center space-x-3 text-white">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAFAF8', fontFamily: "'Market Sans', sans-serif" }}>
+                <div className="flex items-center space-x-3 text-gray-600">
                     <div className="w-6 h-6 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
                     <span>Loading design...</span>
                 </div>
@@ -127,8 +140,8 @@ const JewelryRefine: React.FC = () => {
 
     if (!design || !selectedImage) {
         return (
-            <div className="min-h-screen bg-[#0A1128] flex items-center justify-center">
-                <div className="flex items-center space-x-3 text-red-400">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#FAFAF8' }}>
+                <div className="flex items-center space-x-3 text-red-500">
                     <AlertCircle className="w-6 h-6" />
                     <span>Design not found</span>
                 </div>
@@ -137,43 +150,62 @@ const JewelryRefine: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0A1128]">
+        <div className="min-h-screen" style={{ background: '#FAFAF8', fontFamily: "'Market Sans', sans-serif" }}>
             <div className="max-w-7xl mx-auto py-8 px-4">
                 {/* Header */}
                 <div className="mb-8">
                     <Link
                         to="/jewelry-designer/results"
                         state={{ design }}
-                        className="inline-flex items-center text-gray-400 hover:text-white transition-colors mb-4"
+                        className="inline-flex items-center text-gray-500 hover:text-gray-900 transition-colors mb-4"
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Back to Results
                     </Link>
 
-                    <h1 className="text-3xl font-serif text-[#D4AF37] mb-2">
+                    <h1 className="text-3xl mb-2 text-gray-900" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>
                         Refine Your Design
                     </h1>
-                    <p className="text-gray-400">
+                    <p className="text-gray-500">
                         Make adjustments to perfect your jewelry design
                     </p>
                 </div>
 
-                {/* Success Message */}
-                {success && (
-                    <div className="mb-6 p-4 rounded-xl bg-green-900/30 border border-green-700/50">
-                        <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                            <p className="text-green-200">{success}</p>
+                {/* Success / Save Panel — shown after a refinement completes */}
+                {success && refinedDesign && (
+                    <div className="mb-6 p-5 rounded-xl bg-green-50 border border-green-200">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div className="flex items-center">
+                                <CheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                                <p className="text-green-800 text-sm">{success}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    try {
+                                        sessionStorage.setItem(
+                                            'lastJewelryDesign',
+                                            JSON.stringify(refinedDesign)
+                                        );
+                                    } catch { /* quota */ }
+                                    navigate('/jewelry-designer/results', {
+                                        state: { design: refinedDesign },
+                                    });
+                                }}
+                                className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#D4AF37] to-[#F5D061] text-[#0A1128] font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                            >
+                                <Save className="w-4 h-4" />
+                                <span>Save &amp; View in Gallery</span>
+                            </button>
                         </div>
                     </div>
                 )}
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mb-6 p-4 rounded-xl bg-red-900/30 border border-red-700/50">
+                    <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200">
                         <div className="flex items-center">
                             <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
-                            <p className="text-red-200">{error}</p>
+                            <p className="text-red-700">{error}</p>
                         </div>
                     </div>
                 )}
@@ -182,14 +214,14 @@ const JewelryRefine: React.FC = () => {
                     {/* Left: Design Display (2 columns) */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Current Design */}
-                        <div className="bg-[#111827] rounded-2xl border border-gray-800 p-6">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-lg font-medium text-white">
+                                <h2 className="text-lg font-semibold text-gray-900">
                                     Current Version
                                 </h2>
                                 <button
                                     onClick={() => downloadImage(currentImageUrl)}
-                                    className="flex items-center space-x-2 px-4 py-2 border border-gray-700 rounded-lg text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+                                    className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
                                 >
                                     <Download className="w-4 h-4" />
                                     <span>Download</span>
@@ -206,7 +238,7 @@ const JewelryRefine: React.FC = () => {
                         </div>
 
                         {/* Version History */}
-                        <div className="bg-[#111827] rounded-2xl border border-gray-800 p-6">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                             <VersionHistory
                                 originalImages={design.generatedImages}
                                 selectedOriginal={selectedImage}
@@ -221,7 +253,7 @@ const JewelryRefine: React.FC = () => {
 
                         {/* Comparison View */}
                         {showComparison && previousImageUrl && (
-                            <div className="bg-[#111827] rounded-2xl border border-gray-800 p-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                                 <ComparisonView
                                     beforeImage={previousImageUrl}
                                     afterImage={currentImageUrl}
@@ -234,8 +266,8 @@ const JewelryRefine: React.FC = () => {
 
                     {/* Right: Refinement Controls (1 column) */}
                     <div className="lg:col-span-1">
-                        <div className="bg-[#111827] rounded-2xl border border-gray-800 p-6 sticky top-8 space-y-6">
-                            <h2 className="text-lg font-medium text-white">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-8 space-y-6 shadow-sm">
+                            <h2 className="text-lg font-semibold text-gray-900">
                                 Refine Design
                             </h2>
 
@@ -245,22 +277,22 @@ const JewelryRefine: React.FC = () => {
                             />
 
                             {/* Design Info */}
-                            <div className="pt-6 border-t border-gray-700 space-y-4">
-                                <h3 className="text-sm font-medium text-white">
+                            <div className="pt-6 border-t border-gray-200 space-y-4">
+                                <h3 className="text-sm font-semibold text-gray-900">
                                     Design Details
                                 </h3>
                                 <div className="grid grid-cols-2 gap-3 text-sm">
-                                    <div className="p-2 rounded bg-[#1a1f35]">
-                                        <span className="text-gray-500 block text-xs">Gem</span>
-                                        <span className="text-white">{design.gemType} - {design.gemCut}</span>
+                                    <div className="p-2 rounded bg-gray-50">
+                                        <span className="text-gray-400 block text-xs">Gem</span>
+                                        <span className="text-gray-900">{design.gemType} - {design.gemCut}</span>
                                     </div>
-                                    <div className="p-2 rounded bg-[#1a1f35]">
-                                        <span className="text-gray-500 block text-xs">Color</span>
-                                        <span className="text-white">{design.gemColor}</span>
+                                    <div className="p-2 rounded bg-gray-50">
+                                        <span className="text-gray-400 block text-xs">Color</span>
+                                        <span className="text-gray-900">{design.gemColor}</span>
                                     </div>
-                                    <div className="col-span-2 p-2 rounded bg-[#1a1f35]">
-                                        <span className="text-gray-500 block text-xs">Refinements</span>
-                                        <span className="text-[#D4AF37] font-medium">
+                                    <div className="col-span-2 p-2 rounded bg-gray-50">
+                                        <span className="text-gray-400 block text-xs">Refinements</span>
+                                        <span className="text-[#B8860B] font-medium">
                                             {design.refinements?.length || 0}
                                         </span>
                                     </div>
@@ -268,11 +300,11 @@ const JewelryRefine: React.FC = () => {
                             </div>
 
                             {/* Original Prompt */}
-                            <div className="pt-4 border-t border-gray-700">
-                                <h3 className="text-sm font-medium text-white mb-2">
+                            <div className="pt-4 border-t border-gray-200">
+                                <h3 className="text-sm font-semibold text-gray-900 mb-2">
                                     Original Prompt
                                 </h3>
-                                <p className="text-sm text-gray-400 leading-relaxed">
+                                <p className="text-sm text-gray-600 leading-relaxed">
                                     {design.designPrompt}
                                 </p>
                             </div>

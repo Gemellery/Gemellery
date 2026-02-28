@@ -2,15 +2,10 @@ import * as admin from "firebase-admin";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
-// ============================================
-// Firebase Admin Configuration
-// ============================================
+
 
 let firebaseInitialized = false;
 
-/**
- * Initialize Firebase Admin SDK
- */
 function initializeFirebase(): void {
     if (firebaseInitialized) return;
 
@@ -45,9 +40,7 @@ function initializeFirebase(): void {
     }
 }
 
-// ============================================
-// Types
-// ============================================
+
 
 export interface UploadedImage {
     id: string;
@@ -62,14 +55,8 @@ export interface UploadOptions {
     folder?: string;
 }
 
-// ============================================
-// Image Upload Functions
-// ============================================
 
-/**
- * Upload an image to Firebase Storage
- * Automatically creates a thumbnail
- */
+
 export async function uploadDesignImage(
     imageBuffer: Buffer,
     options: UploadOptions,
@@ -144,9 +131,6 @@ export async function uploadDesignImage(
     }
 }
 
-/**
- * Upload a gem image (user's photo of their gemstone)
- */
 export async function uploadGemImage(
     imageBuffer: Buffer,
     userId: number
@@ -157,9 +141,6 @@ export async function uploadGemImage(
     });
 }
 
-/**
- * Delete an image and its thumbnail from Firebase Storage
- */
 export async function deleteDesignImage(imageUrl: string): Promise<boolean> {
     initializeFirebase();
 
@@ -190,9 +171,6 @@ export async function deleteDesignImage(imageUrl: string): Promise<boolean> {
     }
 }
 
-/**
- * Download an image from a URL and return as Buffer
- */
 export async function downloadImageAsBuffer(url: string): Promise<Buffer> {
     const response = await fetch(url);
 
@@ -204,9 +182,6 @@ export async function downloadImageAsBuffer(url: string): Promise<Buffer> {
     return Buffer.from(arrayBuffer);
 }
 
-/**
- * Process an uploaded file buffer (validate and optimize)
- */
 export async function processUploadedImage(
     buffer: Buffer,
     maxSize: number = 1024
@@ -223,9 +198,6 @@ export async function processUploadedImage(
     }
 }
 
-/**
- * Check if Firebase is properly configured
- */
 export function isFirebaseConfigured(): boolean {
     return !!(
         process.env.FIREBASE_PROJECT_ID &&
@@ -235,18 +207,58 @@ export function isFirebaseConfigured(): boolean {
     );
 }
 
-/**
- * Get a placeholder image URL (for when Firebase is not available or image generation fails)
- */
 export function getPlaceholderImageUrl(text: string = "Design"): string {
-    const encodedText = encodeURIComponent(text);
-    return `https://via.placeholder.com/1024x1024/D4AF37/0A1128?text=${encodedText}`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1128"/>
+      <stop offset="100%" style="stop-color:#1a2a5e"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37"/>
+      <stop offset="100%" style="stop-color:#F5D061"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- Decorative ring shape -->
+  <circle cx="512" cy="440" r="180" fill="none" stroke="url(#gem)" stroke-width="32" opacity="0.8"/>
+  <circle cx="512" cy="440" r="120" fill="none" stroke="#D4AF37" stroke-width="12" opacity="0.4"/>
+  <!-- Gem shape (diamond) -->
+  <polygon points="512,300 580,420 512,500 444,420" fill="url(#gem)" opacity="0.9"/>
+  <polygon points="512,300 580,420 512,380" fill="#F5D061" opacity="0.6"/>
+  <!-- Text -->
+  <text x="512" y="680" font-family="Georgia, serif" font-size="48" fill="#D4AF37" text-anchor="middle" opacity="0.9">${text}</text>
+  <text x="512" y="730" font-family="Georgia, serif" font-size="28" fill="#9CA3AF" text-anchor="middle" opacity="0.7">AI Concept Design</text>
+  <!-- Corner decorations -->
+  <line x1="50" y1="50" x2="150" y2="50" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="50" x2="50" y2="150" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="974" y1="50" x2="874" y2="50" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="974" y1="50" x2="974" y2="150" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="974" x2="150" y2="974" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="50" y1="974" x2="50" y2="874" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="974" y1="974" x2="874" y2="974" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+  <line x1="974" y1="974" x2="974" y2="874" stroke="#D4AF37" stroke-width="2" opacity="0.3"/>
+</svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
-/**
- * Get a placeholder thumbnail URL
- */
 export function getPlaceholderThumbnailUrl(text: string = "Design"): string {
-    const encodedText = encodeURIComponent(text);
-    return `https://via.placeholder.com/300x300/D4AF37/0A1128?text=${encodedText}`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1128"/>
+      <stop offset="100%" style="stop-color:#1a2a5e"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37"/>
+      <stop offset="100%" style="stop-color:#F5D061"/>
+    </linearGradient>
+  </defs>
+  <rect width="300" height="300" fill="url(#bg)"/>
+  <circle cx="150" cy="130" r="55" fill="none" stroke="url(#gem)" stroke-width="10" opacity="0.8"/>
+  <polygon points="150,88 175,125 150,148 125,125" fill="url(#gem)" opacity="0.9"/>
+  <text x="150" y="205" font-family="Georgia, serif" font-size="18" fill="#D4AF37" text-anchor="middle">${text}</text>
+</svg>`;
+    return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
+

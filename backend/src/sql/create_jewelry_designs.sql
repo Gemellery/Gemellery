@@ -1,10 +1,6 @@
-
--- AI Jewelry Designer - Database Schema
-
-
 CREATE TABLE IF NOT EXISTS jewelry_designs (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
+  user_id INT NOT NULL DEFAULT 0,
   gem_type VARCHAR(50) NOT NULL,
   gem_cut VARCHAR(50) NOT NULL,
   gem_size_mode ENUM('simple', 'advanced') NOT NULL DEFAULT 'simple',
@@ -15,18 +11,14 @@ CREATE TABLE IF NOT EXISTS jewelry_designs (
   gem_size_carat DECIMAL(10,2),
   gem_color VARCHAR(50) NOT NULL,
   gem_transparency VARCHAR(50) NOT NULL,
-  gem_image_url TEXT,
+  gem_image_url LONGTEXT,
   design_prompt TEXT NOT NULL,
-  materials JSON NOT NULL,
-  generated_images JSON NOT NULL,
-  selected_image_url TEXT,
-  refinements JSON,
+  materials LONGTEXT NOT NULL,
+  generated_images LONGTEXT NOT NULL,
+  selected_image_url LONGTEXT,
+  refinements LONGTEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
   INDEX idx_user_id (user_id),
   INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
--- Verify table was created
