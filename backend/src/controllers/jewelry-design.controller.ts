@@ -26,9 +26,7 @@ import {
     processUploadedImage,
 } from "../utils/firebase-storage";
 
-// ============================================
-// Helper: Transform DB row (snake_case) → Frontend shape (camelCase)
-// ============================================
+// Transform DB row (snake_case) to frontend shape (camelCase)
 const transformDesign = (d: any) => ({
     id: d.id,
     userId: d.user_id,
@@ -52,15 +50,8 @@ const transformDesign = (d: any) => ({
     updatedAt: d.updated_at,
 });
 
-// ============================================
-// Controller Functions
 
-// ============================================
 
-/**
- * Get all designs for the current user
- * GET /api/jewelry-design/user-designs
- */
 export const getUserDesigns = async (
     req: Request,
     res: Response
@@ -68,24 +59,21 @@ export const getUserDesigns = async (
     try {
         const userId = (req as any).user?.id;
 
+        // No logged-in user — return empty (don't show guest designs)
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(200).json({ designs: [] });
             return;
         }
 
         const designs = await getUserDesignsFromDB(userId);
 
-        res.status(200).json({ designs });
+        res.status(200).json({ designs: designs.map(transformDesign) });
     } catch (error) {
         console.error("Error fetching user designs:", error);
         res.status(500).json({ message: "Failed to fetch designs" });
     }
 };
 
-/**
- * Get a single design by ID
- * GET /api/jewelry-design/:id
- */
 export const getDesignByIdController = async (
     req: Request,
     res: Response
@@ -95,7 +83,7 @@ export const getDesignByIdController = async (
         const userId = (req as any).user?.id;
 
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Login required to view designs" });
             return;
         }
 
@@ -106,27 +94,24 @@ export const getDesignByIdController = async (
             return;
         }
 
-        res.status(200).json({ design });
+        res.status(200).json({ design: transformDesign(design) });
     } catch (error) {
         console.error("Error fetching design:", error);
         res.status(500).json({ message: "Failed to fetch design" });
     }
 };
 
-/**
- * Generate new jewelry designs
- * POST /api/jewelry-design/generate
- * 
- * Integrates with Gemini AI for design generation and Firebase for storage.
- * Falls back to placeholder images if AI is not available.
- */
 export const generateDesign = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
-        // Use authenticated user ID, or default to 0 for dev/guest testing
-        const userId = (req as any).user?.id || 0;
+        // Use authenticated user ID — login required for design generation
+        const userId = (req as any).user?.id;
+        if (!userId) {
+            res.status(401).json({ message: "Login required to generate designs" });
+            return;
+        }
 
         const {
             gemType,
@@ -291,17 +276,17 @@ export const generateDesign = async (
     }
 };
 
-/**
- * Save/update a design (select an image)
- * PUT /api/jewelry-design/:id/save
- */
 export const saveDesign = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user?.id ?? 0; // Allow guest (userId=0)
+        const userId = (req as any).user?.id;
+        if (!userId) {
+            res.status(401).json({ message: "Login required to save designs" });
+            return;
+        }
 
         const { selectedImageUrl } = req.body;
 
@@ -341,19 +326,17 @@ export const saveDesign = async (
     }
 };
 
-/**
- * Refine an existing design
- * POST /api/jewelry-design/:id/refine
- * 
- * Uses Gemini AI for design refinement with fallback to placeholders.
- */
 export const refineDesign = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user?.id ?? 0; // Allow guest (userId=0)
+        const userId = (req as any).user?.id;
+        if (!userId) {
+            res.status(401).json({ message: "Login required to refine designs" });
+            return;
+        }
 
         const { refinementPrompt, baseImageUrl, baseImageId, strength = 0.5 } = req.body;
 
@@ -451,10 +434,6 @@ export const refineDesign = async (
     }
 };
 
-/**
- * Delete a design
- * DELETE /api/jewelry-design/:id
- */
 export const deleteDesignController = async (
     req: Request,
     res: Response
@@ -491,12 +470,6 @@ export const deleteDesignController = async (
     }
 };
 
-/**
- * Upload a gem image
- * POST /api/jewelry-design/upload-gem-image
- * 
- * Accepts multipart/form-data with an image file.
- */
 export const uploadGemImage = async (
     req: Request,
     res: Response
@@ -554,10 +527,6 @@ export const uploadGemImage = async (
     }
 };
 
-/**
- * Get AI configuration status
- * GET /api/jewelry-design/status
- */
 export const getAIStatus = async (
     req: Request,
     res: Response
