@@ -26,16 +26,16 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
     };
 
     return (
-        <div className="space-y-3">
+        <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
             {/* Collapsible Header */}
             <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-700 bg-[#1a1f35] hover:border-gray-600 transition-all"
+                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:border-gray-300 transition-all"
             >
                 <div className="flex items-center">
-                    <span className="text-sm font-medium text-white">Metal & Materials</span>
-                    <span className="ml-2 text-xs text-gray-500">(optional)</span>
+                    <span className="text-sm font-semibold text-gray-800">Metal & Materials</span>
+                    <span className="ml-2 text-xs text-gray-400">(optional)</span>
                 </div>
                 {isExpanded ? (
                     <ChevronUp className="w-5 h-5 text-gray-400" />
@@ -46,10 +46,10 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
 
             {/* Expanded Content */}
             {isExpanded && (
-                <div className="p-4 rounded-xl border border-gray-700 bg-[#1a1f35] space-y-4">
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-4">
                     {/* Metal Types */}
                     <div>
-                        <label className="block text-sm font-medium text-white mb-3">
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
                             Select metal type(s)
                         </label>
                         <div className="grid grid-cols-2 gap-2">
@@ -61,8 +61,8 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                                     className={`
                     flex items-center justify-between px-3 py-2 rounded-lg border transition-all text-sm
                     ${selectedMetals.includes(metal.value)
-                                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-white'
-                                            : 'border-gray-700 bg-[#0d1121] text-gray-400 hover:border-gray-600'
+                                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-gray-900'
+                                            : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                                         }
                   `}
                                 >
@@ -77,7 +77,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
 
                     {/* Metal Finish */}
                     <div>
-                        <label className="block text-sm font-medium text-white mb-3">
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
                             Finish (optional)
                         </label>
                         <div className="flex gap-2">
@@ -89,8 +89,8 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                                     className={`
                     flex-1 px-3 py-2 rounded-lg border transition-all text-sm text-center
                     ${selectedFinish === finish.value
-                                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-white'
-                                            : 'border-gray-700 bg-[#0d1121] text-gray-400 hover:border-gray-600'
+                                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-gray-900'
+                                            : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                                         }
                   `}
                                 >

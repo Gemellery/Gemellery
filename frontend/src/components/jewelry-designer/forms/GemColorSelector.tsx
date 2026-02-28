@@ -24,8 +24,8 @@ export const GemColorSelector: React.FC<GemColorSelectorProps> = ({
     };
 
     return (
-        <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
+        <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
+            <label className="block text-sm font-semibold text-gray-800">
                 What color is your gem? <span className="text-red-500">*</span>
             </label>
 
@@ -33,10 +33,10 @@ export const GemColorSelector: React.FC<GemColorSelectorProps> = ({
                 {/* Color swatch preview */}
                 {value && (
                     <div
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-gray-600"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-gray-300"
                         style={{
                             background: getColorHex(value),
-                            boxShadow: value === 'colorless' ? 'inset 0 0 0 1px #666' : 'none',
+                            boxShadow: value === 'colorless' ? 'inset 0 0 0 1px #ccc' : 'none',
                         }}
                     />
                 )}
@@ -47,17 +47,18 @@ export const GemColorSelector: React.FC<GemColorSelectorProps> = ({
                     onChange={(e) => onChange(e.target.value)}
                     className={`
             w-full px-4 py-3 rounded-lg border appearance-none cursor-pointer
-            bg-[#1a1f35] text-white transition-all duration-200
+            bg-gray-50 text-gray-900 transition-all duration-200
             ${value ? 'pl-12' : 'pl-4'}
             ${errors.gemColor
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-700 hover:border-gray-600 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37] focus:ring-opacity-30'
+                            ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
+                            : 'border-gray-300 hover:border-gray-400 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20'
                         }
           `}
+                    style={{ fontFamily: "'Market Sans', sans-serif" }}
                 >
-                    <option value="" className="bg-[#1a1f35]">Select color...</option>
+                    <option value="" className="bg-white">Select color...</option>
                     {GEM_COLORS.map((color) => (
-                        <option key={color.value} value={color.value} className="bg-[#1a1f35]">
+                        <option key={color.value} value={color.value} className="bg-white">
                             {color.label}
                         </option>
                     ))}

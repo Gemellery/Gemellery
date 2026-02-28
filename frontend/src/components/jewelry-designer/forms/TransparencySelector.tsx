@@ -22,7 +22,7 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
         const iconStyle = {
             width: '24px',
             height: '24px',
-            color: isSelected ? '#D4AF37' : '#9CA3AF',
+            color: isSelected ? '#B8860B' : '#9CA3AF',
         };
 
         switch (transparencyValue) {
@@ -38,8 +38,8 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <label style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontFamily: "'Market Sans', sans-serif" }}>
+            <label style={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }}>
                 How see-through is your gem? <span style={{ color: '#EF4444' }}>*</span>
             </label>
 
@@ -54,11 +54,12 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
                             style={{
                                 padding: '16px',
                                 borderRadius: '12px',
-                                border: isSelected ? '2px solid #D4AF37' : '2px solid #374151',
-                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : '#1a1f35',
+                                border: isSelected ? '2px solid #D4AF37' : '2px solid #E5E7EB',
+                                background: isSelected ? 'rgba(212, 175, 55, 0.08)' : '#F9FAFB',
                                 textAlign: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
+                                fontFamily: "'Market Sans', sans-serif",
                             }}
                         >
                             {/* Icon */}
@@ -68,13 +69,13 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
 
                             <p style={{
                                 fontSize: '13px',
-                                fontWeight: 500,
-                                color: isSelected ? 'white' : '#9CA3AF',
+                                fontWeight: 600,
+                                color: isSelected ? '#1F2937' : '#6B7280',
                                 marginBottom: '4px',
                             }}>
                                 {option.label}
                             </p>
-                            <p style={{ fontSize: '11px', color: '#6B7280' }}>
+                            <p style={{ fontSize: '11px', color: '#9CA3AF' }}>
                                 {option.description}
                             </p>
                         </button>
@@ -85,7 +86,7 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemTransparency')} value={value} />
 
-            <p style={{ fontSize: '12px', color: '#6B7280' }}>
+            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
                 This helps us render light and reflections accurately
             </p>
 
