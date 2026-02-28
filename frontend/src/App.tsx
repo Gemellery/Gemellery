@@ -33,6 +33,7 @@ import ManageUsers from "./pages/Admin/AdminUserManagement";
 import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
+import SellerAnalyticsPage from "./pages/seller/SellerAnalytics";
 
 function App() {
   return (
@@ -74,6 +75,15 @@ function App() {
             <ProtectedRoute allowedRoles={["seller"]}>
               <SellerDashboard />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seller/analytics"
+          element={
+            <ProtectedRoute allowedRoles={["seller"]}>
+              <SellerAnalyticsPage />
+           </ProtectedRoute>
           }
         />
 
