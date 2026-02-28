@@ -78,6 +78,7 @@ export async function fetchGems(
   if (filters.gemName) params.append('gemName', filters.gemName);
   if (filters.priceMin !== undefined) params.append('priceMin', filters.priceMin.toString());
   if (filters.priceMax !== undefined) params.append('priceMax', filters.priceMax.toString());
+  if (filters.priceRanges) params.append('priceRanges', filters.priceRanges);
   if (filters.caratMin !== undefined) params.append('caratMin', filters.caratMin.toString());
   if (filters.caratMax !== undefined) params.append('caratMax', filters.caratMax.toString());
   if (filters.color) params.append('color', filters.color);
