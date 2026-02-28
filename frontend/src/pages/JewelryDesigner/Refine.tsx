@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, Download, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle, AlertCircle, Save } from 'lucide-react';
 import { getDesignById, refineDesign } from '../../lib/jewelry-designer/api';
 import type { JewelryDesign, GeneratedImage } from '../../lib/jewelry-designer/types';
 import { RefinementPrompt } from '../../components/jewelry-designer/refinement/RefinementPrompt';
@@ -26,6 +26,7 @@ const JewelryRefine: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [showComparison, setShowComparison] = useState(false);
     const [previousImageUrl, setPreviousImageUrl] = useState('');
+    const [refinedDesign, setRefinedDesign] = useState<JewelryDesign | null>(null);
 
     // Fetch design if not in state
     useEffect(() => {
@@ -69,18 +70,18 @@ const JewelryRefine: React.FC = () => {
                 parseInt(id),
                 prompt,
                 baseImageUrl,
-                strength
+                strength,
+                selectedImage?.id // pass original image ID for gallery matching
             );
 
-            // Update design with new refinement
+            // Update design + show refined image
             setDesign(result.design);
             setCurrentImageUrl(result.refinement.imageUrl);
-            setBaseImageUrl(result.refinement.imageUrl);
-            setSuccess('Design refined successfully!');
+            // Do NOT update baseImageUrl — keep it pointing to original for consistent gallery matching
+            setRefinedDesign(result.design);
+            setSuccess('Design refined successfully! Click "Save & View in Gallery" to see it.');
             setShowComparison(true);
 
-            // Hide success message after 3 seconds
-            setTimeout(() => setSuccess(''), 3000);
         } catch (err: unknown) {
             console.error('Refinement error:', err);
             const errorMessage = err instanceof Error ? err.message : 'Failed to refine design';
@@ -96,18 +97,30 @@ const JewelryRefine: React.FC = () => {
         setShowComparison(false);
     };
 
-    const downloadImage = async (url: string) => {
+    const downloadImage = (url: string, filename?: string) => {
         try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `refined-design-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(downloadUrl);
+            link.download = filename || `jewelry-design-${Date.now()}.png`;
+
+            if (url.startsWith('data:')) {
+                // data URI — link directly
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // Regular URL — fetch as blob
+                fetch(url)
+                    .then(r => r.blob())
+                    .then(blob => {
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        link.href = blobUrl;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl);
+                    });
+            }
         } catch (error) {
             console.error('Download failed:', error);
             alert('Failed to download image');
@@ -158,12 +171,31 @@ const JewelryRefine: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Success Message */}
-                {success && (
-                    <div className="mb-6 p-4 rounded-xl bg-green-900/30 border border-green-700/50">
-                        <div className="flex items-center">
-                            <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                            <p className="text-green-200">{success}</p>
+                {/* Success / Save Panel — shown after a refinement completes */}
+                {success && refinedDesign && (
+                    <div className="mb-6 p-5 rounded-xl bg-green-900/30 border border-green-700/50">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div className="flex items-center">
+                                <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                                <p className="text-green-200 text-sm">{success}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    try {
+                                        sessionStorage.setItem(
+                                            'lastJewelryDesign',
+                                            JSON.stringify(refinedDesign)
+                                        );
+                                    } catch { /* quota */ }
+                                    navigate('/jewelry-designer/results', {
+                                        state: { design: refinedDesign },
+                                    });
+                                }}
+                                className="flex items-center justify-center space-x-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#D4AF37] to-[#F5D061] text-[#0A1128] font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
+                            >
+                                <Save className="w-4 h-4" />
+                                <span>Save &amp; View in Gallery</span>
+                            </button>
                         </div>
                     </div>
                 )}

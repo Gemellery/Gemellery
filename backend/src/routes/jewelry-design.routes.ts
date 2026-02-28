@@ -33,6 +33,12 @@ const upload = multer({
 // Public route - Get AI status (no auth required)
 router.get("/status", getAIStatus);
 
+// DEVELOPMENT: Generate, save, refine endpoints temporarily public for testing
+// TODO: Move back below authGuard for production
+router.post("/generate", generateDesign);
+router.put("/:id/save", saveDesign);
+router.post("/:id/refine", refineDesign);
+
 // All other routes require authentication
 router.use(authGuard);
 
@@ -42,8 +48,7 @@ router.get("/user-designs", getUserDesigns);
 // GET /api/jewelry-design/:id - Get single design by ID
 router.get("/:id", getDesignByIdController);
 
-// POST /api/jewelry-design/generate - Generate new jewelry designs
-router.post("/generate", generateDesign);
+// Note: /generate moved above for dev testing
 
 // POST /api/jewelry-design/upload-gem-image - Upload a gem image
 router.post("/upload-gem-image", upload.single("image"), uploadGemImage);

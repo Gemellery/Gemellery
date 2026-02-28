@@ -81,12 +81,13 @@ export async function refineDesign(
     id: number,
     refinementPrompt: string,
     baseImageUrl: string,
-    strength: number = 0.5
+    strength: number = 0.5,
+    baseImageId?: string
 ): Promise<RefineDesignResponse> {
     const response = await fetch(`${API_BASE}/api/jewelry-design/${id}/refine`, {
         method: 'POST',
         headers: getAuthHeader(),
-        body: JSON.stringify({ refinementPrompt, baseImageUrl, strength }),
+        body: JSON.stringify({ refinementPrompt, baseImageUrl, baseImageId, strength }),
     });
 
     if (!response.ok) {

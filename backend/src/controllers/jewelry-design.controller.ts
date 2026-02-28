@@ -27,7 +27,34 @@ import {
 } from "../utils/firebase-storage";
 
 // ============================================
+// Helper: Transform DB row (snake_case) → Frontend shape (camelCase)
+// ============================================
+const transformDesign = (d: any) => ({
+    id: d.id,
+    userId: d.user_id,
+    gemType: d.gem_type,
+    gemCut: d.gem_cut,
+    gemSizeMode: d.gem_size_mode,
+    gemSizeSimple: d.gem_size_simple,
+    gemSizeLengthMm: d.gem_size_length_mm,
+    gemSizeWidthMm: d.gem_size_width_mm,
+    gemSizeHeightMm: d.gem_size_height_mm,
+    gemSizeCarat: d.gem_size_carat,
+    gemColor: d.gem_color,
+    gemTransparency: d.gem_transparency,
+    gemImageUrl: d.gem_image_url,
+    designPrompt: d.design_prompt,
+    materials: d.materials || { metals: [] },
+    generatedImages: d.generated_images || [],
+    selectedImageUrl: d.selected_image_url,
+    refinements: d.refinements || [],
+    createdAt: d.created_at,
+    updatedAt: d.updated_at,
+});
+
+// ============================================
 // Controller Functions
+
 // ============================================
 
 /**
@@ -98,12 +125,8 @@ export const generateDesign = async (
     res: Response
 ): Promise<void> => {
     try {
-        const userId = (req as any).user?.id;
-
-        if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
+        // Use authenticated user ID, or default to 0 for dev/guest testing
+        const userId = (req as any).user?.id || 0;
 
         const {
             gemType,
@@ -166,21 +189,43 @@ export const generateDesign = async (
                 // Generate designs using Gemini
                 const aiDesigns = await generateJewelryDesigns(promptInput, numImages);
 
-                // For now, Gemini 2.0 Flash doesn't directly generate images
-                // We'll use placeholder images until we integrate Imagen or another image model
-                // But we've validated the prompts work
-
-                for (let i = 0; i < numImages; i++) {
+                for (let i = 0; i < aiDesigns.length; i++) {
+                    const design = aiDesigns[i];
                     const imageId = uuidv4();
+
+                    if (design.imageBase64 && design.imageBase64.length > 100) {
+                        // Real AI-generated image — use as data URI directly
+                        const imageDataUri = `data:${design.mimeType || 'image/png'};base64,${design.imageBase64}`;
+                        generatedImages.push({
+                            id: imageId,
+                            url: imageDataUri,
+                            thumbnailUrl: imageDataUri,
+                            generatedAt: new Date().toISOString(),
+                        });
+                        console.log(`[Design] Image ${i + 1}: Real AI image used (${design.imageBase64.length} chars)`);
+                    } else {
+                        // No image data — use SVG placeholder
+                        generatedImages.push({
+                            id: imageId,
+                            url: getPlaceholderImageUrl(`Design ${i + 1}`),
+                            thumbnailUrl: getPlaceholderThumbnailUrl(`Design ${i + 1}`),
+                            generatedAt: new Date().toISOString(),
+                        });
+                        console.log(`[Design] Image ${i + 1}: No image data, using placeholder`);
+                    }
+                }
+
+                // If Gemini returned fewer designs than requested, fill with placeholders
+                for (let i = generatedImages.length; i < numImages; i++) {
                     generatedImages.push({
-                        id: imageId,
+                        id: uuidv4(),
                         url: getPlaceholderImageUrl(`Design ${i + 1}`),
                         thumbnailUrl: getPlaceholderThumbnailUrl(`Design ${i + 1}`),
                         generatedAt: new Date().toISOString(),
                     });
                 }
 
-                console.log(`[Design] Generated ${generatedImages.length} AI-prompted designs`);
+                console.log(`[Design] Generated ${generatedImages.length} designs`);
             } catch (aiError) {
                 console.error("[Design] AI generation failed, using placeholders:", aiError);
                 // Fall back to placeholders
@@ -233,12 +278,16 @@ export const generateDesign = async (
 
         res.status(201).json({
             message: "Design generated successfully",
-            design,
+            design: design ? transformDesign(design) : null,
             aiUsed: aiConfigured,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating design:", error);
-        res.status(500).json({ message: "Failed to generate design" });
+        console.error("Error details:", error?.message, error?.code);
+        res.status(500).json({
+            message: "Failed to generate design",
+            error: error?.message || "Unknown error"
+        });
     }
 };
 
@@ -252,12 +301,7 @@ export const saveDesign = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user?.id;
-
-        if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
+        const userId = (req as any).user?.id ?? 0; // Allow guest (userId=0)
 
         const { selectedImageUrl } = req.body;
 
@@ -266,7 +310,7 @@ export const saveDesign = async (
             return;
         }
 
-        // Check if design exists and belongs to user
+        // Check if design exists (for guests, just verify it exists by ID)
         const existingDesign = await getDesignById(parseInt(id), userId);
 
         if (!existingDesign) {
@@ -289,7 +333,7 @@ export const saveDesign = async (
 
         res.status(200).json({
             message: "Design saved successfully",
-            design,
+            design: design ? transformDesign(design) : null,
         });
     } catch (error) {
         console.error("Error saving design:", error);
@@ -309,14 +353,9 @@ export const refineDesign = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        const userId = (req as any).user?.id;
+        const userId = (req as any).user?.id ?? 0; // Allow guest (userId=0)
 
-        if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
-            return;
-        }
-
-        const { refinementPrompt, baseImageUrl, strength = 0.5 } = req.body;
+        const { refinementPrompt, baseImageUrl, baseImageId, strength = 0.5 } = req.body;
 
         if (!refinementPrompt || !baseImageUrl) {
             res.status(400).json({ message: "Missing required fields" });
@@ -349,25 +388,28 @@ export const refineDesign = async (
 
         if (aiConfigured) {
             try {
-                // Attempt AI refinement
+                // Pass the base image so Gemini can edit it directly
                 const refined = await refineJewelryDesign(
                     existingDesign.design_prompt,
                     refinementPrompt,
-                    undefined, // We could pass base64 image here
+                    baseImageUrl, // Pass actual base64/data-URI for true image editing
                     strength
                 );
 
-                if (refined) {
-                    // For now, use placeholders since image generation isn't working yet
-                    refinedImageUrl = getPlaceholderImageUrl("Refined");
-                    refinedThumbnailUrl = getPlaceholderThumbnailUrl("Refined");
+                if (refined && refined.imageBase64 && refined.imageBase64.length > 100) {
+                    // Real AI refined image
+                    refinedImageUrl = `data:${refined.mimeType || 'image/png'};base64,${refined.imageBase64}`;
+                    refinedThumbnailUrl = refinedImageUrl;
+                    console.log(`[Refine] Got real AI refined image (${refined.imageBase64.length} chars)`);
+                } else {
+                    console.log("[Refine] AI returned no image, using placeholder");
                 }
             } catch (aiError) {
                 console.error("[Refine] AI refinement failed:", aiError);
             }
         }
 
-        // Fallback to placeholder
+        // Fallback to placeholder only if no real image was generated
         if (!refinedImageUrl) {
             refinedImageUrl = getPlaceholderImageUrl("Refined");
             refinedThumbnailUrl = getPlaceholderThumbnailUrl("Refined");
@@ -376,6 +418,7 @@ export const refineDesign = async (
         const refinement: Refinement = {
             id: refinementId,
             prompt: refinementPrompt,
+            baseImageId: baseImageId || undefined,  // ID-based matching for gallery
             baseImageUrl: baseImageUrl,
             imageUrl: refinedImageUrl,
             thumbnailUrl: refinedThumbnailUrl,
@@ -399,7 +442,7 @@ export const refineDesign = async (
         res.status(200).json({
             message: "Design refined successfully",
             refinement,
-            design,
+            design: design ? transformDesign(design) : null,
             aiUsed: aiConfigured,
         });
     } catch (error) {

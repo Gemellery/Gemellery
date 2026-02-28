@@ -8,11 +8,23 @@ import { DesignGallery } from '../../components/jewelry-designer/results/DesignG
 const JewelryResults: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const design = location.state?.design as JewelryDesign | undefined;
+    // Try location.state first, then sessionStorage fallback (for back-navigation)
+    const design = (location.state?.design ||
+        (() => {
+            try { return JSON.parse(sessionStorage.getItem('lastJewelryDesign') || ''); } catch { return null; }
+        })()
+    ) as JewelryDesign | undefined;
 
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
+
+    // Persist design to sessionStorage whenever it changes
+    useEffect(() => {
+        if (design) {
+            try { sessionStorage.setItem('lastJewelryDesign', JSON.stringify(design)); } catch { /* quota exceeded */ }
+        }
+    }, [design]);
 
     useEffect(() => {
         if (!design) {
@@ -21,8 +33,17 @@ const JewelryResults: React.FC = () => {
     }, [design, navigate]);
 
     if (!design) {
-        return null;
+        return (
+            <div style={{ minHeight: '100vh', background: '#0A1128', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p style={{ color: '#9CA3AF' }}>Redirecting...</p>
+            </div>
+        );
     }
+
+    // Safe access for potentially missing fields
+    const generatedImages = design.generatedImages || [];
+    const metals = design.materials?.metals || [];
+
 
     const handleSelectDesign = async (image: GeneratedImage) => {
         setSaving(true);
@@ -81,7 +102,7 @@ const JewelryResults: React.FC = () => {
                                 Your Designs are Ready! ✨
                             </h1>
                             <p className="text-gray-400">
-                                We created {design.generatedImages.length} unique concept{design.generatedImages.length > 1 ? 's' : ''} based on your specifications
+                                We created {generatedImages.length} unique concept{generatedImages.length !== 1 ? 's' : ''} based on your specifications
                             </p>
                         </div>
                         <button
@@ -115,7 +136,7 @@ const JewelryResults: React.FC = () => {
                         <div className="p-3 rounded-lg bg-[#1a1f35]">
                             <p className="text-xs text-gray-500 mb-1">Materials</p>
                             <p className="text-white font-medium text-sm">
-                                {design.materials.metals.length > 0 ? design.materials.metals.join(', ') : 'Not specified'}
+                                {metals.length > 0 ? metals.join(', ') : 'Not specified'}
                             </p>
                         </div>
                     </div>
@@ -158,7 +179,11 @@ const JewelryResults: React.FC = () => {
                 )}
 
                 {/* Gallery */}
-                <DesignGallery images={design.generatedImages} onSelectDesign={handleSelectDesign} />
+                <DesignGallery
+                    images={generatedImages}
+                    refinements={design.refinements || []}
+                    onSelectDesign={handleSelectDesign}
+                />
 
                 {/* Call to Action */}
                 <div className="mt-12 text-center">

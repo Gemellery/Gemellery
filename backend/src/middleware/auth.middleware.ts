@@ -15,7 +15,7 @@ export const authGuard = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.sendStatus(401);
+    return res.status(401).json({ message: "Authorization header missing" });
   }
 
   const token = authHeader.split(" ")[1];
@@ -35,7 +35,7 @@ export const authGuard = (
 
     next();
   } catch {
-    return res.sendStatus(403);
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
