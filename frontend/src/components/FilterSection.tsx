@@ -55,13 +55,13 @@ interface CutShapeOption {
 }
 
 // ──────────────────────────────────────────────
-// Price buckets — maps UI labels to actual number ranges
+// Price buckets — maps UI labels to min-max ranges
 // ──────────────────────────────────────────────
-const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
-  under100k:   { max: 100000 },
+const PRICE_BUCKETS: Record<string, { min: number; max: number | typeof Infinity }> = {
+  under100k:    { min: 0,      max: 100000 },
   '100kto250k': { min: 100000, max: 250000 },
   '250kto500k': { min: 250000, max: 500000 },
-  above500k:   { min: 500000 },
+  above500k:    { min: 500000, max: Infinity },
 };
 
 // ──────────────────────────────────────────────
@@ -70,7 +70,7 @@ const PRICE_BUCKETS: Record<string, { min?: number; max?: number }> = {
 function convertToGemFilters(filters: FiltersType): GemFilters {
   const gemFilters: GemFilters = {};
 
-  // Gem name/type — can be multiple, join with commas
+  // Gem name/type
   if (filters.gemName.length > 0) {
     gemFilters.gemName = filters.gemName.join(',');
   }
@@ -83,38 +83,42 @@ function convertToGemFilters(filters: FiltersType): GemFilters {
     gemFilters.caratMax = filters.caratWeight[1];
   }
 
-  // Price range — convert bucket string to min/max numbers
+  // Price range
   if (filters.priceRange.length > 0) {
-    const bucket = PRICE_BUCKETS[filters.priceRange[0]];
-    if (bucket) {
-      if (bucket.min !== undefined) gemFilters.priceMin = bucket.min;
-      if (bucket.max !== undefined) gemFilters.priceMax = bucket.max;
+    const ranges = filters.priceRange.map(key => {
+      const bucket = PRICE_BUCKETS[key];
+      if (!bucket) return null;
+      return `${bucket.min}-${bucket.max === Infinity ? 'Infinity' : bucket.max}`;
+    }).filter(Boolean);
+
+    if (ranges.length > 0) {
+      gemFilters.priceRanges = ranges.join(',');
     }
   }
 
-  // Color — exact match
+  // Color
   if (filters.color.length > 0) {
-    gemFilters.color = filters.color[0];
+    gemFilters.color = filters.color.join(',');
   }
 
-  // Cut/Shape — exact match
+  // Cut/Shape 
   if (filters.cutShape.length > 0) {
-    gemFilters.cut = filters.cutShape[0];
+    gemFilters.cut = filters.cutShape.join(',');
   }
 
-  // Clarity — exact match
+  // Clarity
   if (filters.clarity.length > 0) {
-    gemFilters.clarity = filters.clarity[0];
+    gemFilters.clarity = filters.clarity.join(',');
   }
 
-  // Origin — exact match
+  // Origin 
   if (filters.origin.length > 0) {
-    gemFilters.origin = filters.origin[0];
+    gemFilters.origin = filters.origin.join(',');
   }
 
-  // Treatment → maps to gem_type column
+  // Treatment 
   if (filters.treatment.length > 0) {
-    gemFilters.gemType = filters.treatment[0];
+    gemFilters.gemType = filters.treatment.join(',');
   }
 
   // ── Certification ──
@@ -367,7 +371,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
         </div>
       </FilterSection_Component>
 
-      {/* ─── Carat Weight ─── */}
+      {/* Carat Weight */}
       <FilterSection_Component title="Carat Weight" sectionKey="caratWeight">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
