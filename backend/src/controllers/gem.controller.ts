@@ -117,26 +117,67 @@ export const getGems = async (req: any, res: any) => {
     whereConditions.push("g.status = ?");
     queryParams.push("Available");
 
+    // Multiple value filters (gem type, color, cut, clarity, origin)
+    const addInClause = (queryParam: string | undefined, column: string) => {
+      if (!queryParam) return;
+      const values = (queryParam as string).split(',').map(v => v.trim()).filter(v => v);
+      if (values.length === 1) {
+        whereConditions.push(`${column} = ?`);
+        queryParams.push(values[0]);
+      } else if (values.length > 1) {
+        const placeholders = values.map(() => '?').join(', ');
+        whereConditions.push(`${column} IN (${placeholders})`);
+        queryParams.push(...values);
+      }
+    };
+
     // Filter by gem type
-    if (req.query.gemType) {
-      whereConditions.push("g.gem_type = ?");
-      queryParams.push(req.query.gemType);
-    }
+    addInClause(req.query.gemType, 'g.gem_type');
+
+    // Filter by gem name 
+    addInClause(req.query.gemName, 'g.gem_name');
+
+    // Filter by color 
+    addInClause(req.query.color, 'g.color');
+
+    // Filter by cut 
+    addInClause(req.query.cut, 'g.cut');
+
+    // Filter by clarity
+    addInClause(req.query.clarity, 'g.clarity');
+
+    // Filter by origin 
+    addInClause(req.query.origin, 'g.origin');
 
     // Filter by price range
-    if (req.query.priceMin !== undefined && !isNaN(parseFloat(req.query.priceMin))) {
-      whereConditions.push("g.price >= ?");
-      queryParams.push(parseFloat(req.query.priceMin));
-    }
-    if (req.query.priceMax !== undefined && !isNaN(parseFloat(req.query.priceMax))) {
-      whereConditions.push("g.price <= ?");
-      queryParams.push(parseFloat(req.query.priceMax));
+    if (req.query.priceRanges) {
+      const ranges = (req.query.priceRanges as string).split(',').map(r => r.trim()).filter(r => r);
+      if (ranges.length > 0) {
+        const priceConditions: string[] = [];
+        ranges.forEach(range => {
+          const [min, max] = range.split('-');
+          if (max === 'Infinity') {
+            priceConditions.push('g.price >= ?');
+            queryParams.push(parseFloat(min));
+          } else {
+            priceConditions.push('(g.price >= ? AND g.price <= ?)');
+            queryParams.push(parseFloat(min), parseFloat(max));
+          }
+        });
+        whereConditions.push(`(${priceConditions.join(' OR ')})`);
+      }
     }
 
-    // Filter by origin
-    if (req.query.origin) {
-      whereConditions.push("g.origin = ?");
-      queryParams.push(req.query.origin);
+    // Legacy single price min/max (keep for backward compatibility)
+    if (!req.query.priceRanges) {
+      if (req.query.priceMin !== undefined && !isNaN(parseFloat(req.query.priceMin))) {
+        whereConditions.push("g.price >= ?");
+        queryParams.push(parseFloat(req.query.priceMin));
+      }
+      if (req.query.priceMax !== undefined && !isNaN(parseFloat(req.query.priceMax))) {
+        whereConditions.push("g.price <= ?");
+        queryParams.push(parseFloat(req.query.priceMax));
+      }
     }
 
     // Filter by certification status
@@ -146,41 +187,10 @@ export const getGems = async (req: any, res: any) => {
       whereConditions.push("g.ngja_certificate_url IS NULL");
     }
 
-    // Filter by color
-    if (req.query.color) {
-      whereConditions.push("g.color = ?");
-      queryParams.push(req.query.color);
-    }
-
-    // Filter by clarity grade
-    if (req.query.clarity) {
-      whereConditions.push("g.clarity = ?");
-      queryParams.push(req.query.clarity);
-    }
-
-    // Filter by cut
-    if (req.query.cut) {
-      whereConditions.push("g.cut = ?");
-      queryParams.push(req.query.cut);
-    }
-
-    // Filter by search
+    // Filter by search (text search across name, type, origin)
     if (req.query.search) {
-      whereConditions.push("g.gem_name LIKE ?");
-      queryParams.push(`%${req.query.search}%`);
-    }
-
-    // Filter by gem name
-    if (req.query.gemName) {
-      const names = (req.query.gemName as string).split(',').map(n => n.trim()).filter(n => n);
-      if (names.length === 1) {
-        whereConditions.push("g.gem_name = ?");
-        queryParams.push(names[0]);
-      } else if (names.length > 1) {
-        const placeholders = names.map(() => '?').join(', ');
-        whereConditions.push(`g.gem_name IN (${placeholders})`);
-        queryParams.push(...names);
-      }
+      whereConditions.push("(g.gem_name LIKE ? OR g.gem_type LIKE ? OR g.origin LIKE ?)");
+      queryParams.push(`%${req.query.search}%`, `%${req.query.search}%`, `%${req.query.search}%`);
     }
 
     // Filter by carat range
@@ -196,7 +206,7 @@ export const getGems = async (req: any, res: any) => {
     // Combine all WHERE conditions with AND
     let whereClause = whereConditions.join(" AND ");
 
-    // Build main query to fetch gems with SQL aliases
+    // Build main query
     let query = `
       SELECT 
         g.gem_id as id,
