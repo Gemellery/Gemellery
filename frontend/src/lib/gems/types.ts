@@ -32,6 +32,7 @@ export interface GemFilters {
   gemName?: string;
   priceMin?: number;
   priceMax?: number;
+  priceRanges?: string;
   caratMin?: number;
   caratMax?: number;
   color?: string;
