@@ -148,6 +148,10 @@ export const getGems = async (req: any, res: any) => {
     // Filter by origin 
     addInClause(req.query.origin, 'g.origin');
 
+    //Filter by Region
+    addInClause(req.query.miningRegion, 'g.mining_region');
+
+    //Filter by color
     const colorParts: string[] = [];
 
     if (req.query.color) {
@@ -243,6 +247,7 @@ export const getGems = async (req: any, res: any) => {
       g.clarity,
       g.color,
       g.origin,
+      g.mining_region as miningRegion,
       g.description,
       g.ngja_certificate_no as certification,
       g.ngja_certificate_url as certificateUrl,
@@ -260,7 +265,7 @@ export const getGems = async (req: any, res: any) => {
       LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
       LEFT JOIN user u ON g.seller_id = u.user_id
       WHERE ${whereClause}
-      GROUP BY g.gem_id, g.gem_name, g.gem_type, g.price, g.carat, g.cut, g.clarity, g.color, g.origin, g.description, g.ngja_certificate_no, g.ngja_certificate_url, g.seller_id, u.full_name, g.verification_status, g.status, g.created_at
+      GROUP BY g.gem_id, g.gem_name, g.gem_type, g.price, g.carat, g.cut, g.clarity, g.color, g.origin, g.mining_region, g.description, g.ngja_certificate_no, g.ngja_certificate_url, g.seller_id, u.full_name, g.verification_status, g.status, g.created_at
       ORDER BY g.created_at DESC
       LIMIT ? OFFSET ?
     `;
