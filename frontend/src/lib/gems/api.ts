@@ -78,6 +78,7 @@ export async function fetchGems(
   if (filters.cut) params.append('cut', filters.cut);
   if (filters.clarity) params.append('clarity', filters.clarity);
   if (filters.origin) params.append('origin', filters.origin);
+  if (filters.miningRegion) params.append('miningRegion', filters.miningRegion);
   if (filters.isCertified) params.append('isCertified', filters.isCertified);
 
   const url = `${API_CONFIG.BASE_URL}${API_CONFIG.GEMS_ENDPOINT}?${params.toString()}`;

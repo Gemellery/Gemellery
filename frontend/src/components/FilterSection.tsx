@@ -17,7 +17,7 @@ interface FiltersType {
   color: string[];
   cutShape: string[];
   clarity: string[];
-  origin: string[];
+  miningRegion: string[];
   treatment: string[];
   certification: string[];
 }
@@ -29,7 +29,7 @@ interface ExpandedSectionsType {
   color: boolean;
   cutShape: boolean;
   clarity: boolean;
-  origin: boolean;
+  miningRegion: boolean;
   treatment: boolean;
   certification: boolean;
 }
@@ -144,6 +144,7 @@ function convertToGemFilters(
     gemFilters.caratMax = filters.caratWeight[1];
   }
 
+  // Price Range
   const priceSelections = filters.priceRange.filter(key => key !== 'custom')
 
   if (priceSelections.length > 0 || filters.priceRange.includes('custom')) {
@@ -192,8 +193,8 @@ function convertToGemFilters(
     gemFilters.clarity = filters.clarity.join(',');
   }
 
-  if (filters.origin.length > 0) {
-    gemFilters.origin = filters.origin.join(',');
+  if (filters.miningRegion.length > 0) {
+    gemFilters.miningRegion = filters.miningRegion.join(',');
   }
 
   if (filters.treatment.length > 0) {
@@ -280,7 +281,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
     color: false,
     cutShape: false,
     clarity: false,
-    origin: false,
+    miningRegion: false,
     treatment: false,
     certification: false,
   })
@@ -301,7 +302,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
     color: [],
     cutShape: [],
     clarity: [],
-    origin: [],
+    miningRegion: [],
     treatment: [],
     certification: [],
   })
@@ -335,7 +336,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
     filters.color,
     filters.cutShape,
     filters.clarity,
-    filters.origin,
+    filters.miningRegion,
     filters.treatment,
     filters.certification,
     debouncedCustomPrice,
@@ -364,7 +365,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
       color: [],
       cutShape: [],
       clarity: [],
-      origin: [],
+      miningRegion: [],
       treatment: [],
       certification: [],
     })
@@ -697,11 +698,17 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
         </div>
       </CollapsibleSection>
 
-      {/* === Origin === */}
-      <CollapsibleSection title="Origin" isExpanded={expandedSections.origin} onToggle={() => toggleSection('origin')}>
+      {/* === Mining Region (replaces Origin) === */}
+      <CollapsibleSection title="Mining Region" isExpanded={expandedSections.miningRegion} onToggle={() => toggleSection('miningRegion')}>
         <div className="space-y-1">
-          <FilterCheckbox label="Sri Lankan" checked={filters.origin.includes('Sri Lankan')} onChange={() => handleCheckboxChange('origin', 'Sri Lankan')} />
-          <FilterCheckbox label="Natural" checked={filters.origin.includes('Natural')} onChange={() => handleCheckboxChange('origin', 'Natural')} />
+          <FilterCheckbox label="Ratnapura" checked={filters.miningRegion.includes('Ratnapura')} onChange={() => handleCheckboxChange('miningRegion', 'Ratnapura')} />
+          <FilterCheckbox label="Elahera" checked={filters.miningRegion.includes('Elahera')} onChange={() => handleCheckboxChange('miningRegion', 'Elahera')} />
+          <FilterCheckbox label="Meetiyagoda" checked={filters.miningRegion.includes('Meetiyagoda')} onChange={() => handleCheckboxChange('miningRegion', 'Meetiyagoda')} />
+          <FilterCheckbox label="Balangoda / Pelmadulla" checked={filters.miningRegion.includes('Balangoda / Pelmadulla')} onChange={() => handleCheckboxChange('miningRegion', 'Balangoda / Pelmadulla')} />
+          <FilterCheckbox label="Okkampitiya" checked={filters.miningRegion.includes('Okkampitiya')} onChange={() => handleCheckboxChange('miningRegion', 'Okkampitiya')} />
+          <FilterCheckbox label="Kataragama" checked={filters.miningRegion.includes('Kataragama')} onChange={() => handleCheckboxChange('miningRegion', 'Kataragama')} />
+          <FilterCheckbox label="Ambalangoda" checked={filters.miningRegion.includes('Ambalangoda')} onChange={() => handleCheckboxChange('miningRegion', 'Ambalangoda')} />
+          <FilterCheckbox label="Other / Unknown" checked={filters.miningRegion.includes('Other / Unknown')} onChange={() => handleCheckboxChange('miningRegion', 'Other / Unknown')} />
         </div>
       </CollapsibleSection>
 

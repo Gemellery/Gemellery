@@ -39,6 +39,7 @@ export interface GemFilters {
   cut?: string;
   clarity?: string;
   origin?: string;
+  miningRegion?: string;
   isCertified?: string;
   specialColors?: string;
 }
