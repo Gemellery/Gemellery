@@ -685,6 +685,14 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
       {/* === Clarity === */}
       <CollapsibleSection title="Clarity" isExpanded={expandedSections.clarity} onToggle={() => toggleSection('clarity')}>
         <div className="space-y-1">
+          <FilterCheckbox label="VVS (Very Very Slightly Included)" checked={filters.clarity.includes('VVS')} onChange={() => handleCheckboxChange('clarity', 'VVS')} />
+          <FilterCheckbox label="VS (Very Slightly Included)" checked={filters.clarity.includes('VS')} onChange={() => handleCheckboxChange('clarity', 'VS')} />
+          <FilterCheckbox label="SI (Slightly Included)" checked={filters.clarity.includes('SI')} onChange={() => handleCheckboxChange('clarity', 'SI')} />
+          <FilterCheckbox label="Included" checked={filters.clarity.includes('Included')} onChange={() => handleCheckboxChange('clarity', 'Included')} />
+          <FilterCheckbox label="Excellent" checked={filters.clarity.includes('Excellent')} onChange={() => handleCheckboxChange('clarity', 'Excellent')} />
+          <FilterCheckbox label="Very Good" checked={filters.clarity.includes('Very Good')} onChange={() => handleCheckboxChange('clarity', 'Very Good')} />
+          <FilterCheckbox label="Good" checked={filters.clarity.includes('Good')} onChange={() => handleCheckboxChange('clarity', 'Good')} />
+          <FilterCheckbox label="Fair" checked={filters.clarity.includes('Fair')} onChange={() => handleCheckboxChange('clarity', 'Fair')} />
           <FilterCheckbox label="Opaque" checked={filters.clarity.includes('Opaque')} onChange={() => handleCheckboxChange('clarity', 'Opaque')} />
         </div>
       </CollapsibleSection>
