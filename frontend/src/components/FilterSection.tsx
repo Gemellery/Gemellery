@@ -715,8 +715,9 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
       {/* === Treatment === */}
       <CollapsibleSection title="Treatment" isExpanded={expandedSections.treatment} onToggle={() => toggleSection('treatment')}>
         <div className="space-y-1">
-          <FilterCheckbox label="Unheated" checked={filters.treatment.includes('Unheated')} onChange={() => handleCheckboxChange('treatment', 'Unheated')} />
           <FilterCheckbox label="Natural" checked={filters.treatment.includes('Natural')} onChange={() => handleCheckboxChange('treatment', 'Natural')} />
+          <FilterCheckbox label="Heated" checked={filters.treatment.includes('Heated')} onChange={() => handleCheckboxChange('treatment', 'Heated')} />
+          <FilterCheckbox label="Unheated" checked={filters.treatment.includes('Unheated')} onChange={() => handleCheckboxChange('treatment', 'Unheated')} />
         </div>
       </CollapsibleSection>
 
