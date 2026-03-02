@@ -3,6 +3,7 @@ import SellerSidebar from "../../components/SellerSidebar";
 import { SellerAnalyticsKpiCards } from "../../components/SellerAnalyticsKpiCards";
 import { SellerSalesChart } from "../../components/SellerSalesChart";
 import { TopGemsBarChart } from "../../components/TopGemsBarChart";
+import API_CONFIG from "../../lib/api.config";
 
 export interface SellerKpi {
   label: string;
@@ -30,35 +31,33 @@ export interface SellerAnalyticsData {
 const SellerAnalyticsPage: React.FC = () => {
   const [data, setData] = useState<SellerAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const mock: SellerAnalyticsData = {
-      kpis: [
-        { label: "Total Revenue (LKR)", value: 1250000, trend: "up" },
-        { label: "Orders This Month", value: 48, trend: "up" },
-        { label: "Average Order Value (LKR)", value: 26000, trend: "neutral" },
-        { label: "Refund Rate", value: "1.2%", trend: "down" },
-      ],
-      salesOverTime: [
-        { date: "Mon", sales: 120000, orders: 8 },
-        { date: "Tue", sales: 180000, orders: 12 },
-        { date: "Wed", sales: 90000, orders: 6 },
-        { date: "Thu", sales: 200000, orders: 14 },
-        { date: "Fri", sales: 160000, orders: 10 },
-        { date: "Sat", sales: 220000, orders: 15 },
-        { date: "Sun", sales: 155000, orders: 11 },
-      ],
-      topGems: [
-        { name: "Blue Sapphire 5ct", revenue: 450000 },
-        { name: "Ruby 3ct", revenue: 320000 },
-        { name: "Alexandrite 2ct", revenue: 210000 },
-      ],
+    const fetchAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/seller/analytics`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch analytics");
+        }
+
+        const json: SellerAnalyticsData = await res.json();
+        setData(json);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message ?? "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setTimeout(() => {
-      setData(mock);
-      setLoading(false);
-    }, 300);
+    fetchAnalytics();
   }, []);
 
   return (
@@ -80,8 +79,12 @@ const SellerAnalyticsPage: React.FC = () => {
           Monitor your performance, trends, and best‑selling gems.
         </p>
 
-        {loading || !data ? (
+        {loading ? (
           <p className="text-sm text-gray-500">Loading analytics...</p>
+        ) : error ? (
+          <p className="text-sm text-red-500">{error}</p>
+        ) : !data ? (
+          <p className="text-sm text-gray-500">No analytics data available.</p>
         ) : (
           <div className="space-y-6">
             <SellerAnalyticsKpiCards kpis={data.kpis} />
