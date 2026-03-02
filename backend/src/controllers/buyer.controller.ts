@@ -52,11 +52,11 @@ export const getRecentOrders = async (req: Request, res: Response) => {
           o.order_status,
           o.total_amount,
           o.created_at,
-          MIN(gi.imageurl) AS image_url
+          MIN(gi.image_url) AS image_url
         FROM orders o
         LEFT JOIN order_items oi ON oi.order_id = o.order_id
-        LEFT JOIN gem g ON g.gemid = oi.gemid
-        LEFT JOIN gemimages gi ON gi.gemid = g.gemid
+        LEFT JOIN gem g ON g.gem_id = oi.gem_id
+        LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
         WHERE o.buyer_id = ?
         GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at
         ORDER BY o.created_at DESC
@@ -80,19 +80,19 @@ export const getWishlist = async (req: Request, res: Response) => {
     const [rows]: any = await db.query(
       `
         SELECT
-          w.wishlistid,
-          g.gemid,
-          g.gemname,
+          w.wishlist_id,
+          g.gem_id,
+          g.gem_name,
           g.carat,
           g.cut,
           g.price,
-          MIN(gi.imageurl) AS image_url
+          MIN(gi.image_url) AS image_url
         FROM wishlist w
-        JOIN gem g ON g.gemid = w.gemid
-        LEFT JOIN gemimages gi ON gi.gemid = g.gemid
-        WHERE w.userid = ?
-        GROUP BY w.wishlistid, g.gemid
-        ORDER BY w.wishlistid DESC
+        JOIN gem g ON g.gem_id = w.gem_id
+        LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+        WHERE w.user_id = ?
+        GROUP BY w.wishlist_id, g.gem_id
+        ORDER BY w.wishlist_id DESC
         LIMIT 20
       `,
       [buyerId]
@@ -109,18 +109,18 @@ export const getWishlist = async (req: Request, res: Response) => {
 export const addToWishlist = async (req: Request, res: Response) => {
   try {
     const buyerId = (req.user as any).id;
-    const { gemid } = req.body;
+    const { gem_id } = req.body;
 
-    if (!gemid) {
-      return res.status(400).json({ error: "gemid is required" });
+    if (!gem_id) {
+      return res.status(400).json({ error: "gem_id is required" });
     }
 
     await db.query(
       `
-        INSERT INTO wishlist (userid, gemid)
+        INSERT INTO wishlist (user_id, gem_id)
         VALUES (?, ?)
       `,
-      [buyerId, gemid]
+      [buyerId, gem_id]
     );
 
     return res.status(201).json({ message: "Added to wishlist" });
@@ -142,7 +142,7 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
     await db.query(
       `
         DELETE FROM wishlist
-        WHERE wishlistid = ? AND userid = ?
+        WHERE wishlist_id = ? AND user_id = ?
       `,
       [id, buyerId]
     );
