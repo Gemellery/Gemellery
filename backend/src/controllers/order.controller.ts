@@ -61,7 +61,7 @@ export const checkoutOrder = async (req: any, res: Response) => {
 
     // Create order
     const [orderResult]: any = await conn.query(
-      `INSERT INTO orders (user_id, total_amount, payment_method, shipping_address_id)
+      `INSERT INTO orders (buyer_id, total_amount, payment_method, shipping_address_id)
        VALUES (?, ?, ?, ?)`,
       [user_id, total_amount, payment_method, shipping_address_id]
     );
