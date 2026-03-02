@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BuyerSidebar from "../../components/BuyerSidebar";
 import Footer from "../../components/BasicFooter";
 import {
@@ -39,6 +40,7 @@ interface WishlistItem {
 
 function BuyerDashboardLayout() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -154,6 +156,7 @@ function BuyerDashboardLayout() {
           </div>
 
           <button
+            onClick={() => navigate("/jewelry-designer")}
             className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#cc000b]
             text-white font-semibold rounded-full shadow-lg
             hover:scale-105 hover:shadow-xl transition-all duration-300"
