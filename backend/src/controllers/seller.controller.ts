@@ -22,6 +22,7 @@ export const getSellerProfile = async (
         s.business_reg_no,
         s.ngja_registration_no,
         s.seller_license_url,
+        s.verification_status,
 
         a.address
         FROM user u
