@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Heart, Shield, Sparkles } from 'lucide-react'
 import { MdOutlineScale } from "react-icons/md";
 import { FaRegGem } from "react-icons/fa";
 import { IoMdGlobe } from "react-icons/io";
 import { GrCertificate } from "react-icons/gr";
+import { useCart } from '@/context/CartContext';
 
 interface GemCardProps {
   id?: string
@@ -20,6 +21,8 @@ interface GemCardProps {
 
 const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin, certification, verified, image }) => {
   const navigate = useNavigate()
+  const { addToCart } = useCart()
+  const [buttonText, setButtonText] = useState('Add to Cart')
 
   // Normalize verified to a real boolean
   const isVerified = 
@@ -27,13 +30,29 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
     verified === 1 || 
     verified === '1' || 
     verified === 'true' || 
-    verified === 'approved' || 
-    verified === 'verified'
+    verified === 'approved' 
 
   const handleCardClick = () => {
     if (id) {
       navigate(`/product-detail/${id}`)
     }
+  }
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!id) return
+
+    const success = await addToCart(Number(id))
+
+    if (success) {
+      setButtonText('Added')
+    } else {
+      setButtonText('Failed to Add')
+    }
+
+    setTimeout(() => {
+      setButtonText('Add to Cart')
+    }, 2000)
   }
 
   return (
@@ -96,8 +115,11 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
 
         {/* Add to Cart Button */}
         <div className="flex gap-2 mt-auto">
-          <button className="flex-1 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 text-sm sm:text-base shadow-sm hover:shadow-md">
-            Add to Cart
+          <button 
+            onClick={handleAddToCart}
+            className="flex-1 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 text-sm sm:text-base shadow-sm hover:shadow-md"
+          >
+            {buttonText}
           </button>
           <button className="bg-gray-100 hover:bg-linear-to-br hover:from-amber-100 hover:to-amber-200 border border-gray-200 rounded-lg sm:rounded-xl p-2.5 sm:p-3 transition-all duration-300 shrink-0">
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-amber-600" />
