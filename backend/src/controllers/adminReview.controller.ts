@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from "../database";
+import pool from "../database";
 
 /**
  * GET All seller reviews
@@ -53,7 +53,7 @@ export const getAllSellerReviews = async (req: Request, res: Response) => {
 
         query += " ORDER BY sr.review_date DESC";
 
-        const [rows]: any = await db.query(query, values);
+        const [rows]: any = await pool.query(query, values);
 
         res.json(rows);
 
@@ -81,7 +81,7 @@ export const deleteSellerReview = async (req: Request, res: Response) => {
             });
         }
 
-        const [result]: any = await db.query(
+        const [result]: any = await pool.query(
             "DELETE FROM seller_reviews WHERE review_id = ?",
             [review_id]
         );

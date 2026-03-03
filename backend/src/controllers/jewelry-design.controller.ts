@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import {
     createDesign,
     getDesignById,
-    getUserDesigns as getUserDesignsFromDB,
+    getUserDesigns as getUserDesignsFrompool,
     updateDesign,
-    deleteDesign as deleteDesignFromDB,
+    deleteDesign as deleteDesignFrompool,
     JewelryDesignInput,
     GeneratedImage,
     Refinement,
@@ -46,7 +46,7 @@ export const getUserDesigns = async (
             return;
         }
 
-        const designs = await getUserDesignsFromDB(userId);
+        const designs = await getUserDesignsFrompool(userId);
 
         res.status(200).json({ designs });
     } catch (error) {
@@ -434,7 +434,7 @@ export const deleteDesignController = async (
         }
 
         // Delete design
-        const deleted = await deleteDesignFromDB(parseInt(id), userId);
+        const deleted = await deleteDesignFrompool(parseInt(id), userId);
 
         if (!deleted) {
             res.status(500).json({ message: "Failed to delete design" });
@@ -487,10 +487,10 @@ export const uploadGemImage = async (
 
         try {
             // Process and optimize the image
-            const processedBuffer = await processUploadedImage(file.buffer);
+            const processepooluffer = await processUploadedImage(file.buffer);
 
             // Upload to Firebase Storage
-            const uploadResult = await uploadGemImageToStorage(processedBuffer, userId);
+            const uploadResult = await uploadGemImageToStorage(processepooluffer, userId);
 
             res.status(200).json({
                 message: "Gem image uploaded successfully",

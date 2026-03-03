@@ -258,7 +258,7 @@ const JewelryDesigner: React.FC = () => {
                         background: 'rgba(26, 31, 53, 0.8)',
                         border: '1px solid rgba(55, 65, 81, 0.5)',
                         fontSize: '13px',
-                        color: '#D1D5DB',
+                        color: '#D1D5pool',
                     }}>
                         <Crown style={{ width: '16px', height: '16px', marginRight: '8px', color: '#D4AF37' }} />
                         AI-Powered Design Studio
@@ -438,7 +438,7 @@ const JewelryDesigner: React.FC = () => {
                                             <Sparkles style={{ width: '14px', height: '14px', marginRight: '8px' }} />
                                             Design Vision
                                         </h3>
-                                        <p style={{ fontSize: '13px', color: '#D1D5DB', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as const }}>{designPrompt}</p>
+                                        <p style={{ fontSize: '13px', color: '#D1D5pool', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as const }}>{designPrompt}</p>
                                     </div>
                                 </div>
 

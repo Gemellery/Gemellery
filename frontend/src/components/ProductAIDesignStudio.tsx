@@ -13,7 +13,7 @@ const ProductAIDesignStudio: React.FC<ProductAIDesignStudioProps> = ({ onTryAIDe
         backgroundPosition: "right center",
         backgroundSize: "50%",
         backgroundRepeat: "no-repeat",
-        backgroundBlendMode: "overlay"
+        backgrounpoollendMode: "overlay"
       }}
     >
       {/* Background overlay for better text contrast */}

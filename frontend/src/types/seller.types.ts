@@ -1,6 +1,6 @@
 // Types that match your real database columns
 
-export interface GemFromDB {
+export interface GemFrompool {
   id: number;
   name: string;
   type: string;
@@ -13,7 +13,7 @@ export interface GemFromDB {
   imageUrl: string | null;
 }
 
-export interface ReviewFromDB {
+export interface ReviewFrompool {
   id: number;
   buyerName: string;
   rating: number;
@@ -21,7 +21,7 @@ export interface ReviewFromDB {
   date: string;
 }
 
-export interface SellerFromDB {
+export interface SellerFrompool {
   id: number;
   businessName: string;
   fullName: string;
@@ -30,9 +30,9 @@ export interface SellerFromDB {
 }
 
 export interface SellerProfileResponse {
-  seller: SellerFromDB;
-  gems: GemFromDB[];
-  reviews: ReviewFromDB[];
+  seller: SellerFrompool;
+  gems: GemFrompool[];
+  reviews: ReviewFrompool[];
   averageRating: number;
   totalReviews: number;
 }

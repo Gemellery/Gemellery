@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from "../database";
+import pool from "../database";
 
 // GET /api/buyer/dashboard-summary
 export const getBuyerDashboardSummary = async (req: Request, res: Response) => {
@@ -7,7 +7,7 @@ export const getBuyerDashboardSummary = async (req: Request, res: Response) => {
     const buyerId = (req.user as any).id;
 
     // Active orders: Processing or Shipped
-    const [[ordersRow]]: any = await db.query(
+    const [[ordersRow]]: any = await pool.query(
       `
         SELECT COUNT(*) AS active_orders
         FROM orders
@@ -18,7 +18,7 @@ export const getBuyerDashboardSummary = async (req: Request, res: Response) => {
     );
 
     // Saved designs
-    const [[designsRow]]: any = await db.query(
+    const [[designsRow]]: any = await pool.query(
       `
         SELECT COUNT(*) AS saved_designs
         FROM design
@@ -45,7 +45,7 @@ export const getRecentOrders = async (req: Request, res: Response) => {
   try {
     const buyerId = (req.user as any).id;
 
-    const [rows]: any = await db.query(
+    const [rows]: any = await pool.query(
       `
         SELECT
           o.order_id,
@@ -77,7 +77,7 @@ export const getWishlist = async (req: Request, res: Response) => {
   try {
     const buyerId = (req.user as any).id;
 
-    const [rows]: any = await db.query(
+    const [rows]: any = await pool.query(
       `
         SELECT
           w.wishlistid,
@@ -115,7 +115,7 @@ export const addToWishlist = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "gemid is required" });
     }
 
-    await db.query(
+    await pool.query(
       `
         INSERT INTO wishlist (userid, gemid)
         VALUES (?, ?)
@@ -139,7 +139,7 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
     const buyerId = (req.user as any).id;
     const { id } = req.params;
 
-    await db.query(
+    await pool.query(
       `
         DELETE FROM wishlist
         WHERE wishlistid = ? AND userid = ?

@@ -59,7 +59,7 @@ export const register = async (req: Request, res: Response) => {
 
         if (role === "seller") {
 
-            const normalizedBusiness = business_name.trim().toUpperCase();
+            const normalizepoolusiness = business_name.trim().toUpperCase();
             const normalizedNgja = ngja_registration_no.trim().toUpperCase();
 
             const [existingSeller]: any = await conn.query(
@@ -79,7 +79,7 @@ export const register = async (req: Request, res: Response) => {
          FROM ngja_registered_sellers
          WHERE ngja_registration_no = ?
          AND UPPER(business_name) = ?`,
-                [normalizedNgja, normalizedBusiness]
+                [normalizedNgja, normalizepoolusiness]
             );
 
             let verificationStatus = "pending";
@@ -99,7 +99,7 @@ export const register = async (req: Request, res: Response) => {
                 `INSERT INTO seller
          (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url, verification_status)
          VALUES (?, ?, ?, ?, ?, ?)`,
-                [user_id, normalizedBusiness, business_reg_no, normalizedNgja, licenseUrl, verificationStatus]
+                [user_id, normalizepoolusiness, business_reg_no, normalizedNgja, licenseUrl, verificationStatus]
             );
         }
 

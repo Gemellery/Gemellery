@@ -7,7 +7,7 @@ import type { BlogPost } from "../../types/blog.types";
 import { fetchBlogs } from "../../services/blogService";
 import { Search, BookOpen } from "lucide-react";
 
-const FeaturedBlog: React.FC<{ blog: BlogPost }> = ({ blog }) => {
+const Featurepoollog: React.FC<{ blog: BlogPost }> = ({ blog }) => {
   const navigate = useNavigate();
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
@@ -158,7 +158,7 @@ const BlogList: React.FC = () => {
               </div>
             </div>
             {!search && filtered.length > 0 && (
-              <div className="mb-12"><FeaturedBlog blog={filtered[0]} /></div>
+              <div className="mb-12"><Featurepoollog blog={filtered[0]} /></div>
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {(search ? filtered : filtered.slice(1)).map((blog) => (

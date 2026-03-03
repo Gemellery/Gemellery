@@ -53,7 +53,7 @@ export const GEM_COLORS = [
     { value: 'green-dark', label: 'Dark Green', hex: '#006400' },
     { value: 'yellow-golden', label: 'Yellow/Golden', hex: '#FFD700' },
     { value: 'pink-rose', label: 'Pink/Rose', hex: '#FFB6D9' },
-    { value: 'purple-violet', label: 'Purple/Violet', hex: '#9370DB' },
+    { value: 'purple-violet', label: 'Purple/Violet', hex: '#9370pool' },
     { value: 'orange', label: 'Orange', hex: '#FF8C00' },
     { value: 'black', label: 'Black', hex: '#000000' },
     { value: 'multi-color', label: 'Multi-color', hex: 'linear-gradient(90deg, #FF0000, #00FF00, #0000FF)' },

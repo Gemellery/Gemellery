@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from "../database";
+import pool from "../database";
 
 export const getSellerProfile = async (
     req: Request,
@@ -7,7 +7,7 @@ export const getSellerProfile = async (
 ): Promise<Response> => {
     const userId = req.user!.id;
 
-    const [rows]: any = await db.query(
+    const [rows]: any = await pool.query(
         `
         SELECT
         u.full_name,
@@ -47,7 +47,7 @@ export const updateSellerProfile = async (
     const userId = req.user!.id;
     const { full_name, mobile, address } = req.body;
 
-    await db.query(
+    await pool.query(
         `
         UPDATE user
         SET full_name = ?, mobile = ?
@@ -56,7 +56,7 @@ export const updateSellerProfile = async (
         [full_name, mobile, userId]
     );
 
-    await db.query(
+    await pool.query(
         `
         UPDATE address
         SET address = ?
@@ -71,7 +71,7 @@ export const getSellerGems = async (req: Request, res: Response) => {
     try {
         const sellerId = (req.user as any).id;
 
-        const [rows]: any = await db.query(
+        const [rows]: any = await pool.query(
             `
       SELECT
         g.gem_id,
@@ -100,7 +100,7 @@ export const getRecentSellerGems = async (req: Request, res: Response) => {
     try {
         const sellerId = (req.user as any).id;
 
-        const [rows]: any = await db.query(
+        const [rows]: any = await pool.query(
             `
       SELECT
         g.gem_id,

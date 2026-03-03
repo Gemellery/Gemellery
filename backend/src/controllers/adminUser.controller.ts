@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import db from "../database";
+import pool from "../database";
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
-        const [rows]: any = await db.query(`
+        const [rows]: any = await pool.query(`
             SELECT 
                 u.user_id,
                 u.full_name,
@@ -54,7 +54,7 @@ export const updateUserStatus = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "Invalid status value" });
         }
 
-        const [result]: any = await db.query(
+        const [result]: any = await pool.query(
             `UPDATE user 
              SET status = ?, updated_at = NOW() 
              WHERE user_id = ?`,
