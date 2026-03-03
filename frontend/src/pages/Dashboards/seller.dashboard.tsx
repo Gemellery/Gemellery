@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { useNavigate } from "react-router-dom";
-import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart, ShieldCheck, ShieldAlert, Clock, ShieldX } from "lucide-react";
+import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Package, ChartNoAxesCombined, ArrowRight, Heart, ShieldCheck, ShieldAlert, Clock, ShieldX } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 
 function SellerDashboardLayout() {
@@ -23,6 +23,7 @@ function SellerDashboardLayout() {
     const [seller, setSeller] = useState<any>(null);
     const [gems, setGems] = useState<Gem[]>([]);
     const [gemsLoading, setGemsLoading] = useState(true);
+    const [dashboardStats, setDashboardStats] = useState<any>(null);
 
     useEffect(() => {
         const fetchSellerProfile = async () => {
@@ -75,6 +76,22 @@ function SellerDashboardLayout() {
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
         setUser(storedUser);
+    }, []);
+
+    useEffect(() => {
+        const fetchDashboardSummary = async () => {
+            try {
+                const res = await fetch("http://localhost:5001/api/seller/dashboard-summary", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error("Failed to fetch dashboard summary");
+                const data = await res.json();
+                setDashboardStats(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchDashboardSummary();
     }, []);
 
     return (
@@ -190,37 +207,43 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500">Total Revenue</span>
-                            <span className="text-2xl font-bold text-gray-900">$5,000</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                +12% from last month
+                            <span className="text-2xl font-bold text-gray-900">
+                                ${dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString()}` : "Loading..."}
+                            </span>
+                            <span className={`text-xs mt-1 ${dashboardStats?.revenueTrend >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% from last month` : ""}
                             </span>
                         </div>
                     </div>
 
-                    {/* Profile Views */}
+                    {/* Total Listings */}
                     <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
                         <div className="p-4 rounded-xl bg-white">
-                            <Eye className="text-[#1F7A73] size-7" />
+                            <Package className="text-[#1F7A73] size-7" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Profile Views</span>
-                            <span className="text-2xl font-bold text-gray-900">456</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                +8% this week
+                            <span className="text-sm text-gray-500">Active Listings</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.totalListings ?? "Loading..."}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                                Available gems
                             </span>
                         </div>
                     </div>
 
-                    {/* Inquiry Rate */}
+                    {/* Total Orders */}
                     <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
                         <div className="p-4 rounded-xl bg-white">
-                            <MessageSquare className="text-[#1F7A73] size-7" />
+                            <BadgeCheck className="text-[#1F7A73] size-7" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Inquiry Rate</span>
-                            <span className="text-2xl font-bold text-gray-900">25%</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                High engagement
+                            <span className="text-sm text-gray-500">Total Orders</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.totalOrders ?? "Loading..."}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                                All time
                             </span>
                         </div>
                     </div>
@@ -232,7 +255,9 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500">Wishlisted Gems</span>
-                            <span className="text-2xl font-bold text-gray-900">48</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.wishlistCount ?? "Loading..."}
+                            </span>
                             <span className="text-xs text-gray-500 mt-1">
                                 Across all listings
                             </span>
@@ -340,14 +365,14 @@ function SellerDashboardLayout() {
                     <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
                         <div className="flex flex-col">
                             <h2 className="font-bold">Verification Rate</h2>
-                            <h2 className="text-sm text-gray-500">98%</h2>
+                            <h2 className="text-sm text-gray-500">{dashboardStats ? `${dashboardStats.verificationRate}%` : "Loading..."}</h2>
                         </div>
                     </div>
 
                     <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
                         <div className="flex flex-col">
                             <h2 className="font-bold">Active Shipments</h2>
-                            <h2 className="text-sm text-gray-500">45</h2>
+                            <h2 className="text-sm text-gray-500">{dashboardStats?.activeShipments ?? "Loading..."}</h2>
                         </div>
                     </div>
                 </div>
