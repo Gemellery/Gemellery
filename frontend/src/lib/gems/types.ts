@@ -32,13 +32,16 @@ export interface GemFilters {
   gemName?: string;
   priceMin?: number;
   priceMax?: number;
+  priceRanges?: string;
   caratMin?: number;
   caratMax?: number;
   color?: string;
   cut?: string;
   clarity?: string;
   origin?: string;
+  miningRegion?: string;
   isCertified?: string;
+  specialColors?: string;
 }
 
 // ──────────────────────────────────────────────

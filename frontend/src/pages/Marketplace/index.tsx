@@ -13,9 +13,7 @@ import type { GemCardDisplay } from '@/lib/gems/utils'
 const GEMS_PER_PAGE = 12
 
 const Marketplace = () => {
-  // ──────────────────────────────────────────
-  // State
-  // ──────────────────────────────────────────
+  /* === State === */
   const [gems, setGems] = useState<GemCardDisplay[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -27,9 +25,7 @@ const Marketplace = () => {
   const [sortBy, setSortBy] = useState('Newest')
   const [showMobileFilters, setShowMobileFilters] = useState(false)
 
-  // ──────────────────────────────────────────
-  // Fetch gems from the API
-  // ──────────────────────────────────────────
+  /* === Fetch gems from the API === */
   const loadGems = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -71,9 +67,7 @@ const Marketplace = () => {
     }
   }, [currentPage, filters, searchQuery, sortBy])
 
-  // ──────────────────────────────────────────
-  // Client-side sort helper
-  // ──────────────────────────────────────────
+  /* === Client-side sort helper === */
   function sortGems(gems: GemCardDisplay[], sort: string): GemCardDisplay[] {
     const sorted = [...gems]
 
@@ -97,40 +91,30 @@ const Marketplace = () => {
     return sorted
   }
 
-  // ──────────────────────────────────────────
-  // Trigger fetch when dependencies change
-  // ──────────────────────────────────────────
+  /* === Trigger fetch when dependencies change === */
   useEffect(() => {
     loadGems()
   }, [loadGems])
 
-  // ──────────────────────────────────────────
-  // Callback: FilterSection changed
-  // ──────────────────────────────────────────
+  /* === Callback: FilterSection changed === */
   const handleFilterChange = useCallback((newFilters: GemFilters) => {
     setFilters(newFilters)
     setCurrentPage(1) 
   }, [])
 
-  // ──────────────────────────────────────────
-  // Callback: SearchBar search query changed
-  // ──────────────────────────────────────────
+  /* === Callback: SearchBar search query changed === */
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
     setCurrentPage(1)
   }, [])
 
-  // ──────────────────────────────────────────
-  // Callback: SearchBar sort option changed
-  // ──────────────────────────────────────────
+  /* === Callback: SearchBar sort option changed === */
 
   const handleSortChange = useCallback((sort: string) => {
     setSortBy(sort)
   }, [])
 
-  // ──────────────────────────────────────────
-  // Render
-  // ──────────────────────────────────────────
+  /* === Render === */
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -248,7 +232,7 @@ const Marketplace = () => {
                       cut={gem.cut}
                       origin={gem.origin}
                       certification={gem.certificationLabel}
-                      verified={gem.isVerified}
+                      verified={gem.verified}
                       image={gem.imageUrl}
                     />
                   ))}

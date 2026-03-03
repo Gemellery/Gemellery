@@ -1,16 +1,12 @@
 import { API_CONFIG } from '@/lib/api.config';
 import type { GemListItem, GemFilters, GemApiResponse } from '@/lib/gems/types';
 
-// ──────────────────────────────────────────────
-// Image URL builder
-// ──────────────────────────────────────────────
+/* === Image URL builder === */
 export function getGemImageUrl(filename: string): string {
   return `${API_CONFIG.BASE_URL}/uploads/gem_images/${filename}`;
 }
 
-// ──────────────────────────────────────────────
-// parseImages — safely parse the images field
-// ──────────────────────────────────────────────
+/* === parseImages — safely parse the images field === */
 function parseImages(images: any): string[] {
   if (!images) return [];
 
@@ -36,9 +32,7 @@ function parseImages(images: any): string[] {
   return [];
 }
 
-// ──────────────────────────────────────────────
-// normalizeGem — convert raw API row → GemListItem
-// ──────────────────────────────────────────────
+/* === normalizeGem — convert raw API row → GemListItem === */
 function normalizeGem(raw: any): GemListItem {
   return {
     id: raw.id,
@@ -63,9 +57,7 @@ function normalizeGem(raw: any): GemListItem {
   };
 }
 
-// ──────────────────────────────────────────────
-// fetchGems — fetch gems from GET /api/gems
-// ──────────────────────────────────────────────
+/* === fetchGems — fetch gems from GET /api/gems === */
 export async function fetchGems(
   filters: GemFilters = {}
 ): Promise<GemApiResponse> {
@@ -78,12 +70,15 @@ export async function fetchGems(
   if (filters.gemName) params.append('gemName', filters.gemName);
   if (filters.priceMin !== undefined) params.append('priceMin', filters.priceMin.toString());
   if (filters.priceMax !== undefined) params.append('priceMax', filters.priceMax.toString());
+  if (filters.priceRanges) params.append('priceRanges', filters.priceRanges);
   if (filters.caratMin !== undefined) params.append('caratMin', filters.caratMin.toString());
   if (filters.caratMax !== undefined) params.append('caratMax', filters.caratMax.toString());
   if (filters.color) params.append('color', filters.color);
+  if (filters.specialColors) params.append('specialColors', filters.specialColors);
   if (filters.cut) params.append('cut', filters.cut);
   if (filters.clarity) params.append('clarity', filters.clarity);
   if (filters.origin) params.append('origin', filters.origin);
+  if (filters.miningRegion) params.append('miningRegion', filters.miningRegion);
   if (filters.isCertified) params.append('isCertified', filters.isCertified);
 
   const url = `${API_CONFIG.BASE_URL}${API_CONFIG.GEMS_ENDPOINT}?${params.toString()}`;

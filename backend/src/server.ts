@@ -20,7 +20,7 @@ import adminUserRoutes from "./routes/adminUser.routes";
 import adminReviewRoutes from "./routes/adminReview.routes";
 import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
-
+import wishlistRoutes from "./routes/wishlist.routes";
 
 
 const app = express();
@@ -41,6 +41,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/shipping", shippingRoutes);
 app.use("/api/buyer", buyerRoutes);
