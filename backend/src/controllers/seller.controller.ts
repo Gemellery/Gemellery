@@ -97,6 +97,106 @@ export const getSellerGems = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * GET /api/seller/dashboard-summary
+ * Returns stats for the seller dashboard cards and performance section.
+ */
+export const getSellerDashboardSummary = async (req: Request, res: Response) => {
+    try {
+        const sellerId = (req.user as any).id;
+
+        // Total Revenue (delivered orders)
+        const [[revenueRow]]: any = await db.query(
+            `SELECT COALESCE(SUM(oi.price * oi.quantity), 0) AS total_revenue
+             FROM order_items oi
+             JOIN gem g ON g.gem_id = oi.gem_id
+             JOIN orders o ON o.order_id = oi.order_id
+             WHERE g.seller_id = ? AND o.order_status = 'Delivered'`,
+            [sellerId]
+        );
+
+        // Revenue last month for trend
+        const [[revLastMonthRow]]: any = await db.query(
+            `SELECT COALESCE(SUM(oi.price * oi.quantity), 0) AS rev
+             FROM order_items oi
+             JOIN gem g ON g.gem_id = oi.gem_id
+             JOIN orders o ON o.order_id = oi.order_id
+             WHERE g.seller_id = ? AND o.order_status = 'Delivered'
+               AND MONTH(o.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
+               AND YEAR(o.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))`,
+            [sellerId]
+        );
+
+        const totalRevenue = Number(revenueRow.total_revenue);
+        const revLastMonth = Number(revLastMonthRow.rev);
+        const revenueTrend = revLastMonth > 0
+            ? Math.round(((totalRevenue - revLastMonth) / revLastMonth) * 100)
+            : 0;
+
+        // Total listings count
+        const [[listingsRow]]: any = await db.query(
+            `SELECT COUNT(*) AS total_listings FROM gem WHERE seller_id = ? AND status = 'Available'`,
+            [sellerId]
+        );
+
+        // Wishlisted gems count (how many times this seller's gems are wishlisted)
+        const [[wishlistRow]]: any = await db.query(
+            `SELECT COUNT(*) AS wishlist_count
+             FROM wishlist w
+             JOIN gem g ON g.gem_id = w.gem_id
+             WHERE g.seller_id = ?`,
+            [sellerId]
+        );
+
+        // Total orders for this seller
+        const [[totalOrdersRow]]: any = await db.query(
+            `SELECT COUNT(DISTINCT oi.order_id) AS total_orders
+             FROM order_items oi
+             JOIN gem g ON g.gem_id = oi.gem_id
+             WHERE g.seller_id = ?`,
+            [sellerId]
+        );
+
+        // Gem verification rate (approved / total gems)
+        const [[verificationRow]]: any = await db.query(
+            `SELECT 
+               COUNT(*) AS total_gems,
+               SUM(CASE WHEN verification_status = 'approved' THEN 1 ELSE 0 END) AS approved_gems
+             FROM gem WHERE seller_id = ?`,
+            [sellerId]
+        );
+        const totalGems = Number(verificationRow.total_gems);
+        const approvedGems = Number(verificationRow.approved_gems);
+        const verificationRate = totalGems > 0
+            ? Math.round((approvedGems / totalGems) * 100)
+            : 0;
+
+        // Active shipments (pending or completed but not delivered)
+        const [[shipmentsRow]]: any = await db.query(
+            `SELECT COUNT(*) AS active_shipments
+             FROM shipment s
+             JOIN orders o ON o.order_id = s.order_id
+             JOIN order_items oi ON oi.order_id = o.order_id
+             JOIN gem g ON g.gem_id = oi.gem_id
+             WHERE g.seller_id = ? AND s.shipment_status IN ('pending', 'completed')`,
+            [sellerId]
+        );
+
+        return res.json({
+            totalRevenue,
+            revenueTrend,
+            totalListings: Number(listingsRow.total_listings),
+            wishlistCount: Number(wishlistRow.wishlist_count),
+            totalOrders: Number(totalOrdersRow.total_orders),
+            verificationRate,
+            activeShipments: Number(shipmentsRow.active_shipments),
+        });
+    } catch (err) {
+        console.error("Seller dashboard summary error:", err);
+        return res.status(500).json({ error: "Failed to load dashboard summary" });
+    }
+};
+
 export const getRecentSellerGems = async (req: Request, res: Response) => {
     try {
         const sellerId = (req.user as any).id;

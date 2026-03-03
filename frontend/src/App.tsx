@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
+import EditGem from "./pages/Gem/EditGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
@@ -101,6 +102,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["seller"]}>
               <SellerAllListings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-gem/:id"
+          element={
+            <ProtectedRoute allowedRoles={["seller"]}>
+              <EditGem />
             </ProtectedRoute>
           }
         />
