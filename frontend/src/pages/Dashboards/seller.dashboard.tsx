@@ -256,7 +256,9 @@ function SellerDashboardLayout() {
                                 </h2>
                             </div>
                         </div>
-                        <button className="bg-[#000000] text-white px-4 py-2 rounded-lg hover:bg-[#16635d]">
+                        <button
+                            onClick={() => navigate("/jewelry-designer")}
+                            className="bg-[#000000] text-white px-4 py-2 rounded-lg hover:bg-[#16635d]">
                             View Analysis
                         </button>
                     </div>
