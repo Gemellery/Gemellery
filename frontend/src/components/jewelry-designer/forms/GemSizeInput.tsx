@@ -30,8 +30,8 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
     };
 
     return (
-        <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
+        <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
+            <label className="block text-sm font-semibold text-gray-800">
                 What size is your gem? <span className="text-red-500">*</span>
             </label>
 
@@ -45,7 +45,7 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
                 flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all
                 ${selectedSize === size.value
                                     ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                    : 'border-gray-700 bg-[#1a1f35] hover:border-gray-600'
+                                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                                 }
               `}
                         >
@@ -55,10 +55,10 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
                                 value={size.value}
                                 checked={selectedSize === size.value}
                                 onChange={() => onSizeChange(size.value)}
-                                className="mt-1 w-4 h-4 text-[#D4AF37] bg-[#1a1f35] border-gray-600 focus:ring-[#D4AF37] focus:ring-offset-0"
+                                className="mt-1 w-4 h-4 text-[#D4AF37] bg-white border-gray-300 focus:ring-[#D4AF37] focus:ring-offset-0"
                             />
                             <div className="ml-3">
-                                <p className="text-sm font-medium text-white">{size.label}</p>
+                                <p className="text-sm font-medium text-gray-900">{size.label}</p>
                                 <p className="text-xs text-gray-500">{size.description}</p>
                             </div>
                         </label>
@@ -72,52 +72,56 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
 
             {/* Advanced Mode - Dimension inputs */}
             {showAdvanced && (
-                <div className="space-y-4 p-4 rounded-xl border-2 border-gray-700 bg-[#1a1f35]">
+                <div className="space-y-4 p-4 rounded-xl border-2 border-gray-200 bg-gray-50">
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Length (mm)</label>
+                            <label className="block text-xs text-gray-500 mb-1">Length (mm)</label>
                             <input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeLengthMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-[#0d1121] text-white
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
                   focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
                                 placeholder="0.0"
+                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Width (mm)</label>
+                            <label className="block text-xs text-gray-500 mb-1">Width (mm)</label>
                             <input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeWidthMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-[#0d1121] text-white
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
                   focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
                                 placeholder="0.0"
+                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-400 mb-1">Height (mm)</label>
+                            <label className="block text-xs text-gray-500 mb-1">Height (mm)</label>
                             <input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeHeightMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-[#0d1121] text-white
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
                   focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
                                 placeholder="0.0"
+                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs text-gray-400 mb-1">Carat Weight (optional)</label>
+                        <label className="block text-xs text-gray-500 mb-1">Carat Weight (optional)</label>
                         <input
                             type="number"
                             step="0.01"
                             {...register('gemSizeCarat', { valueAsNumber: true })}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-[#0d1121] text-white
+                            className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
                 focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
                             placeholder="0.00"
+                            style={{ fontFamily: "'Market Sans', sans-serif" }}
                         />
                     </div>
 
@@ -131,7 +135,8 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
             <button
                 type="button"
                 onClick={toggleAdvanced}
-                className="flex items-center text-sm text-[#D4AF37] hover:text-[#e5c349] font-medium"
+                className="flex items-center text-sm text-[#B8860B] hover:text-[#D4AF37] font-semibold"
+                style={{ fontFamily: "'Market Sans', sans-serif" }}
             >
                 {showAdvanced ? (
                     <>

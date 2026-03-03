@@ -15,9 +15,12 @@ import Contact from "./pages/Contact";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
+import EditGem from "./pages/Gem/EditGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
 import JewelryResults from "./pages/JewelryDesigner/Results";
 import JewelryRefine from "./pages/JewelryDesigner/Refine";
+import DesignDetail from "./pages/JewelryDesigner/DesignDetail";
+import DesignHistoryLayout from "./components/jewelry-designer/history/DesignHistoryLayout";
 import SellerSettings from "./pages/seller/SellerSettings";
 import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
@@ -32,6 +35,7 @@ import ManageUsers from "./pages/Admin/AdminUserManagement";
 import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
+import SellerAnalyticsPage from "./pages/seller/SellerAnalytics";
 
 function App() {
   return (
@@ -53,6 +57,7 @@ function App() {
           <Route path="/jewelry_designer" element={<JewelryDesigner />} />
           <Route path="/jewelry-designer/results" element={<JewelryResults />} />
           <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+          <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
 
           <Route path="/seller/:id" element={<SellerProfile />} />
 
@@ -84,10 +89,28 @@ function App() {
           />
 
           <Route
+            path="/seller/analytics"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/seller/settings"
             element={
               <ProtectedRoute allowedRoles={["seller"]}>
                 <SellerSettings />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edit-gem/:id"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <EditGem />
               </ProtectedRoute>
             }
           />

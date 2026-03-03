@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
+import AdminNavbar from "../../components/AdminNavbar";
+import AdminStatCards from "../../components/AdminStatsCards";
+import AdminOverviewSection from "../../components/AdminOverviewSection";
+import AdminInsightsSection from "../../components/AdminInsightsSection"; 
+import AdminLiveActivityFeed from "../../components/AdminLiveActivityFeed";
+import Footer from "../../components/BasicFooter";
 
 const AdminDashboardLayout: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [adminName, setAdminName] = useState("");
   const [role, setRole] = useState<"admin" | "super_admin">("admin");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -14,9 +23,16 @@ const AdminDashboardLayout: React.FC = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
 
+      {/* Sidebar */}
       <AdminSidebar
         adminName={adminName}
         role={role}
@@ -24,36 +40,34 @@ const AdminDashboardLayout: React.FC = () => {
         onClose={() => setIsOpen(false)}
       />
 
+      {/* Main Area */}
       <div className="flex-1 flex flex-col ml-0 md:ml-64">
 
-        {/* Top Header */}
-        <header className="bg-white shadow p-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-          <div className="text-sm text-gray-600 capitalize">
-            Welcome, {adminName}
-          </div>
-        </header>
+        {/* Navbar */}
+        <AdminNavbar
+          adminName={adminName}
+          onOpenSidebar={() => setIsOpen(true)}
+          onLogout={handleLogout}
+        />
 
         {/* Main Content */}
         <main className="p-6 flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-            <div className="bg-white p-6 rounded shadow">
-              <h2 className="text-gray-500 text-sm">Total Sellers</h2>
-              <p className="text-3xl font-bold mt-2">120</p>
-            </div>
+          <AdminStatCards
+            totalUsers={350}
+            totalGems={542}
+            pendingVerifications={8}
+            pendingGemApprovals={5}
+            totalOrders={78}
+          />
 
-            <div className="bg-white p-6 rounded shadow">
-              <h2 className="text-gray-500 text-sm">Pending Verifications</h2>
-              <p className="text-3xl font-bold mt-2">8</p>
-            </div>
+          <AdminOverviewSection />
 
-            <div className="bg-white p-6 rounded shadow">
-              <h2 className="text-gray-500 text-sm">Total Gems Listed</h2>
-              <p className="text-3xl font-bold mt-2">542</p>
-            </div>
+          <AdminInsightsSection />
 
-          </div>
+          <AdminLiveActivityFeed />
+
+          <Footer/>
         </main>
       </div>
     </div>

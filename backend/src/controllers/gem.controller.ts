@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import pool from "../database";
 import { gemModel } from "../models/Gem.model";
 import type { GemQueryParams } from "../models/Gem.model";
 
@@ -60,6 +61,142 @@ export const createGem = async (req: Request, res: Response) => {
 
     return res.status(500).json({ error: "Failed to create gem" });
   }
+};
+
+// ============================================================
+// Get gem for editing (seller only)
+// ============================================================
+/**
+ * GET /api/gems/seller/:id
+ * Get a gem by ID for the owning seller (includes all fields for editing).
+ */
+export const getGemForEdit = async (req: Request, res: Response) => {
+    try {
+        const gemId = req.params.id;
+        const sellerId = req.user!.id;
+
+        const [rows]: any = await pool.query(
+            `SELECT g.gem_id, g.gem_name, g.gem_type, g.carat, g.cut, g.clarity,
+                    g.color, g.origin, g.price, g.description,
+                    g.ngja_certificate_no, g.ngja_certificate_url, g.status
+             FROM gem g
+             WHERE g.gem_id = ? AND g.seller_id = ?`,
+            [gemId, sellerId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Gem not found or you don't own it" });
+        }
+
+        const [images]: any = await pool.query(
+            `SELECT image_id, image_url FROM gem_images WHERE gem_id = ?`,
+            [gemId]
+        );
+
+        return res.json({ ...rows[0], images });
+    } catch (err) {
+        console.error("Error fetching gem for edit:", err);
+        return res.status(500).json({ error: "Failed to fetch gem" });
+    }
+};
+
+// ============================================================
+// Update gem (seller only)
+// ============================================================
+/**
+ * PUT /api/gems/:id
+ * Update gemstone details (seller only, must own the gem).
+ */
+export const updateGem = async (req: Request, res: Response) => {
+    const conn = await pool.getConnection();
+
+    try {
+        await conn.beginTransaction();
+
+        const gemId = req.params.id;
+        const sellerId = req.user!.id;
+
+        // Verify ownership
+        const [existing]: any = await conn.query(
+            "SELECT gem_id FROM gem WHERE gem_id = ? AND seller_id = ?",
+            [gemId, sellerId]
+        );
+
+        if (existing.length === 0) {
+            await conn.rollback();
+            return res.status(404).json({ error: "Gem not found or you don't own it" });
+        }
+
+        const {
+            gem_name,
+            gem_type,
+            carat,
+            cut,
+            clarity,
+            color,
+            origin,
+            price,
+            description,
+        } = req.body;
+
+        // Update gem details
+        await conn.query(
+            `UPDATE gem SET
+                gem_name = ?, gem_type = ?, carat = ?, cut = ?, clarity = ?,
+                color = ?, origin = ?, price = ?, description = ?,
+                updated_date = CURDATE()
+             WHERE gem_id = ? AND seller_id = ?`,
+            [
+                gem_name,
+                gem_type || null,
+                carat || null,
+                cut || null,
+                clarity || null,
+                color || null,
+                origin || null,
+                price || null,
+                description || null,
+                gemId,
+                sellerId,
+            ]
+        );
+
+        // Handle new images if uploaded
+        const newImages = (req.files as any)?.images?.map((f: any) => f.filename) || [];
+
+        if (newImages.length > 0) {
+            const imageValues = newImages.map((filename: string) => [gemId, filename]);
+            await conn.query(
+                `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
+                [imageValues]
+            );
+        }
+
+        // Handle deleted images
+        const deletedImageIds = req.body.deleted_image_ids;
+        if (deletedImageIds) {
+            const ids = typeof deletedImageIds === "string"
+                ? JSON.parse(deletedImageIds)
+                : deletedImageIds;
+
+            if (Array.isArray(ids) && ids.length > 0) {
+                await conn.query(
+                    `DELETE FROM gem_images WHERE image_id IN (?) AND gem_id = ?`,
+                    [ids, gemId]
+                );
+            }
+        }
+
+        await conn.commit();
+
+        return res.json({ message: "Gem updated successfully" });
+    } catch (err) {
+        await conn.rollback();
+        console.error("Error updating gem:", err);
+        return res.status(500).json({ error: "Failed to update gem" });
+    } finally {
+        conn.release();
+    }
 };
 
 // ============================================================

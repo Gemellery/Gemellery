@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BuyerSidebar from "../../components/BuyerSidebar";
 import Footer from "../../components/BasicFooter";
 import {
@@ -11,6 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import image from "../../assets/logos/example_ring.png";
+import API_CONFIG from "../../lib/api.config";
 
 interface Summary {
   activeOrders: number;
@@ -27,9 +29,9 @@ interface RecentOrder {
 }
 
 interface WishlistItem {
-  wishlistid: number;
-  gemid: number;
-  gemname: string;
+  wishlist_id: number;
+  gem_id: number;
+  gem_name: string;
   carat: number;
   cut: string;
   price: number;
@@ -38,6 +40,7 @@ interface WishlistItem {
 
 function BuyerDashboardLayout() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -61,7 +64,7 @@ function BuyerDashboardLayout() {
     const fetchSummary = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5001/api/buyer/dashboard-summary",
+          `${API_CONFIG.BASE_URL}/api/buyer/dashboard-summary`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -82,7 +85,7 @@ function BuyerDashboardLayout() {
     const fetchOrders = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5001/api/buyer/orders/recent",
+          `${API_CONFIG.BASE_URL}/api/buyer/orders/recent`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -104,7 +107,7 @@ function BuyerDashboardLayout() {
 
     const fetchWishlist = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/buyer/wishlist", {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/buyer/wishlist`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -153,6 +156,7 @@ function BuyerDashboardLayout() {
           </div>
 
           <button
+            onClick={() => navigate("/jewelry-designer")}
             className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#cc000b]
             text-white font-semibold rounded-full shadow-lg
             hover:scale-105 hover:shadow-xl transition-all duration-300"
@@ -202,7 +206,7 @@ function BuyerDashboardLayout() {
                   <img
                     src={
                       order.image_url
-                        ? `http://localhost:5001/uploads/gem_images/${order.image_url}`
+                        ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
                         : image
                     }
                     alt="Order"
@@ -236,7 +240,7 @@ function BuyerDashboardLayout() {
 
           {wishlist.map((item) => (
             <div
-              key={item.wishlistid}
+              key={item.wishlist_id}
               className="rounded-2xl border border-[#e9dfc8] bg-white p-3"
             >
               <div className="relative">
@@ -244,10 +248,10 @@ function BuyerDashboardLayout() {
                   <img
                     src={
                       item.image_url
-                        ? `http://localhost:5001/uploads/gem_images/${item.image_url}`
+                        ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`
                         : "/placeholder-gem.png"
                     }
-                    alt={item.gemname}
+                    alt={item.gem_name}
                     className="w-full h-48 object-contain rounded-xl"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
@@ -261,7 +265,7 @@ function BuyerDashboardLayout() {
               </div>
               <div className="mt-3 space-y-1">
                 <h3 className="font-semibold text-sm text-gray-900">
-                  {item.gemname}
+                  {item.gem_name}
                 </h3>
                 <p className="text-xs text-gray-500">
                   {item.carat} ct • {item.cut}

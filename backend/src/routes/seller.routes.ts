@@ -3,7 +3,9 @@ import {
   getSellerProfile,
   updateSellerProfile,
   getSellerGems,
-  getRecentSellerGems
+  getRecentSellerGems,
+  getSellerAnalytics,
+  getSellerDashboardSummary,
 } from "../controllers/seller.controller";
 import { authGuard, authorizeRole } from "../middleware/auth.middleware";
 import pool from "../database";
@@ -15,6 +17,8 @@ router.get("/profile", authGuard, authorizeRole("seller"), getSellerProfile);
 router.patch("/profile", authGuard, authorizeRole("seller"), updateSellerProfile);
 router.get("/gems", authGuard, authorizeRole("seller"), getSellerGems);
 router.get("/gems/recent", authGuard, authorizeRole("seller"), getRecentSellerGems);
+router.get("/analytics", authGuard, authorizeRole("seller"), getSellerAnalytics);
+router.get("/dashboard-summary", authGuard, authorizeRole("seller"), getSellerDashboardSummary);
 
 // NEW: Public seller profile - no login required
 router.get("/:id", async (req: Request, res: Response) => {

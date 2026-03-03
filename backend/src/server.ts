@@ -1,6 +1,8 @@
+// MUST be first - load env vars before any other module initializes
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes";
 import countryRoutes from "./routes/country.routes";
 import jewelryDesignRoutes from "./routes/jewelry-design.routes";
@@ -9,6 +11,7 @@ import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
 import cartRoutes from "./routes/cart.routes";
 import orderRoutes from "./routes/order.routes";
+import shippingRoutes from "./routes/shipping.routes";
 import buyerRoutes from "./routes/buyer.routes";
 import superAdminRoutes from "./routes/superAdmin.routes";
 import adminSellerRoutes from "./routes/adminSeller.routes";
@@ -19,17 +22,17 @@ import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 
-dotenv.config();
 
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/countries", countryRoutes);
@@ -40,6 +43,7 @@ app.use("/api/gems", gemRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/shipping", shippingRoutes);
 app.use("/api/buyer", buyerRoutes);
 app.use("/api/super-admin", superAdminRoutes);
 app.use("/api/admin", adminSellerRoutes);
