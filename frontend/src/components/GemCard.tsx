@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Heart, Shield, Sparkles } from 'lucide-react'
 import { MdOutlineScale } from "react-icons/md";
@@ -6,6 +6,7 @@ import { FaRegGem } from "react-icons/fa";
 import { IoMdGlobe } from "react-icons/io";
 import { GrCertificate } from "react-icons/gr";
 import { useCart } from '@/context/CartContext';
+import * as wishlistApi from '@/lib/wishlist/api';
 
 interface GemCardProps {
   id?: string
@@ -23,6 +24,8 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
   const navigate = useNavigate()
   const { addToCart } = useCart()
   const [buttonText, setButtonText] = useState('Add to Cart')
+  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [wishlistLoading, setWishlistLoading] = useState(false)
 
   // Normalize verified to a real boolean
   const isVerified = 
@@ -31,6 +34,30 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
     verified === '1' || 
     verified === 'true' || 
     verified === 'approved' 
+
+  // Check if this gem is already wishlisted on mount
+  useEffect(() => {
+    const checkIfWishlisted = async () => {
+      if (!id) return;
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      // Only check for logged-in buyers
+      if (!token || !user) return;
+      try {
+        const role = JSON.parse(user).role?.toLowerCase();
+        if (role !== 'buyer') return;
+      } catch { return; }
+
+      try {
+        const result = await wishlistApi.checkWishlist(Number(id));
+        setIsWishlisted(result);
+      } catch {
+        // Silently fail — user might not be logged in
+      }
+    };
+    checkIfWishlisted();
+  }, [id]);
 
   const handleCardClick = () => {
     if (id) {
@@ -53,6 +80,46 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
     setTimeout(() => {
       setButtonText('Add to Cart')
     }, 2000)
+  }
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.stopPropagation()  // Prevent card click navigation
+    if (!id || wishlistLoading) return
+
+    // Check if user is logged in as buyer
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (!token || !user) {
+      navigate('/signin');
+      return;
+    }
+
+    try {
+      const role = JSON.parse(user).role?.toLowerCase();
+      if (role !== 'buyer') {
+        alert('Only buyers can add items to wishlist');
+        return;
+      }
+    } catch {
+      navigate('/signin');
+      return;
+    }
+
+    setWishlistLoading(true)
+
+    try {
+      if (isWishlisted) {
+        await wishlistApi.removeFromWishlist(Number(id))
+        setIsWishlisted(false)
+      } else {
+        await wishlistApi.addToWishlist(Number(id))
+        setIsWishlisted(true)
+      }
+    } catch (error) {
+      console.error('Wishlist error:', error)
+    } finally {
+      setWishlistLoading(false)
+    }
   }
 
   return (
@@ -79,9 +146,19 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
           </div>
         )}
 
-        {/* Wishlist Button */}
-        <button className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/95 rounded-full p-2 sm:p-2.5 shadow-md hover:shadow-lg hover:bg-red-50 transition backdrop-blur-sm group/wishlist">
-          <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 group-hover/wishlist:text-red-600 transition" />
+        {/* Wishlist Button — NOW FUNCTIONAL */}
+        <button 
+          onClick={handleToggleWishlist}
+          disabled={wishlistLoading}
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/95 rounded-full p-2 sm:p-2.5 shadow-md hover:shadow-lg hover:bg-red-50 transition backdrop-blur-sm group/wishlist disabled:opacity-50"
+        >
+          <Heart 
+            className={`w-5 h-5 sm:w-6 sm:h-6 transition ${
+              isWishlisted 
+                ? 'text-red-600 fill-red-600' 
+                : 'text-gray-400 group-hover/wishlist:text-red-600'
+            }`} 
+          />
         </button>
       </div>
 
