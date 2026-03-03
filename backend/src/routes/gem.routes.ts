@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGem, getGems, getGemById } from "../controllers/gem.controller";
+import { createGem, getGems, getGemById, getGemForEdit, updateGem } from "../controllers/gem.controller";
 import { upload } from "../middleware/upload.middleware";
 import { validateGem } from "../middleware/validateGem.middleware";
 import { authGuard, authorizeRole } from "../middleware/auth.middleware";
@@ -17,6 +17,25 @@ router.post(
     ]),
     validateGem,
     createGem
+);
+
+// Get gem for editing (seller only, must own it)
+router.get(
+    "/seller/:id",
+    authGuard,
+    authorizeRole("seller"),
+    getGemForEdit
+);
+
+// Update gem (seller only)
+router.put(
+    "/:id",
+    authGuard,
+    authorizeRole("seller"),
+    upload.fields([
+        { name: "images", maxCount: 5 },
+    ]),
+    updateGem
 );
 
 // Get all gems with optional filters and pagination
