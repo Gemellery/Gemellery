@@ -27,7 +27,7 @@ const Featurepoollog: React.FC<{ blog: BlogPost }> = ({ blog }) => {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-8xl opacity-10">💎</span>
+            <span className="text-8xl opacity-10"></span>
           </div>
         )}
         <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
@@ -144,7 +144,7 @@ const BlogList: React.FC = () => {
         )}
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-24">
-            <p className="text-5xl mb-4">📭</p>
+            <p className="text-5xl mb-4"></p>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No articles found</h3>
             <p className="text-gray-400 text-sm">{search ? "Try a different search term." : "Check back soon for new content!"}</p>
           </div>
