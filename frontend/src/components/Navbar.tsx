@@ -5,28 +5,42 @@ import { ShoppingCart, CircleUserRound, Search, Menu, X, Sparkles } from "lucide
 
 function Navbar() {
   const [userName, setUserName] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<"Seller" | "Buyer" | null>(null);
+  type UserRole = "buyer" | "seller" | "admin" | "super_admin";
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const formatRole = (role: string) =>
+    role.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
 
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       const parsed = JSON.parse(user);
       setUserName(parsed.full_name || parsed.email);
-      setUserRole(parsed.role);
+      setUserRole(parsed.role?.toLowerCase());
     }
   }, []);
 
   const handleProfileRedirect = () => {
     if (!userRole) return;
 
-    const role = userRole.toLowerCase();
+    switch (userRole) {
+      case "seller":
+        navigate("/seller/dashboard");
+        break;
 
-    if (role === "seller") {
-      navigate("/seller/dashboard");
-    } else if (role === "buyer") {
-      navigate("/buyer/dashboard");
+      case "buyer":
+        navigate("/buyer/dashboard");
+        break;
+
+      case "admin":
+      case "super_admin":
+        navigate("/admin/dashboard");
+        break;
+
+      default:
+        navigate("/");
     }
   };
 
@@ -93,7 +107,7 @@ function Navbar() {
                 {userName}
               </span>
               <span className="text-xs text-gray-500 capitalize">
-                {userRole}
+                {userRole && formatRole(userRole)}
               </span>
             </button>
           ) : (
@@ -127,7 +141,7 @@ function Navbar() {
                 {userName}
               </span><br />
               <span className="text-xs text-gray-500 capitalize">
-                {userRole}
+                {userRole && formatRole(userRole)}
               </span>
             </button>
           )}

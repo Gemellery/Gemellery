@@ -26,14 +26,32 @@ import {
     processUploadedImage,
 } from "../utils/firebase-storage";
 
-// ============================================
-// Controller Functions
-// ============================================
+// Transform DB row (snake_case) to frontend shape (camelCase)
+const transformDesign = (d: any) => ({
+    id: d.id,
+    userId: d.user_id,
+    gemType: d.gem_type,
+    gemCut: d.gem_cut,
+    gemSizeMode: d.gem_size_mode,
+    gemSizeSimple: d.gem_size_simple,
+    gemSizeLengthMm: d.gem_size_length_mm,
+    gemSizeWidthMm: d.gem_size_width_mm,
+    gemSizeHeightMm: d.gem_size_height_mm,
+    gemSizeCarat: d.gem_size_carat,
+    gemColor: d.gem_color,
+    gemTransparency: d.gem_transparency,
+    gemImageUrl: d.gem_image_url,
+    designPrompt: d.design_prompt,
+    materials: d.materials || { metals: [] },
+    generatedImages: d.generated_images || [],
+    selectedImageUrl: d.selected_image_url,
+    refinements: d.refinements || [],
+    createdAt: d.created_at,
+    updatedAt: d.updated_at,
+});
 
-/**
- * Get all designs for the current user
- * GET /api/jewelry-design/user-designs
- */
+
+
 export const getUserDesigns = async (
     req: Request,
     res: Response
@@ -41,24 +59,21 @@ export const getUserDesigns = async (
     try {
         const userId = (req as any).user?.id;
 
+        // No logged-in user — return empty (don't show guest designs)
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(200).json({ designs: [] });
             return;
         }
 
         const designs = await getUserDesignsFromDB(userId);
 
-        res.status(200).json({ designs });
+        res.status(200).json({ designs: designs.map(transformDesign) });
     } catch (error) {
         console.error("Error fetching user designs:", error);
         res.status(500).json({ message: "Failed to fetch designs" });
     }
 };
 
-/**
- * Get a single design by ID
- * GET /api/jewelry-design/:id
- */
 export const getDesignByIdController = async (
     req: Request,
     res: Response
@@ -68,7 +83,7 @@ export const getDesignByIdController = async (
         const userId = (req as any).user?.id;
 
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Login required to view designs" });
             return;
         }
 
@@ -79,29 +94,22 @@ export const getDesignByIdController = async (
             return;
         }
 
-        res.status(200).json({ design });
+        res.status(200).json({ design: transformDesign(design) });
     } catch (error) {
         console.error("Error fetching design:", error);
         res.status(500).json({ message: "Failed to fetch design" });
     }
 };
 
-/**
- * Generate new jewelry designs
- * POST /api/jewelry-design/generate
- * 
- * Integrates with Gemini AI for design generation and Firebase for storage.
- * Falls back to placeholder images if AI is not available.
- */
 export const generateDesign = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     try {
+        // Use authenticated user ID — login required for design generation
         const userId = (req as any).user?.id;
-
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Login required to generate designs" });
             return;
         }
 
@@ -166,21 +174,43 @@ export const generateDesign = async (
                 // Generate designs using Gemini
                 const aiDesigns = await generateJewelryDesigns(promptInput, numImages);
 
-                // For now, Gemini 2.0 Flash doesn't directly generate images
-                // We'll use placeholder images until we integrate Imagen or another image model
-                // But we've validated the prompts work
-
-                for (let i = 0; i < numImages; i++) {
+                for (let i = 0; i < aiDesigns.length; i++) {
+                    const design = aiDesigns[i];
                     const imageId = uuidv4();
+
+                    if (design.imageBase64 && design.imageBase64.length > 100) {
+                        // Real AI-generated image — use as data URI directly
+                        const imageDataUri = `data:${design.mimeType || 'image/png'};base64,${design.imageBase64}`;
+                        generatedImages.push({
+                            id: imageId,
+                            url: imageDataUri,
+                            thumbnailUrl: imageDataUri,
+                            generatedAt: new Date().toISOString(),
+                        });
+                        console.log(`[Design] Image ${i + 1}: Real AI image used (${design.imageBase64.length} chars)`);
+                    } else {
+                        // No image data — use SVG placeholder
+                        generatedImages.push({
+                            id: imageId,
+                            url: getPlaceholderImageUrl(`Design ${i + 1}`),
+                            thumbnailUrl: getPlaceholderThumbnailUrl(`Design ${i + 1}`),
+                            generatedAt: new Date().toISOString(),
+                        });
+                        console.log(`[Design] Image ${i + 1}: No image data, using placeholder`);
+                    }
+                }
+
+                // If Gemini returned fewer designs than requested, fill with placeholders
+                for (let i = generatedImages.length; i < numImages; i++) {
                     generatedImages.push({
-                        id: imageId,
+                        id: uuidv4(),
                         url: getPlaceholderImageUrl(`Design ${i + 1}`),
                         thumbnailUrl: getPlaceholderThumbnailUrl(`Design ${i + 1}`),
                         generatedAt: new Date().toISOString(),
                     });
                 }
 
-                console.log(`[Design] Generated ${generatedImages.length} AI-prompted designs`);
+                console.log(`[Design] Generated ${generatedImages.length} designs`);
             } catch (aiError) {
                 console.error("[Design] AI generation failed, using placeholders:", aiError);
                 // Fall back to placeholders
@@ -233,19 +263,19 @@ export const generateDesign = async (
 
         res.status(201).json({
             message: "Design generated successfully",
-            design,
+            design: design ? transformDesign(design) : null,
             aiUsed: aiConfigured,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating design:", error);
-        res.status(500).json({ message: "Failed to generate design" });
+        console.error("Error details:", error?.message, error?.code);
+        res.status(500).json({
+            message: "Failed to generate design",
+            error: error?.message || "Unknown error"
+        });
     }
 };
 
-/**
- * Save/update a design (select an image)
- * PUT /api/jewelry-design/:id/save
- */
 export const saveDesign = async (
     req: Request,
     res: Response
@@ -253,9 +283,8 @@ export const saveDesign = async (
     try {
         const { id } = req.params;
         const userId = (req as any).user?.id;
-
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Login required to save designs" });
             return;
         }
 
@@ -266,7 +295,7 @@ export const saveDesign = async (
             return;
         }
 
-        // Check if design exists and belongs to user
+        // Check if design exists (for guests, just verify it exists by ID)
         const existingDesign = await getDesignById(parseInt(id), userId);
 
         if (!existingDesign) {
@@ -289,7 +318,7 @@ export const saveDesign = async (
 
         res.status(200).json({
             message: "Design saved successfully",
-            design,
+            design: design ? transformDesign(design) : null,
         });
     } catch (error) {
         console.error("Error saving design:", error);
@@ -297,12 +326,6 @@ export const saveDesign = async (
     }
 };
 
-/**
- * Refine an existing design
- * POST /api/jewelry-design/:id/refine
- * 
- * Uses Gemini AI for design refinement with fallback to placeholders.
- */
 export const refineDesign = async (
     req: Request,
     res: Response
@@ -310,13 +333,12 @@ export const refineDesign = async (
     try {
         const { id } = req.params;
         const userId = (req as any).user?.id;
-
         if (!userId) {
-            res.status(401).json({ message: "Unauthorized" });
+            res.status(401).json({ message: "Login required to refine designs" });
             return;
         }
 
-        const { refinementPrompt, baseImageUrl, strength = 0.5 } = req.body;
+        const { refinementPrompt, baseImageUrl, baseImageId, strength = 0.5 } = req.body;
 
         if (!refinementPrompt || !baseImageUrl) {
             res.status(400).json({ message: "Missing required fields" });
@@ -349,25 +371,28 @@ export const refineDesign = async (
 
         if (aiConfigured) {
             try {
-                // Attempt AI refinement
+                // Pass the base image so Gemini can edit it directly
                 const refined = await refineJewelryDesign(
                     existingDesign.design_prompt,
                     refinementPrompt,
-                    undefined, // We could pass base64 image here
+                    baseImageUrl, // Pass actual base64/data-URI for true image editing
                     strength
                 );
 
-                if (refined) {
-                    // For now, use placeholders since image generation isn't working yet
-                    refinedImageUrl = getPlaceholderImageUrl("Refined");
-                    refinedThumbnailUrl = getPlaceholderThumbnailUrl("Refined");
+                if (refined && refined.imageBase64 && refined.imageBase64.length > 100) {
+                    // Real AI refined image
+                    refinedImageUrl = `data:${refined.mimeType || 'image/png'};base64,${refined.imageBase64}`;
+                    refinedThumbnailUrl = refinedImageUrl;
+                    console.log(`[Refine] Got real AI refined image (${refined.imageBase64.length} chars)`);
+                } else {
+                    console.log("[Refine] AI returned no image, using placeholder");
                 }
             } catch (aiError) {
                 console.error("[Refine] AI refinement failed:", aiError);
             }
         }
 
-        // Fallback to placeholder
+        // Fallback to placeholder only if no real image was generated
         if (!refinedImageUrl) {
             refinedImageUrl = getPlaceholderImageUrl("Refined");
             refinedThumbnailUrl = getPlaceholderThumbnailUrl("Refined");
@@ -376,6 +401,7 @@ export const refineDesign = async (
         const refinement: Refinement = {
             id: refinementId,
             prompt: refinementPrompt,
+            baseImageId: baseImageId || undefined,  // ID-based matching for gallery
             baseImageUrl: baseImageUrl,
             imageUrl: refinedImageUrl,
             thumbnailUrl: refinedThumbnailUrl,
@@ -399,7 +425,7 @@ export const refineDesign = async (
         res.status(200).json({
             message: "Design refined successfully",
             refinement,
-            design,
+            design: design ? transformDesign(design) : null,
             aiUsed: aiConfigured,
         });
     } catch (error) {
@@ -408,10 +434,6 @@ export const refineDesign = async (
     }
 };
 
-/**
- * Delete a design
- * DELETE /api/jewelry-design/:id
- */
 export const deleteDesignController = async (
     req: Request,
     res: Response
@@ -448,12 +470,6 @@ export const deleteDesignController = async (
     }
 };
 
-/**
- * Upload a gem image
- * POST /api/jewelry-design/upload-gem-image
- * 
- * Accepts multipart/form-data with an image file.
- */
 export const uploadGemImage = async (
     req: Request,
     res: Response
@@ -511,10 +527,6 @@ export const uploadGemImage = async (
     }
 };
 
-/**
- * Get AI configuration status
- * GET /api/jewelry-design/status
- */
 export const getAIStatus = async (
     req: Request,
     res: Response

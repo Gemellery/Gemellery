@@ -17,8 +17,8 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
     onChange,
 }) => {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <label style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontFamily: "'Market Sans', sans-serif" }}>
+            <label style={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }}>
                 What is the shape/cut of your gem? <span style={{ color: '#EF4444' }}>*</span>
             </label>
 
@@ -33,9 +33,9 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
                             style={{
                                 padding: '16px 8px',
                                 borderRadius: '12px',
-                                border: isSelected ? '1px solid rgba(212, 175, 55, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
-                                background: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                                color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.6)',
+                                border: isSelected ? '1px solid rgba(212, 175, 55, 0.5)' : '1px solid #E5E7EB',
+                                background: isSelected ? 'rgba(212, 175, 55, 0.08)' : '#F9FAFB',
+                                color: isSelected ? '#B8860B' : '#9CA3AF',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
                                 display: 'flex',
@@ -47,16 +47,16 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
                             }}
                         >
                             {/* SVG Icon */}
-                            <div style={{ width: '48px', height: '48px', marginBottom: '8px', color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.5)' }}>
+                            <div style={{ width: '48px', height: '48px', marginBottom: '8px', color: isSelected ? '#B8860B' : '#9CA3AF' }}>
                                 {getCutIcon(cut.value)}
                             </div>
 
                             <p style={{
                                 fontSize: '11px',
                                 fontWeight: 500,
-                                color: isSelected ? '#D4AF37' : 'rgba(255, 255, 255, 0.7)',
+                                color: isSelected ? '#B8860B' : '#6B7280',
                                 textAlign: 'center',
-                                fontFamily: 'Inter, sans-serif',
+                                fontFamily: "'Market Sans', sans-serif",
                             }}>
                                 {cut.label}
                             </p>
@@ -68,7 +68,7 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemCut')} value={value} />
 
-            <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.4)' }}>
+            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
                 Click on a shape that matches your gemstone
             </p>
 
@@ -79,8 +79,6 @@ export const GemCutSelector: React.FC<GemCutSelectorProps> = ({
     );
 };
 
-// Premium SVG icons for each cut type - detailed gem facet representations
-// EXACTLY matching user provided snippet
 function getCutIcon(cut: string) {
     const iconMap: Record<string, React.ReactNode> = {
         'round-brilliant': (
