@@ -136,7 +136,7 @@ const BlogList: React.FC = () => {
                   <div className="relative h-52 overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100">
                     {blog.blog_image_url ? (
                       <img
-                        src={`http://localhost:5001/uploads/${blog.blog_image_url}`}
+                        src={blog.blog_image_url?.startsWith('http') ? blog.blog_image_url : `http://localhost:5001/uploads/${blog.blog_image_url}`}
                         alt={blog.blog_title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
