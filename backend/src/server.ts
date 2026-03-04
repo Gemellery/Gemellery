@@ -28,10 +28,10 @@ app.use(
 );
 app.use(express.json());
 
+// Register routes BEFORE static files
 app.use("/api/auth", authRoutes);
 app.use("/api/countries", countryRoutes);
 app.use("/api/jewelry-design", jewelryDesignRoutes);
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
 app.use("/api/buyer", buyerRoutes);
@@ -43,6 +43,9 @@ app.use("/api/admin", adminReviewRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/blogs", blogRoutes);
+
+// Static files after API routes
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 const PORT = 5001;
 app.listen(PORT, () => {
