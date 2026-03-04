@@ -2,63 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
-import BlogCard from "../../components/blog/BlogCard";
 import type { BlogPost } from "../../types/blog.types";
 import { fetchBlogs } from "../../services/blogService";
 import { Search, BookOpen } from "lucide-react";
 
-const Featurepoollog: React.FC<{ blog: BlogPost }> = ({ blog }) => {
-  const navigate = useNavigate();
-  const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-
-  return (
-    <div
-      onClick={() => navigate(`/blog/${blog.blog_id}`)}
-      className="group cursor-pointer bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col md:flex-row"
-    >
-      <div className="relative md:w-1/2 h-64 md:h-auto overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100 min-h-64">
-        {blog.blog_image_url ? (
-          <img
-            src={`http://localhost:5001/uploads/${blog.blog_image_url}`}
-            alt={blog.blog_title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-8xl opacity-10"></span>
-          </div>
-        )}
-        <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs px-3 py-1.5 rounded-full font-semibold">
-          Featured
-        </div>
-      </div>
-      <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-        <p className="text-amber-600 text-xs font-semibold uppercase tracking-widest mb-3">
-          {formatDate(blog.created_at)}
-        </p>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 group-hover:text-amber-700 transition-colors leading-tight">
-          {blog.blog_title}
-        </h2>
-        <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-4">
-          {blog.blog_content}
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">By {blog.author_name || "Gemellery Team"}</span>
-          <span className="text-sm font-semibold text-amber-600 group-hover:underline">Read Full Article →</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const BlogList: React.FC = () => {
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [filtered, setFiltered] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric", month: "long", day: "numeric"
+    });
 
   useEffect(() => {
     const load = async () => {
@@ -92,11 +51,13 @@ const BlogList: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAF7]">
       <Navbar />
+
+      {/* Hero Banner */}
       <section className="bg-gradient-to-br from-[#1a1209] via-[#2d1f0a] to-[#1a1209] text-white px-6 py-20 text-center relative overflow-hidden">
         <img
-        src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80"
-        alt="Gemstone Banner"
-        className="absolute inset-0 w-full h-full object-cover opacity-20"
+          src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80"
+          alt="Gemstone Banner"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-20 w-40 h-40 rounded-full bg-amber-400 blur-3xl" />
@@ -125,6 +86,7 @@ const BlogList: React.FC = () => {
         </div>
       </section>
 
+      {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-16">
         {loading && (
           <div className="flex justify-center items-center py-24">
@@ -134,6 +96,7 @@ const BlogList: React.FC = () => {
             </div>
           </div>
         )}
+
         {error && (
           <div className="text-center py-24">
             <p className="text-red-400 text-lg mb-4">{error}</p>
@@ -142,6 +105,7 @@ const BlogList: React.FC = () => {
             </button>
           </div>
         )}
+
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-24">
             <p className="text-5xl mb-4"></p>
@@ -149,20 +113,65 @@ const BlogList: React.FC = () => {
             <p className="text-gray-400 text-sm">{search ? "Try a different search term." : "Check back soon for new content!"}</p>
           </div>
         )}
+
         {!loading && !error && filtered.length > 0 && (
           <>
             <div className="flex items-center justify-between mb-10">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Latest Articles</h2>
-                <p className="text-gray-400 text-sm mt-1">{filtered.length} article{filtered.length !== 1 ? "s" : ""} found</p>
+                <p className="text-gray-400 text-sm mt-1">
+                  {filtered.length} article{filtered.length !== 1 ? "s" : ""} found
+                </p>
               </div>
             </div>
-            {!search && filtered.length > 0 && (
-              <div className="mb-12"><Featurepoollog blog={filtered[0]} /></div>
-            )}
+
+            {/* All articles in same card format */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(search ? filtered : filtered.slice(1)).map((blog) => (
-                <BlogCard key={blog.blog_id} blog={blog} />
+              {filtered.map((blog, index) => (
+                <div
+                  key={blog.blog_id}
+                  onClick={() => navigate(`/blog/${blog.blog_id}`)}
+                  className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 hover:-translate-y-1"
+                >
+                  <div className="relative h-52 overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100">
+                    {blog.blog_image_url ? (
+                      <img
+                        src={`http://localhost:5001/uploads/${blog.blog_image_url}`}
+                        alt={blog.blog_title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl opacity-20"></span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xs px-3 py-1 rounded-full text-amber-700 font-medium shadow">
+                      {formatDate(blog.created_at)}
+                    </div>
+                    {index === 0 && !search && (
+                      <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                        Featured
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-amber-700 transition-colors duration-300 line-clamp-2 leading-snug">
+                      {blog.blog_title}
+                    </h3>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
+                      {blog.blog_content.length > 150 ? blog.blog_content.substring(0, 150) + "..." : blog.blog_content}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <span>By {blog.author_name || "Gemellery Team"}</span>
+                      </div>
+                      <span className="text-xs font-semibold text-amber-600 group-hover:underline">
+                        Read More →
+                      </span>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </>
@@ -174,4 +183,3 @@ const BlogList: React.FC = () => {
 };
 
 export default BlogList;
-
