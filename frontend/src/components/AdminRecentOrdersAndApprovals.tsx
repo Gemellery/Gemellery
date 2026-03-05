@@ -33,9 +33,7 @@ function AdminRecentOrdersAndApprovals() {
     return (
         <div className="space-y-8 mt-8">
 
-            {/* ============================= */}
-            {/* RECENT ORDERS */}
-            {/* ============================= */}
+            {/* Recent orders */}
 
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
 
@@ -93,9 +91,7 @@ function AdminRecentOrdersAndApprovals() {
             </div>
 
 
-            {/* ============================= */}
-            {/* PENDING APPROVALS */}
-            {/* ============================= */}
+            {/* Pending approvals */}
 
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
 

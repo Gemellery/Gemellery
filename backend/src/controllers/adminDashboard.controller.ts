@@ -220,3 +220,28 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
     }
 
 };
+
+// Get top sellers
+export const getTopSellers = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+      SELECT 
+        s.seller_id,
+        s.business_name,
+        SUM(o.total_amount) AS total_sales,
+        COUNT(o.order_id) AS orders
+      FROM orders o
+      JOIN seller s ON o.seller_id = s.seller_id
+      GROUP BY s.seller_id, s.business_name
+      ORDER BY total_sales DESC
+      LIMIT 5
+    `);
+
+        res.json(rows);
+
+    } catch (error) {
+        console.error("Top sellers error:", error);
+        res.status(500).json({ message: "Failed to fetch top sellers" });
+    }
+};

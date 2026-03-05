@@ -8,6 +8,8 @@ import AdminInsightsSection from "../../components/AdminInsightsSection";
 // import AdminLiveActivityFeed from "../../components/AdminLiveActivityFeed";
 import Footer from "../../components/BasicFooter";
 import AdminRecentOrdersAndApprovals from "../../components/AdminRecentOrdersAndApprovals";
+import AdminTopSellers from "../../components/AdminTopSellers";
+import AdminQuickActions from "../../components/AdminQuickActions";
 
 const AdminDashboardLayout: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -98,15 +100,23 @@ const AdminDashboardLayout: React.FC = () => {
             totalOrders={stats.totalOrders}
           />
 
+          {/* Admin shortcuts */}
+          <AdminQuickActions />
+
+          {/* Platform trends */}
           <AdminOverviewSection />
 
+          {/* Marketplace insights */}
           <AdminInsightsSection />
 
+          {/* Operational monitoring */}
           <AdminRecentOrdersAndApprovals />
-          
-          {/* <AdminLiveActivityFeed /> */}
+
+          {/* Performance highlights */}
+          <AdminTopSellers />
 
           <Footer />
+
         </main>
       </div>
     </div>
