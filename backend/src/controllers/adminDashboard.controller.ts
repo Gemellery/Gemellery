@@ -37,3 +37,75 @@ export const getDashboardStats = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Failed to load dashboard stats" });
     }
 };
+
+// Monthly Orders Overview (Chart)
+export const getMonthlyOrders = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT 
+                MONTH(created_at) AS month,
+                COUNT(order_id) AS orders
+            FROM orders
+            WHERE YEAR(created_at) = YEAR(CURDATE())
+            GROUP BY MONTH(created_at)
+            ORDER BY MONTH(created_at)
+        `);
+
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        const formatted = rows.map((row: any) => ({
+            month: months[row.month - 1],
+            orders: row.orders
+        }));
+
+        res.json(formatted);
+
+    } catch (error) {
+        console.error("Monthly orders error:", error);
+        res.status(500).json({ message: "Failed to load monthly orders" });
+    }
+};
+
+// Total Revenue
+export const getTotalRevenue = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT SUM(total_amount) AS revenue
+            FROM orders
+            WHERE payment_status = 'Paid'
+        `);
+
+        res.json({
+            revenue: rows[0].revenue || 0
+        });
+
+    } catch (error) {
+        console.error("Revenue error:", error);
+        res.status(500).json({ message: "Failed to load revenue" });
+    }
+};
+
+// Orders Today
+export const getOrdersToday = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT COUNT(order_id) AS todayOrders
+            FROM orders
+            WHERE DATE(created_at) = CURDATE()
+        `);
+
+        res.json({
+            todayOrders: rows[0].todayOrders
+        });
+
+    } catch (error) {
+        console.error("Orders today error:", error);
+        res.status(500).json({ message: "Failed to load today's orders" });
+    }
+};
