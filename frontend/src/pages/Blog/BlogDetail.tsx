@@ -73,7 +73,7 @@ const BlogDetail: React.FC = () => {
           <div className="relative w-full h-72 md:h-96 bg-gradient-to-br from-[#1a1209] to-[#2d1f0a] overflow-hidden">
             {blog.blog_image_url && (
               <img
-                src={blog.blog_image_url?.startsWith('http') ? blog.blog_image_url : `http://localhost:5001/uploads/${blog.blog_image_url}`}
+                 src={blog.blog_image_url && blog.blog_image_url.startsWith('http') ? blog.blog_image_url : `http://localhost:5001/uploads/${blog.blog_image_url ?? ''}`}
                 alt={blog.blog_title}
                 className="w-full h-full object-cover opacity-50"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
