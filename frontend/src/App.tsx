@@ -36,6 +36,8 @@ import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalytics";
+import BlogList from "./pages/Blog/BlogList";
+import BlogDetail from "./pages/Blog/BlogDetail";
 
 function App() {
   return (
@@ -58,6 +60,8 @@ function App() {
           <Route path="/jewelry-designer/results" element={<JewelryResults />} />
           <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
           <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
 
           <Route path="/seller/:id" element={<SellerProfile />} />
 
