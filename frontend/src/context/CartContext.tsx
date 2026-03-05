@@ -17,6 +17,7 @@ interface CartContextType {
   // Actions
   addToCart: (gemId: number) => Promise<boolean>;
   removeFromCart: (cartItemId: number) => Promise<boolean>;
+  updateCartItem: (cartItemId: number, quantity: number) => Promise<boolean>;
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
 }
@@ -133,6 +134,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [refreshCart]);
 
+  // Update item quantity
+  const updateCartItem = useCallback(async (cartItemId: number, quantity: number): Promise<boolean> => {
+    setError(null);
+    try {
+      if (quantity < 1) {
+        throw new Error('Quantity must be at least 1');
+      }
+      await cartApi.updateCartItem(cartItemId, quantity);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.cart_item_id === cartItemId
+            ? { ...item, quantity, total_price: item.price * quantity }
+            : item
+        )
+      );
+      await refreshCart();
+      return true;
+    } catch (err: any) {
+      console.error('Failed to update cart item:', err);
+      setError(err.message || 'Failed to update item quantity');
+      await refreshCart();
+      return false;
+    }
+  }, [refreshCart]);
+
   // Clear entire cart
   const clearCart = useCallback(async () => {
     setError(null);
@@ -171,6 +197,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     error,
     addToCart,
     removeFromCart,
+    updateCartItem,
     clearCart,
     refreshCart,
   };
