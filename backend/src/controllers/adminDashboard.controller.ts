@@ -163,3 +163,60 @@ export const getSellerGrowth = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Failed to load seller growth data" });
     }
 };
+
+
+// Recent Orders
+export const getRecentOrders = async (req: Request, res: Response) => {
+
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT 
+                order_id,
+                buyer_id,
+                seller_id,
+                total_amount,
+                order_status,
+                created_at
+            FROM orders
+            ORDER BY created_at DESC
+            LIMIT 10
+        `);
+
+        res.json(rows);
+
+    } catch (error) {
+        console.error("Recent orders error:", error);
+        res.status(500).json({ message: "Failed to load recent orders" });
+    }
+
+};
+
+// Pending Approvals
+export const getPendingApprovals = async (req: Request, res: Response) => {
+
+    try {
+
+        const [sellerRows]: any = await pool.query(`
+            SELECT COUNT(*) AS pending_sellers
+            FROM seller
+            WHERE verification_status = 'pending'
+        `);
+
+        const [gemRows]: any = await pool.query(`
+            SELECT COUNT(*) AS pending_gems
+            FROM gem
+            WHERE verification_status = 'pending'
+        `);
+
+        res.json({
+            pendingSellers: sellerRows[0].pending_sellers,
+            pendingGems: gemRows[0].pending_gems
+        });
+
+    } catch (error) {
+        console.error("Pending approvals error:", error);
+        res.status(500).json({ message: "Failed to load pending approvals" });
+    }
+
+};

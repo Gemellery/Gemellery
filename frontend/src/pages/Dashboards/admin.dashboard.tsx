@@ -5,8 +5,9 @@ import AdminNavbar from "../../components/AdminNavbar";
 import AdminStatCards from "../../components/AdminStatsCards";
 import AdminOverviewSection from "../../components/AdminOverviewSection";
 import AdminInsightsSection from "../../components/AdminInsightsSection";
-import AdminLiveActivityFeed from "../../components/AdminLiveActivityFeed";
+// import AdminLiveActivityFeed from "../../components/AdminLiveActivityFeed";
 import Footer from "../../components/BasicFooter";
+import AdminRecentOrdersAndApprovals from "../../components/AdminRecentOrdersAndApprovals";
 
 const AdminDashboardLayout: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -101,7 +102,9 @@ const AdminDashboardLayout: React.FC = () => {
 
           <AdminInsightsSection />
 
-          <AdminLiveActivityFeed />
+          <AdminRecentOrdersAndApprovals />
+          
+          {/* <AdminLiveActivityFeed /> */}
 
           <Footer />
         </main>

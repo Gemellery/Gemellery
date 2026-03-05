@@ -5,7 +5,9 @@ import {
     getTotalRevenue,
     getOrdersToday,
     getTopGemCategories,
-    getSellerGrowth
+    getSellerGrowth,
+    getRecentOrders,
+    getPendingApprovals
 } from "../controllers/adminDashboard.controller";
 
 const router = express.Router();
@@ -16,5 +18,7 @@ router.get("/total-revenue", getTotalRevenue);
 router.get("/orders-today", getOrdersToday);
 router.get("/top-gem-categories", getTopGemCategories);
 router.get("/seller-growth", getSellerGrowth);
+router.get("/recent-orders", getRecentOrders);
+router.get("/pending-approvals", getPendingApprovals);
 
 export default router;
