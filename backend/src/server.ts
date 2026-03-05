@@ -22,6 +22,8 @@ import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import blogRoutes from "./routes/blogRoutes";
+import adminDashboardRoutes from "./routes/adminDashboard.routes";
+import adminRoutes from "./routes/admin.routes";
 
 const app = express();
 
@@ -53,6 +55,8 @@ app.use("/api/admin", adminReviewRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/admin", adminDashboardRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {
