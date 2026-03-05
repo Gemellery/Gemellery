@@ -4,7 +4,7 @@ import AdminSidebar from "../../components/AdminSidebar";
 import AdminNavbar from "../../components/AdminNavbar";
 import AdminStatCards from "../../components/AdminStatsCards";
 import AdminOverviewSection from "../../components/AdminOverviewSection";
-import AdminInsightsSection from "../../components/AdminInsightsSection"; 
+import AdminInsightsSection from "../../components/AdminInsightsSection";
 import AdminLiveActivityFeed from "../../components/AdminLiveActivityFeed";
 import Footer from "../../components/BasicFooter";
 
@@ -16,17 +16,53 @@ const AdminDashboardLayout: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+
     setAdminName(user.full_name || user.email);
+
     if (user.role) {
       setRole(user.role.toLowerCase() as "admin" | "super_admin");
     }
+
+    fetchDashboardStats();
+
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
+  };
+
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalGems: 0,
+    pendingVerifications: 0,
+    pendingGemApprovals: 0,
+    totalOrders: 0,
+  });
+
+  const fetchDashboardStats = async () => {
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "http://localhost:5001/api/admin/dashboard-stats",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      setStats(data);
+
+    } catch (error) {
+      console.error("Failed to fetch dashboard stats", error);
+    }
   };
 
   return (
@@ -54,11 +90,11 @@ const AdminDashboardLayout: React.FC = () => {
         <main className="p-6 flex-1 overflow-y-auto">
 
           <AdminStatCards
-            totalUsers={350}
-            totalGems={542}
-            pendingVerifications={8}
-            pendingGemApprovals={5}
-            totalOrders={78}
+            totalUsers={stats.totalUsers}
+            totalGems={stats.totalGems}
+            pendingVerifications={stats.pendingVerifications}
+            pendingGemApprovals={stats.pendingGemApprovals}
+            totalOrders={stats.totalOrders}
           />
 
           <AdminOverviewSection />
@@ -67,7 +103,7 @@ const AdminDashboardLayout: React.FC = () => {
 
           <AdminLiveActivityFeed />
 
-          <Footer/>
+          <Footer />
         </main>
       </div>
     </div>
