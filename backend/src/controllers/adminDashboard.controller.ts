@@ -109,3 +109,57 @@ export const getOrdersToday = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Failed to load today's orders" });
     }
 };
+
+/* Top Gem Categories */
+export const getTopGemCategories = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT 
+                gem_type AS name,
+                COUNT(*) AS count
+            FROM gem
+            WHERE gem_type IS NOT NULL
+            GROUP BY gem_type
+            ORDER BY count DESC
+            LIMIT 5
+        `);
+
+        res.json(rows);
+
+    } catch (error) {
+        console.error("Gem category stats error:", error);
+        res.status(500).json({ message: "Failed to load gem categories" });
+    }
+};
+
+/* Seller Growth Monthly */
+export const getSellerGrowth = async (req: Request, res: Response) => {
+    try {
+
+        const [rows]: any = await pool.query(`
+            SELECT 
+                MONTH(created_at) AS month,
+                COUNT(*) AS sellers
+            FROM seller
+            GROUP BY MONTH(created_at)
+            ORDER BY MONTH(created_at)
+        `);
+
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        const formatted = rows.map((row: any) => ({
+            month: months[row.month - 1],
+            sellers: row.sellers
+        }));
+
+        res.json(formatted);
+
+    } catch (error) {
+        console.error("Seller growth error:", error);
+        res.status(500).json({ message: "Failed to load seller growth data" });
+    }
+};
