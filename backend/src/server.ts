@@ -22,6 +22,7 @@ import adminOrderRoutes from "./routes/adminOrder.routes";
 import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import blogRoutes from "./routes/blogRoutes";
+import contactRoutes from './routes/contactRoutes';
 
 const app = express();
 
