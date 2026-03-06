@@ -1,44 +1,35 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
-
     // Environment Settings
-    // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
+    "target": "ES2020",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
 
-    // Other Outputs
+    // Module Resolution
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    // Output Settings
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+    "outDir": "./dist",
 
     // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+
+    // Skip type checking for node_modules and generated files
+    "skipLibCheck": true
+  },
+  "include": [
+    "./scripts",
+    "./test",
+    "./ignition",
+    "./typechain-types",
+    "hardhat.config.ts"
+  ]
 }
