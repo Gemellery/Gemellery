@@ -57,6 +57,7 @@ export default function SellerShipments() {
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
 
   // Modal state
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
@@ -85,8 +86,17 @@ export default function SellerShipments() {
   }, []);
 
   const filtered = orders.filter((o) => {
-    if (filter === "all") return true;
-    return o.order_status === filter;
+    // Filter by status
+    if (filter !== "all" && o.order_status !== filter) return false;
+    // Filter by search
+    if (search.trim()) {
+      const searchLower = search.trim().toLowerCase();
+      const matchesBuyer = o.buyer_name?.toLowerCase().includes(searchLower);
+      const matchesOrderId = o.order_id.toString().includes(searchLower);
+      const matchesTracking = o.tracking_no?.toLowerCase().includes(searchLower);
+      return matchesBuyer || matchesOrderId || matchesTracking;
+    }
+    return true;
   });
 
   const openShipmentModal = (order: SellerOrder) => {
@@ -168,6 +178,17 @@ export default function SellerShipments() {
             <h1 className="text-2xl font-bold text-gray-900">Shipments</h1>
             <p className="text-sm text-gray-500">Manage orders and shipment tracking</p>
           </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6 flex items-center">
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by buyer, order ID, or tracking number"
+            className="w-full md:w-96 px-4 py-2 border border-[#16635d] rounded-lg bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#16635d] focus:border-[#16635d] focus:shadow-[0_0_0_1.5px_#16635d] transition-shadow text-sm"
+          />
         </div>
 
         {/* Summary Cards */}
