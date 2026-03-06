@@ -37,6 +37,7 @@ import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalytics";
 import SellerShipments from "./pages/seller/SellerShipments";
+import SellerInventory from "./pages/seller/SellerInventory";
 import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 
@@ -80,6 +81,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["seller"]}>
                 <AddNewGem />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/inventory"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerInventory />
               </ProtectedRoute>
             }
           />

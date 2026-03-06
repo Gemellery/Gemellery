@@ -426,3 +426,102 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Failed to load analytics" });
     }
 };
+
+/**
+ * GET /api/seller/inventory
+ * Returns ALL gems for the seller across every status, with summary counts.
+ */
+export const getSellerInventory = async (req: Request, res: Response) => {
+    try {
+        const sellerId = (req.user as any).id;
+        const { status, verification_status, search } = req.query;
+
+        let where = "WHERE g.seller_id = ?";
+        const params: any[] = [sellerId];
+
+        if (status && status !== "all") {
+            where += " AND g.status = ?";
+            params.push(status);
+        }
+        if (verification_status && verification_status !== "all") {
+            where += " AND g.verification_status = ?";
+            params.push(verification_status);
+        }
+        if (search) {
+            where += " AND (g.gem_name LIKE ? OR g.gem_type LIKE ?)";
+            params.push(`%${search}%`, `%${search}%`);
+        }
+
+        const [gems]: any = await db.query(
+            `SELECT
+               g.gem_id, g.gem_name, g.gem_type, g.carat, g.cut,
+               g.clarity, g.color, g.origin, g.price,
+               g.status, g.verification_status, g.created_at,
+               MIN(gi.image_url) AS image_url
+             FROM gem g
+             LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+             ${where}
+             GROUP BY g.gem_id
+             ORDER BY g.gem_id DESC`,
+            params
+        );
+
+        // Summary counts (always unfiltered for the seller)
+        const [[counts]]: any = await db.query(
+            `SELECT
+               COUNT(*) AS total,
+               SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS available,
+               SUM(CASE WHEN status = 'Reserved' THEN 1 ELSE 0 END) AS unavailable,
+               SUM(CASE WHEN verification_status = 'pending' THEN 1 ELSE 0 END) AS pending,
+               SUM(CASE WHEN verification_status = 'approved' THEN 1 ELSE 0 END) AS approved,
+               SUM(CASE WHEN verification_status = 'rejected' THEN 1 ELSE 0 END) AS rejected
+             FROM gem WHERE seller_id = ?`,
+            [sellerId]
+        );
+
+        return res.json({
+            gems,
+            summary: {
+                total: Number(counts.total),
+                available: Number(counts.available),
+                unavailable: Number(counts.unavailable),
+                pending: Number(counts.pending),
+                approved: Number(counts.approved),
+                rejected: Number(counts.rejected),
+            },
+        });
+    } catch (err) {
+        console.error("Seller inventory error:", err);
+        return res.status(500).json({ error: "Failed to load inventory" });
+    }
+};
+
+/**
+ * PATCH /api/seller/gems/:id/status
+ * Toggle gem status between Available and Unavailable.
+ */
+export const updateGemStatus = async (req: Request, res: Response) => {
+    try {
+        const sellerId = (req.user as any).id;
+        const gemId = req.params.id;
+        const { status } = req.body;
+
+        if (!["Available", "Reserved"].includes(status)) {
+            return res.status(400).json({ error: "Invalid status" });
+        }
+
+        const [result]: any = await db.query(
+            `UPDATE gem SET status = ? WHERE gem_id = ? AND seller_id = ?`,
+            [status, gemId, sellerId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Gem not found" });
+        }
+
+        return res.json({ message: "Status updated" });
+    } catch (err) {
+        console.error("Update gem status error:", err);
+        return res.status(500).json({ error: "Failed to update status" });
+    }
+};
