@@ -19,7 +19,7 @@ export const SellerSalesChart: React.FC<Props> = ({ data }) => {
   return (
     <div className="h-80 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        Sales & Orders (Last 7 days)
+        Sales & Orders (Last 30 days)
       </h2>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>

@@ -247,31 +247,30 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
         );
         const totalRevenue = Number(revenueRow.total_revenue);
 
-        // ─── 2. KPI: Orders This Month ───
-        const [[ordersThisMonthRow]]: any = await db.query(
-            `SELECT COUNT(DISTINCT oi.order_id) AS orders_this_month
+        // ─── 2. KPI: Orders (Last 30 Days) ───
+        const [[ordersLast30Row]]: any = await db.query(
+            `SELECT COUNT(DISTINCT oi.order_id) AS orders_last_30
              FROM order_items oi
              JOIN gem g ON g.gem_id = oi.gem_id
              JOIN orders o ON o.order_id = oi.order_id
              WHERE g.seller_id = ?
-               AND MONTH(o.created_at) = MONTH(CURDATE())
-               AND YEAR(o.created_at) = YEAR(CURDATE())`,
+               AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)`,
             [sellerId]
         );
-        const ordersThisMonth = Number(ordersThisMonthRow.orders_this_month);
+        const ordersThisMonth = Number(ordersLast30Row.orders_last_30);
 
-        // ─── 3. KPI: Orders Last Month ───
-        const [[ordersLastMonthRow]]: any = await db.query(
-            `SELECT COUNT(DISTINCT oi.order_id) AS orders_last_month
+        // ─── 3. KPI: Orders (Previous 30 Days) ───
+        const [[ordersPrev30Row]]: any = await db.query(
+            `SELECT COUNT(DISTINCT oi.order_id) AS orders_prev_30
              FROM order_items oi
              JOIN gem g ON g.gem_id = oi.gem_id
              JOIN orders o ON o.order_id = oi.order_id
              WHERE g.seller_id = ?
-               AND MONTH(o.created_at) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))
-               AND YEAR(o.created_at) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))`,
+               AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 60 DAY)
+               AND o.created_at < DATE_SUB(CURDATE(), INTERVAL 30 DAY)`,
             [sellerId]
         );
-        const ordersLastMonth = Number(ordersLastMonthRow.orders_last_month);
+        const ordersLastMonth = Number(ordersPrev30Row.orders_prev_30);
 
         // ─── 4. KPI: Average Order Value ───
         const [[avgRow]]: any = await db.query(
@@ -341,7 +340,7 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
                 trend: trend(totalRevenue, revLastMonth),
             },
             {
-                label: "Orders This Month",
+                label: "Orders (Last 30 Days)",
                 value: ordersThisMonth,
                 trend: trend(ordersThisMonth, ordersLastMonth),
             },
@@ -360,10 +359,9 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
             },
         ];
 
-        // ─── 7. Sales Over Time – last 7 days ───
+        // ─── 7. Sales Over Time – last 30 days ───
         const [salesRows]: any = await db.query(
             `SELECT
-               DATE_FORMAT(o.created_at, '%a') AS day_name,
                DATE(o.created_at) AS order_date,
                COALESCE(SUM(oi.price * oi.quantity), 0) AS sales,
                COUNT(DISTINCT oi.order_id) AS orders
@@ -371,15 +369,14 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
              JOIN gem g ON g.gem_id = oi.gem_id
              JOIN orders o ON o.order_id = oi.order_id
              WHERE g.seller_id = ?
-               AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+               AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                AND o.order_status != 'Cancelled'
-             GROUP BY order_date, day_name
+             GROUP BY order_date
              ORDER BY order_date ASC`,
             [sellerId]
         );
 
-        // Fill in missing days so the chart always has 7 data points
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        // Fill in missing days so the chart always has 30 data points
         const salesMap = new Map<string, { sales: number; orders: number }>();
         for (const row of salesRows) {
             salesMap.set(row.order_date.toISOString().slice(0, 10), {
@@ -389,14 +386,14 @@ export const getSellerAnalytics = async (req: Request, res: Response) => {
         }
 
         const salesOverTime: { date: string; sales: number; orders: number }[] = [];
-        for (let i = 6; i >= 0; i--) {
+        for (let i = 29; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
             const key = d.toISOString().slice(0, 10);
-            const dayLabel = dayNames[d.getDay()];
+            const dateLabel = `${d.getMonth() + 1}/${d.getDate()}`;
             const entry = salesMap.get(key);
             salesOverTime.push({
-                date: dayLabel,
+                date: dateLabel,
                 sales: entry ? entry.sales : 0,
                 orders: entry ? entry.orders : 0,
             });
