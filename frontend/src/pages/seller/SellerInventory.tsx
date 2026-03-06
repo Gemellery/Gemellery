@@ -70,6 +70,12 @@ export default function SellerInventory() {
   const [searchQuery, setSearchQuery] = useState("");
   const [togglingId, setTogglingId] = useState<number | null>(null);
 
+  // Pagination state and logic
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
+  const paginatedGems: GemItem[] = gems.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(gems.length / pageSize);
+
   const fetchInventory = async () => {
     try {
       setLoading(true);
@@ -236,95 +242,122 @@ export default function SellerInventory() {
                 <p className="text-sm mt-1">Try adjusting your filters or add a new gem.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 border-b">
-                    <tr>
-                      <th className="text-left p-4 font-medium text-gray-600">Gem</th>
-                      <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Type</th>
-                      <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Details</th>
-                      <th className="text-left p-4 font-medium text-gray-600">Price</th>
-                      <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                      <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Verification</th>
-                      <th className="text-left p-4 font-medium text-gray-600">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {gems.map((gem) => {
-                      const vBadge = verificationBadge[gem.verification_status] || verificationBadge.pending;
-                      const sBadge = statusBadge[gem.status] || statusBadge.Reserved;
-                      const VIcon = vBadge.icon;
-
-                      return (
-                        <tr key={gem.gem_id} className="hover:bg-gray-50">
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={
-                                  gem.image_url
-                                    ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${gem.image_url}`
-                                    : "/placeholder-gem.png"
-                                }
-                                alt={gem.gem_name}
-                                className="w-12 h-12 rounded-lg object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = "/placeholder-gem.png";
-                                }}
-                              />
-                              <div>
-                                <p className="font-medium text-gray-900">{gem.gem_name}</p>
-                                <p className="text-xs text-gray-500 md:hidden">{gem.gem_type}</p>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="text-left p-4 font-medium text-gray-600">Gem</th>
+                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Type</th>
+                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Details</th>
+                        <th className="text-left p-4 font-medium text-gray-600">Price</th>
+                        <th className="text-left p-4 font-medium text-gray-600">Status</th>
+                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Verification</th>
+                        <th className="text-left p-4 font-medium text-gray-600">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {paginatedGems.map((gem) => {
+                        const vBadge = verificationBadge[gem.verification_status] || verificationBadge.pending;
+                        const sBadge = statusBadge[gem.status] || statusBadge.Reserved;
+                        const VIcon = vBadge.icon;
+                        return (
+                          <tr key={gem.gem_id} className="hover:bg-gray-50">
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={
+                                    gem.image_url
+                                      ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${gem.image_url}`
+                                      : "/placeholder-gem.png"
+                                  }
+                                  alt={gem.gem_name}
+                                  className="w-12 h-12 rounded-lg object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = "/placeholder-gem.png";
+                                  }}
+                                />
+                                <div>
+                                  <p className="font-medium text-gray-900">{gem.gem_name}</p>
+                                  <p className="text-xs text-gray-500 md:hidden">{gem.gem_type}</p>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="p-4 text-gray-600 hidden md:table-cell">{gem.gem_type}</td>
-                          <td className="p-4 text-gray-500 hidden md:table-cell">
-                            <span>{gem.carat} ct</span>
-                            {gem.cut && <span> · {gem.cut}</span>}
-                            {gem.color && <span> · {gem.color}</span>}
-                          </td>
-                          <td className="p-4 font-semibold text-gray-900">
-                            ${Number(gem.price).toLocaleString()}
-                          </td>
-                          <td className="p-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sBadge.style}`}>
-                              {sBadge.label}
-                            </span>
-                          </td>
-                          <td className="p-4 hidden md:table-cell">
-                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${vBadge.style}`}>
-                              <VIcon className="w-3 h-3" /> {vBadge.label}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
-                                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
-                                title="Edit"
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => toggleStatus(gem)}
-                                disabled={togglingId === gem.gem_id}
-                                className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50"
-                                title={gem.status === "Available" ? "Mark Unavailable" : "Mark Available"}
-                              >
-                                {gem.status === "Available" ? (
-                                  <EyeOff className="w-4 h-4" />
-                                ) : (
-                                  <Eye className="w-4 h-4" />
-                                )}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                            <td className="p-4 text-gray-600 hidden md:table-cell">{gem.gem_type}</td>
+                            <td className="p-4 text-gray-500 hidden md:table-cell">
+                              <span>{gem.carat} ct</span>
+                              {gem.cut && <span> · {gem.cut}</span>}
+                              {gem.color && <span> · {gem.color}</span>}
+                            </td>
+                            <td className="p-4 font-semibold text-gray-900">
+                              ${Number(gem.price).toLocaleString()}
+                            </td>
+                            <td className="p-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${sBadge.style}`}>
+                                {sBadge.label}
+                              </span>
+                            </td>
+                            <td className="p-4 hidden md:table-cell">
+                              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${vBadge.style}`}>
+                                <VIcon className="w-3 h-3" /> {vBadge.label}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
+                                  title="Edit"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => toggleStatus(gem)}
+                                  disabled={togglingId === gem.gem_id}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50"
+                                  title={gem.status === "Available" ? "Mark Unavailable" : "Mark Available"}
+                                >
+                                  {gem.status === "Available" ? (
+                                    <EyeOff className="w-4 h-4" />
+                                  ) : (
+                                    <Eye className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-2 py-4">
+                  <button
+                    className="px-3 py-1 rounded border bg-gray-100 text-gray-700 disabled:opacity-50"
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    Prev
+                  </button>
+                  {Array.from({ length: totalPages || 1 }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      className={`px-3 py-1 rounded border ${page === i + 1 ? 'bg-[#1F7A73] text-white' : 'bg-gray-100 text-gray-700'}`}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    className="px-3 py-1 rounded border bg-gray-100 text-gray-700 disabled:opacity-50"
+                    disabled={page === totalPages || totalPages === 0}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

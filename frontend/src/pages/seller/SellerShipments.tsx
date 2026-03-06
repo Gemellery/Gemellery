@@ -53,10 +53,15 @@ export default function SellerShipments() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
 
   // Modal state
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
@@ -85,9 +90,21 @@ export default function SellerShipments() {
   }, []);
 
   const filtered = orders.filter((o) => {
-    if (filter === "all") return true;
-    return o.order_status === filter;
+    // Filter by status
+    if (filter !== "all" && o.order_status !== filter) return false;
+    // Filter by search
+    if (search.trim()) {
+      const searchLower = search.trim().toLowerCase();
+      const matchesBuyer = o.buyer_name?.toLowerCase().includes(searchLower);
+      const matchesOrderId = o.order_id.toString().includes(searchLower);
+      const matchesTracking = o.tracking_no?.toLowerCase().includes(searchLower);
+      return matchesBuyer || matchesOrderId || matchesTracking;
+    }
+    return true;
   });
+
+  const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(filtered.length / pageSize);
 
   const openShipmentModal = (order: SellerOrder) => {
     setSelectedOrder(order);
@@ -170,6 +187,23 @@ export default function SellerShipments() {
           </div>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-6 flex items-center gap-2">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            placeholder="Search by buyer, order ID, or tracking number"
+            className="w-full md:w-96 px-4 py-2 border border-[#16635d] rounded-lg bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#16635d] focus:border-[#16635d] focus:shadow-[0_0_0_1.5px_#16635d] transition-shadow text-sm"
+          />
+          <button
+            className="px-4 py-2 bg-[#16635d] text-white rounded-lg hover:bg-[#145247] transition-colors text-sm font-semibold"
+            onClick={() => setSearch(searchInput)}
+          >
+            Search
+          </button>
+        </div>
+
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <SummaryCard
@@ -226,7 +260,7 @@ export default function SellerShipments() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filtered.map((order) => (
+                    {paginated.map((order) => (
                     <tr key={order.order_id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="font-medium">#{order.order_id}</div>
@@ -317,6 +351,32 @@ export default function SellerShipments() {
                 </tbody>
               </table>
             </div>
+              {/* Pagination Controls */}
+              <div className="flex justify-center items-center gap-2 py-4">
+                <button
+                  className="px-3 py-1 rounded border bg-gray-100 text-gray-700 disabled:opacity-50"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  Prev
+                </button>
+                {Array.from({ length: totalPages || 1 }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    className={`px-3 py-1 rounded border ${page === i + 1 ? 'bg-[#16635d] text-white' : 'bg-gray-100 text-gray-700'}`}
+                    onClick={() => setPage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  className="px-3 py-1 rounded border bg-gray-100 text-gray-700 disabled:opacity-50"
+                  disabled={page === totalPages || totalPages === 0}
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next
+                </button>
+              </div>
           </div>
         )}
       </main>
