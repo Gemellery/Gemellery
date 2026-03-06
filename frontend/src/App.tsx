@@ -36,6 +36,8 @@ import SellerReviews from "./pages/Admin/SellerReviews";
 import AdminOrders from "./pages/Admin/AdminOrderManagement";
 import AdminBlogs from "./pages/Admin/ManageBlogPosts";
 import SellerAnalyticsPage from "./pages/seller/SellerAnalytics";
+import SellerShipments from "./pages/seller/SellerShipments";
+import SellerInventory from "./pages/seller/SellerInventory";
 import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 
@@ -84,6 +86,15 @@ function App() {
           />
 
           <Route
+            path="/seller/inventory"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerInventory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/seller/listings"
             element={
               <ProtectedRoute allowedRoles={["seller"]}>
@@ -97,6 +108,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["seller"]}>
                 <SellerAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/shipments"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerShipments />
               </ProtectedRoute>
             }
           />
