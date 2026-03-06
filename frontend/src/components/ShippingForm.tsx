@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import Navbar from "./Navbar";
 import AdvancedFooter from "./AdvancedFooter";
-import * as shippingAPI from "@/lib/shipping/api";
-import type { ShippingAddress } from "@/lib/shipping/types";
+import * as shippingAPI from "@/lib/shipping/api.ts";
+import type { ShippingAddress } from "@/lib/shipping/types.ts";
 
 
 function Checkout() {
