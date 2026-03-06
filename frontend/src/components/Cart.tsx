@@ -130,7 +130,7 @@ function Cart() {
                     <div key={item.cart_item_id} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm">
                       <div className="relative w-full md:w-36 h-64 md:h-36 flex-shrink-0">
                         <img 
-                          src={item.image_url || '/sample_gems/default.jpg'} 
+                          src={'/sample_gems/default.jpg'} 
                           alt={item.gem_name}
                           className="w-full h-full object-cover rounded-lg bg-gradient-to-br from-gray-900 to-gray-700"
                         />
