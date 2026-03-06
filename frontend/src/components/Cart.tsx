@@ -2,26 +2,8 @@
 import { useState } from 'react';
 import { Trash2, Plus, Minus, Lock, Sparkles, CheckCircle, Truck, Shield } from 'lucide-react';
 import Navbar from './Navbar';
-// import Footer from '../components/BasicFooter';
 import AdvancedFooter from '../components/AdvancedFooter';
-
-// Type definitions
-interface CartItem {
-  id: string;
-  name: string;
-  seller?: string;
-  weight?: string;
-  clarity?: string;
-  origin?: string;
-  metal?: string;
-  size?: string;
-  design?: string;
-  price: number;
-  quantity: number;
-  image: string;
-  badge?: string;
-  hasCertificate?: boolean;
-}
+import { useCart } from '@/context/CartContext';
 
 interface RecommendedProduct {
   id: string;
@@ -29,34 +11,6 @@ interface RecommendedProduct {
   price: number;
   image: string;
 }
-
-// Sample data
-const initialCartItems: CartItem[] = [
-  {
-    id: '1',
-    name: 'Royal Blue Ceylon Sapphire - Cushion Cut',
-    seller: 'Ratnapura Gems',
-    weight: '2.5 Carats',
-    clarity: 'VVS1',
-    origin: 'Sri Lanka',
-    price: 4500.00,
-    quantity: 1,
-    image: '/sample_gems/sapphire blue_6.jpg',
-    hasCertificate: true
-  },
-  {
-    id: '2',
-    name: '1.2 Carat Padparadscha Sapphire AI Bespoke Ring',
-    design: 'AI Generative Setting',
-    metal: '18K Rose Gold',
-    size: '6.5',
-    origin: 'Madagascar',
-    price: 2800.00,
-    quantity: 1,
-    image: '/sample_gems/almandine_18.jpg',
-    badge: 'BESPOKE'
-  }
-];
 
 const recommendedProducts: RecommendedProduct[] = [
   {
@@ -80,28 +34,35 @@ const recommendedProducts: RecommendedProduct[] = [
 ];
 
 function Cart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
+  const { items: cartItems, isLoading, error, removeFromCart, updateCartItem } = useCart();
   const [promoCode, setPromoCode] = useState<string>('');
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
 
-  // Calculate totals
+  // Calculate subtotal from cart items
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = 0;
   const estimatedTax = 0.00;
   const total = subtotal + shipping + estimatedTax;
 
-  // Cart item handlers
-  const updateQuantity = (id: string, change: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  // Handle quantity updates
+  const handleUpdateQuantity = async (cartItemId: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    
+    setUpdatingId(cartItemId);
+    const success = await updateCartItem(cartItemId, newQuantity);
+    setUpdatingId(null);
+    
+    if (!success) {
+      console.error('Failed to update quantity');
+    }
   };
 
-  const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
+  // Handle item removal
+  const handleRemoveItem = async (cartItemId: number) => {
+    const success = await removeFromCart(cartItemId);
+    if (!success) {
+      console.error('Failed to remove item');
+    }
   };
 
   const handleApplyPromo = () => {
@@ -111,6 +72,20 @@ function Cart() {
   const handleCheckout = () => {
     console.log('Proceeding to checkout');
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-lg text-gray-600">Loading your cart...</p>
+        </div>
+        <AdvancedFooter />
+      </div>
+    );
+  }
+
+  const isEmpty = cartItems.length === 0;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -134,121 +109,128 @@ function Cart() {
               is verified for authenticity.
             </p>
 
-            {/* Cart Items */}
-            <div className="flex flex-col gap-6 mb-12">
-              {cartItems.map(item => (
-                <div key={item.id} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm">
-                  <div className="relative w-full md:w-36 h-64 md:h-36 flex-shrink-0">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-cover rounded-lg bg-gradient-to-br from-gray-900 to-gray-700"
-                    />
-                    {item.hasCertificate && (
-                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white text-gray-800 text-[10px] font-semibold px-2.5 py-1 rounded border border-gray-200">
-                        GIA CERTIFIED
-                      </span>
-                    )}
-                    {item.badge && (
-                      <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-bold px-2.5 py-1 rounded">
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-semibold leading-snug pr-4">{item.name}</h3>
-                      <button 
-                        onClick={() => removeItem(item.id)}
-                        className="text-gray-400 hover:text-red-700 transition-colors p-1"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-
-                    {item.seller && (
-                      <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-                        <CheckCircle size={16} className="text-emerald-600" />
-                        <span>Seller: {item.seller}</span>
-                      </div>
-                    )}
-
-                    {item.design && (
-                      <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
-                        <Sparkles size={16} className="text-yellow-500" />
-                        <span>{item.design}</span>
-                      </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-3 my-3 text-sm text-gray-600">
-                      {item.weight && <span>Weight: {item.weight}</span>}
-                      {item.metal && <span>• Metal: {item.metal}</span>}
-                      {item.clarity && <span>• Clarity: {item.clarity}</span>}
-                      {item.size && <span>• Size: {item.size}</span>}
-                      {item.origin && <span>• Origin: {item.origin}</span>}
-                    </div>
-
-                    <div className="flex justify-between items-center mt-auto">
-                      <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
-                        <button 
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="px-3 py-2 hover:bg-gray-50 transition-colors"
-                          aria-label="Decrease quantity"
-                        >
-                          <Minus size={16} className="text-gray-600" />
-                        </button>
-                        <input 
-                          type="number" 
-                          value={item.quantity} 
-                          readOnly 
-                          className="w-12 text-center border-x border-gray-200 py-2 text-base"
-                          min="1"
-                        />
-                        <button 
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="px-3 py-2 hover:bg-gray-50 transition-colors"
-                          aria-label="Increase quantity"
-                        >
-                          <Plus size={16} className="text-gray-600" />
-                        </button>
-                      </div>
-
-                      <div className="text-2xl font-semibold">
-                        ${item.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Recommendations */}
-            <section className="mt-12">
-              <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                <Sparkles size={20} className="text-yellow-500" />
-                You might also like
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recommendedProducts.map(product => (
-                  <div 
-                    key={product.id} 
-                    className="bg-white rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg"
-                  >
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-52 object-cover bg-gradient-to-br from-gray-900 to-gray-700"
-                    />
-                    <h4 className="px-4 pt-4 text-base font-semibold">{product.name}</h4>
-                    <p className="px-4 pb-4 font-semibold">
-                      ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                ))}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+                {error}
               </div>
-            </section>
+            )}
+
+            {isEmpty ? (
+              <div className="text-center py-12 bg-white rounded-xl">
+                <p className="text-gray-600 text-lg mb-4">Your cart is empty</p>
+                <a href="/marketplace" className="text-red-700 font-semibold hover:underline">
+                  Continue Shopping
+                </a>
+              </div>
+            ) : (
+              <>
+                {/* Cart Items */}
+                <div className="flex flex-col gap-6 mb-12">
+                  {cartItems.map(item => (
+                    <div key={item.cart_item_id} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm">
+                      <div className="relative w-full md:w-36 h-64 md:h-36 flex-shrink-0">
+                        <img 
+                          src={item.image_url || '/sample_gems/default.jpg'} 
+                          alt={item.gem_name}
+                          className="w-full h-full object-cover rounded-lg bg-gradient-to-br from-gray-900 to-gray-700"
+                        />
+                        {item.certification && (
+                          <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white text-gray-800 text-[10px] font-semibold px-2.5 py-1 rounded border border-gray-200">
+                            {item.certification.toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex flex-col">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-lg font-semibold leading-snug pr-4">{item.gem_name}</h3>
+                          <button 
+                            onClick={() => handleRemoveItem(item.cart_item_id)}
+                            className="text-gray-400 hover:text-red-700 transition-colors p-1"
+                            aria-label="Remove item"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+
+                        {item.seller_name && (
+                          <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+                            <CheckCircle size={16} className="text-emerald-600" />
+                            <span>Seller: {item.seller_name}</span>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap gap-3 my-3 text-sm text-gray-600">
+                          {item.carat && <span>Weight: {item.carat} Carats</span>}
+                          {item.cut && <span>• Cut: {item.cut}</span>}
+                          {item.clarity && <span>• Clarity: {item.clarity}</span>}
+                          {item.color && <span>• Color: {item.color}</span>}
+                          {item.origin && <span>• Origin: {item.origin}</span>}
+                        </div>
+
+                        <div className="flex justify-between items-center mt-auto">
+                          <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                            <button 
+                              onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity - 1)}
+                              disabled={updatingId === item.cart_item_id}
+                              className="px-3 py-2 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                              aria-label="Decrease quantity"
+                            >
+                              <Minus size={16} className="text-gray-600" />
+                            </button>
+                            <input 
+                              type="number" 
+                              value={item.quantity} 
+                              readOnly 
+                              className="w-12 text-center border-x border-gray-200 py-2 text-base"
+                              min="1"
+                            />
+                            <button 
+                              onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity + 1)}
+                              disabled={updatingId === item.cart_item_id}
+                              className="px-3 py-2 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                              aria-label="Increase quantity"
+                            >
+                              <Plus size={16} className="text-gray-600" />
+                            </button>
+                          </div>
+
+                          <div className="text-2xl font-semibold">
+                            ${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Recommendations */}
+                <section className="mt-12">
+                  <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
+                    <Sparkles size={20} className="text-yellow-500" />
+                    You might also like
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {recommendedProducts.map(product => (
+                      <div 
+                        key={product.id} 
+                        className="bg-white rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg"
+                      >
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="w-full h-52 object-cover bg-gradient-to-br from-gray-900 to-gray-700"
+                        />
+                        <h4 className="px-4 pt-4 text-base font-semibold">{product.name}</h4>
+                        <p className="px-4 pb-4 font-semibold">
+                          ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )}
           </div>
 
           {/* Order Summary Sidebar */}
@@ -285,7 +267,8 @@ function Cart() {
 
             <button 
               onClick={handleCheckout}
-              className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-4 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors mb-4"
+              disabled={isEmpty}
+              className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-4 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors mb-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <Lock size={16} />
               Secure Checkout

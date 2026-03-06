@@ -1,0 +1,218 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../../components/Navbar";
+import AdvancedFooter from "../../components/AdvancedFooter";
+import type { BlogPost } from "../../types/blog.types";
+import { fetchBlogs } from "../../services/blogService";
+import { Search, BookOpen } from "lucide-react";
+
+const getImageSrc = (url: string | null): string => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  return `http://localhost:5001/uploads/gem_images/${url}`;
+};
+
+const BlogList: React.FC = () => {
+  const navigate = useNavigate();
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [filtered, setFiltered] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchBlogs();
+        setBlogs(data.blogs);
+        setFiltered(data.blogs);
+      } catch {
+        setError("Failed to load blog posts. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    if (!search.trim()) {
+      setFiltered(blogs);
+    } else {
+      const q = search.toLowerCase();
+      setFiltered(
+        blogs.filter(
+          (b) =>
+            b.blog_title.toLowerCase().includes(q) ||
+            b.blog_content.toLowerCase().includes(q) ||
+            (b.author_name && b.author_name.toLowerCase().includes(q))
+        )
+      );
+    }
+  }, [search, blogs]);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FAFAF7]">
+      <Navbar />
+
+      {/* Hero Banner */}
+      <section className="bg-gradient-to-br from-[#1a1209] via-[#2d1f0a] to-[#1a1209] text-white px-6 py-20 text-center relative overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1400&q=80"
+          alt="Gemstone Banner"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-20 w-40 h-40 rounded-full bg-amber-400 blur-3xl" />
+          <div className="absolute bottom-10 right-20 w-60 h-60 rounded-full bg-amber-600 blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
+            <BookOpen className="w-3.5 h-3.5" /> Events & News
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+            Gemellery{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">
+              Blog
+            </span>
+          </h1>
+          <p className="text-gray-300 text-lg max-w-xl mx-auto mb-10">
+            Stories, events and news from the heart of Sri Lanka's gemstone world.
+          </p>
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400/50 text-sm"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 md:px-8 py-16">
+        {loading && (
+          <div className="flex justify-center items-center py-24">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-400 text-sm">Loading articles...</p>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="text-center py-24">
+            <p className="text-red-400 text-lg mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2.5 bg-amber-500 text-white rounded-lg text-sm hover:bg-amber-600 transition"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="text-center py-24">
+            <p className="text-5xl mb-4">💎</p>
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              No articles found
+            </h3>
+            <p className="text-gray-400 text-sm">
+              {search
+                ? "Try a different search term."
+                : "Check back soon for new content!"}
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length > 0 && (
+          <>
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Latest Articles
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  {filtered.length} article{filtered.length !== 1 ? "s" : ""}{" "}
+                  found
+                </p>
+              </div>
+            </div>
+
+            {/* Blog Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filtered.map((blog, index) => (
+                <div
+                  key={blog.blog_id}
+                  onClick={() => navigate(`/blog/${blog.blog_id}`)}
+                  className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 hover:-translate-y-1"
+                >
+                  {/* Card Image */}
+                  <div className="relative h-44 overflow-hidden bg-gradient-to-br from-amber-50 to-amber-100">
+                    {blog.blog_image_url ? (
+                      <img
+                        src={getImageSrc(blog.blog_image_url)}
+                        alt={blog.blog_title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl opacity-20">💎</span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xs px-3 py-1 rounded-full text-amber-700 font-medium shadow">
+                      {formatDate(blog.created_at)}
+                    </div>
+                    {index === 0 && !search && (
+                      <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                        Featured
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-amber-700 transition-colors duration-300 line-clamp-2 leading-snug">
+                      {blog.blog_title}
+                    </h3>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
+                      {blog.blog_content.length > 150
+                        ? blog.blog_content.substring(0, 150) + "..."
+                        : blog.blog_content}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <span>By {blog.author_name || "Gemellery Team"}</span>
+                      </div>
+                      <span className="text-xs font-semibold text-amber-600 group-hover:underline">
+                        Read More →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </main>
+      <AdvancedFooter />
+    </div>
+  );
+};
+
+export default BlogList;

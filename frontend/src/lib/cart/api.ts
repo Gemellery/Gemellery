@@ -79,11 +79,35 @@ export async function addToCart(
 }
 
 // ==========================
+// Update cart item quantity
+// ==========================
+export async function updateCartItem(
+  cartItemId: number,
+  quantity: number
+): Promise<void> {
+  const body = {
+    cart_item_id: cartItemId,
+    quantity,
+  };
+
+  const response = await fetch(`${API_CONFIG.BASE_URL}/api/cart`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Failed to update cart (${response.status})`);
+  }
+}
+
+// ==========================
 // Remove an item from cart
 // ==========================
 export async function removeFromCart(cartItemId: number): Promise<void> {
   const response = await fetch(
-    `${API_CONFIG.BASE_URL}/api/cart/${cartItemId}`,  // ← CHANGED
+    `${API_CONFIG.BASE_URL}/api/cart/${cartItemId}`,
     {
       method: 'DELETE',
       headers: getAuthHeaders(),
