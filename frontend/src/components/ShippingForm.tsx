@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Edit,
   ShieldCheck,
   CreditCard,
   Lock,
-  MessageCircle
+  MessageCircle,
+  Loader,
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import Navbar from "./Navbar";
 import AdvancedFooter from "./AdvancedFooter";
+import * as shippingAPI from "@/lib/shipping/api";
+import type { ShippingAddress } from "@/lib/shipping/types";
 
 
 function Checkout() {
@@ -20,6 +25,16 @@ function Checkout() {
     postalCode: "",
     country: "United States",
   });
+
+  /* ---------------- Shipping Address Management ---------------- */
+  const [addresses, setAddresses] = useState<ShippingAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
+  const [addressSuccess, setAddressSuccess] = useState<string | null>(null);
 
   /* ---------------- Export Options ---------------- */
   const [gia, setGia] = useState(false);
@@ -34,10 +49,130 @@ function Checkout() {
   const TAX = 0;
   const TOTAL = SUBTOTAL + EXPORT_FEE + TAX;
 
+  // Load existing shipping addresses on component mount
+  useEffect(() => {
+    loadAddresses();
+  }, []);
+
+  const loadAddresses = async () => {
+    setIsLoadingAddresses(true);
+    setAddressError(null);
+    try {
+      const data = await shippingAPI.getShippingAddresses();
+      setAddresses(data);
+
+      // Select the default address if available
+      const defaultAddress = data.find(addr => addr.is_default);
+      if (defaultAddress) {
+        setSelectedAddressId(defaultAddress.address_id);
+        populateFormFromAddress(defaultAddress);
+      }
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Failed to load shipping addresses";
+      setAddressError(error);
+      console.error("Error loading addresses:", err);
+    } finally {
+      setIsLoadingAddresses(false);
+    }
+  };
+
+  const populateFormFromAddress = (address: ShippingAddress) => {
+    setShipping({
+      firstName: address.first_name,
+      lastName: address.last_name,
+      street: address.street,
+      city: address.city,
+      postalCode: address.postal_code,
+      country: address.country,
+    });
+  };
+
   const handleShippingChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setShipping({ ...shipping, [e.target.name]: e.target.value });
+  };
+
+  const handleSelectAddress = (address: ShippingAddress) => {
+    setSelectedAddressId(address.address_id);
+    populateFormFromAddress(address);
+    setShowAddressForm(false);
+  };
+
+  const handleSaveAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingAddress(true);
+    setAddressError(null);
+    setAddressSuccess(null);
+
+    // Validate all fields
+    if (!shipping.firstName || !shipping.lastName || !shipping.street || !shipping.city || !shipping.postalCode || !shipping.country) {
+      setAddressError("All address fields are required");
+      setIsSavingAddress(false);
+      return;
+    }
+
+    try {
+      const newAddressId = await shippingAPI.createShippingAddress({
+        first_name: shipping.firstName,
+        last_name: shipping.lastName,
+        street: shipping.street,
+        city: shipping.city,
+        postal_code: shipping.postalCode,
+        country: shipping.country,
+        is_default: addresses.length === 0, // Set as default if it's the first address
+      });
+
+      setAddressSuccess("Shipping address saved successfully!");
+      setSelectedAddressId(newAddressId);
+      
+      // Reload addresses to reflect changes
+      await loadAddresses();
+      setShowAddressForm(false);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setAddressSuccess(null), 3000);
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Failed to save shipping address";
+      setAddressError(error);
+      console.error("Error saving address:", err);
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
+  const handleDeleteAddress = async (e: React.MouseEvent, addressId: number) => {
+    e.stopPropagation(); // Prevent triggering handleSelectAddress
+    
+    if (!confirm("Are you sure you want to delete this address?")) {
+      return;
+    }
+
+    setIsDeletingId(addressId);
+    setAddressError(null);
+    setAddressSuccess(null);
+
+    try {
+      await shippingAPI.deleteShippingAddress(addressId);
+      setAddressSuccess("Address deleted successfully!");
+      
+      // If the deleted address was selected, clear selection
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId(null);
+      }
+
+      // Reload addresses to reflect changes
+      await loadAddresses();
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setAddressSuccess(null), 3000);
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Failed to delete shipping address";
+      setAddressError(error);
+      console.error("Error deleting address:", err);
+    } finally {
+      setIsDeletingId(null);
+    }
   };
 
   return (
@@ -72,28 +207,201 @@ function Checkout() {
                   </span>
                   Shipping Address
                 </h3>
-                <button className="text-xs text-gray-500 flex items-center gap-1">
-                  <Edit className="w-3 h-3" /> Edit
+                <button
+                  type="button"
+                  onClick={() => setShowAddressForm(!showAddressForm)}
+                  className="text-xs text-gray-500 flex items-center gap-1 hover:text-gray-700"
+                >
+                  <Edit className="w-3 h-3" /> {showAddressForm ? "Cancel" : "Edit"}
                 </button>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="firstName" placeholder="First Name" className="input" onChange={handleShippingChange} />
-                <input name="lastName" placeholder="Last Name" className="input" onChange={handleShippingChange} />
-              </div>
+              {/* Error Message */}
+              {addressError && (
+                <div className="flex gap-2 bg-red-50 p-3 rounded-lg text-xs text-red-600">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <p>{addressError}</p>
+                </div>
+              )}
 
-              <input name="street" placeholder="Apartment, suite, etc." className="input" onChange={handleShippingChange} />
+              {/* Success Message */}
+              {addressSuccess && (
+                <div className="flex gap-2 bg-green-50 p-3 rounded-lg text-xs text-green-600">
+                  <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <p>{addressSuccess}</p>
+                </div>
+              )}
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <input name="city" placeholder="City" className="input" onChange={handleShippingChange} />
-                <input name="postalCode" placeholder="Postal Code" className="input" onChange={handleShippingChange} />
-              </div>
+              {/* Loading State */}
+              {isLoadingAddresses ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader className="w-5 h-5 animate-spin text-emerald-600" />
+                  <span className="ml-2 text-sm text-gray-500">Loading addresses...</span>
+                </div>
+              ) : (
+                <>
+                  {/* Saved Addresses List */}
+                  {addresses.length > 0 && !showAddressForm && (
+                    <div className="space-y-3 mb-6">
+                      <p className="text-xs font-medium text-gray-500">SAVED ADDRESSES</p>
+                      {addresses.map((address) => (
+                        <div
+                          key={address.address_id}
+                          onClick={() => handleSelectAddress(address)}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                            selectedAddressId === address.address_id
+                              ? "border-emerald-600 bg-emerald-50"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <input
+                              type="radio"
+                              name="address"
+                              checked={selectedAddressId === address.address_id}
+                              onChange={() => handleSelectAddress(address)}
+                              className="mt-1"
+                            />
+                            <div className="text-sm flex-1">
+                              <p className="font-medium">
+                                {address.first_name} {address.last_name}
+                              </p>
+                              <p className="text-gray-600">{address.street}</p>
+                              <p className="text-gray-600">
+                                {address.city}, {address.postal_code}
+                              </p>
+                              <p className="text-gray-600">{address.country}</p>
+                              {address.is_default && (
+                                <span className="inline-block mt-2 px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteAddress(e, address.address_id)}
+                              disabled={isDeletingId === address.address_id}
+                              className="text-gray-400 hover:text-red-500 transition disabled:opacity-50"
+                              title="Delete address"
+                            >
+                              {isDeletingId === address.address_id ? (
+                                <Loader className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressForm(true)}
+                        className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-emerald-600 hover:text-emerald-600 transition"
+                      >
+                        + Add New Address
+                      </button>
+                    </div>
+                  )}
 
-              <select name="country" className="input" onChange={handleShippingChange}>
-                <option>United States</option>
-                <option>United Kingdom</option>
-                <option>Sri Lanka</option>
-              </select>
+                  {/* Address Form */}
+                  {showAddressForm && (
+                    <form onSubmit={handleSaveAddress} className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <input
+                          name="firstName"
+                          placeholder="First Name"
+                          className="input"
+                          value={shipping.firstName}
+                          onChange={handleShippingChange}
+                          required
+                        />
+                        <input
+                          name="lastName"
+                          placeholder="Last Name"
+                          className="input"
+                          value={shipping.lastName}
+                          onChange={handleShippingChange}
+                          required
+                        />
+                      </div>
+
+                      <input
+                        name="street"
+                        placeholder="Street Address"
+                        className="input"
+                        value={shipping.street}
+                        onChange={handleShippingChange}
+                        required
+                      />
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <input
+                          name="city"
+                          placeholder="City"
+                          className="input"
+                          value={shipping.city}
+                          onChange={handleShippingChange}
+                          required
+                        />
+                        <input
+                          name="postalCode"
+                          placeholder="Postal Code"
+                          className="input"
+                          value={shipping.postalCode}
+                          onChange={handleShippingChange}
+                          required
+                        />
+                      </div>
+
+                      <select
+                        name="country"
+                        className="input"
+                        value={shipping.country}
+                        onChange={handleShippingChange}
+                        required
+                      >
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Sri Lanka">Sri Lanka</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                      </select>
+
+                      <div className="flex gap-3 pt-4">
+                        <button
+                          type="submit"
+                          disabled={isSavingAddress}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition"
+                        >
+                          {isSavingAddress && <Loader className="w-4 h-4 animate-spin" />}
+                          {isSavingAddress ? "Saving..." : "Save Address"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowAddressForm(false)}
+                          className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* No addresses and not showing form */}
+                  {addresses.length === 0 && !showAddressForm && (
+                    <div className="text-center py-6 text-gray-500">
+                      <p className="text-sm mb-4">No saved addresses yet</p>
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressForm(true)}
+                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition"
+                      >
+                        Add Your First Address
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </section>
 
             {/* -------- Export & Authenticity -------- */}
