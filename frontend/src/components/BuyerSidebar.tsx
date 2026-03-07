@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, Flower, Rows3, BadgeDollarSign, X } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, Flower, Rows3, BadgeDollarSign, X, History } from "lucide-react";
 import AiHelpCard from "./AiChat";
 
 interface BuyerSidebarProps {
@@ -42,6 +42,10 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
           <nav className="mt-8 space-y-4">
             <button onClick={() => navigate("/buyer/dashboard")} className="flex items-center gap-3 w-full text-left hover:underline">
               <LayoutDashboard className="w-4 h-4" /> Dashboard
+            </button>
+
+            <button onClick={() => navigate("/buyer/orders/history")} className="flex items-center gap-3 w-full text-left hover:underline">
+              <History className="w-4 h-4" /> Order History
             </button>
 
             <button onClick={() => navigate("/buyer/ai-designs")} className="flex items-center gap-3 w-full text-left hover:underline">
