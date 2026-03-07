@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, Gem, X } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, Gem, X, Package } from "lucide-react";
 
 interface SellerSidebarProps {
     sellerName: string;
@@ -41,9 +41,16 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
 
                     <nav className="mt-8 space-y-4">
                         <button
-                            onClick={() => navigate("/seller/inventory")}
+                            onClick={() => navigate("/seller/dashboard")}
                             className="flex items-center gap-3 text-left w-full hover:underline">
                             <LayoutDashboard className="w-4 h-4" />
+                            Dashboard
+                        </button>
+
+                        <button
+                            onClick={() => navigate("/seller/inventory")}
+                            className="flex items-center gap-3 text-left w-full hover:underline">
+                            <Package className="w-4 h-4" />
                             Inventory
                         </button>
 
@@ -60,7 +67,7 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
                             Shipments
                         </button>
                         <button
-                            onClick={() => navigate("/seller/ai-studio")}
+                            onClick={() => navigate("/jewelry-designer")}
                             className="flex items-center gap-3 text-left w-full hover:underline">
                             <Gem className="w-4 h-4" />
                             AI Studio
