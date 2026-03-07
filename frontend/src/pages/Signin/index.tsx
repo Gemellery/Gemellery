@@ -59,10 +59,14 @@ function SignIn() {
     if (role === "seller") {
       navigate("/seller/dashboard", { replace: true });
     } else if (role === "buyer") {
-      navigate("/", { replace: true });
+      navigate("/buyer/dashboard", { replace: true });
+    } else if (role === "admin" || role === "super_admin") {
+      navigate("/admin/dashboard", { replace: true });
     } else {
       console.log("Unexpected role:", role);
+      setError("Invalid user role");
     }
+
 
   };
 

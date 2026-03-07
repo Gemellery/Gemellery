@@ -26,12 +26,14 @@ export interface GeneratedImage {
     url: string;
     thumbnailUrl?: string;
     generatedAt: string;
+    label?: string; // e.g. "Original 1", "Refinement 2"
 }
 
 // Design refinement data
 export interface Refinement {
     id: string;
     prompt: string;
+    baseImageId?: string;  // ID of the original GeneratedImage
     baseImageUrl: string;
     imageUrl: string;
     thumbnailUrl?: string;

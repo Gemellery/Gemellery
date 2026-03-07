@@ -88,7 +88,10 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
                 <div className="max-w-4xl mx-auto flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <span className="text-white/80 text-sm">
-                            Design {currentIndex + 1} of {images.length}
+                            {currentImage.label || `Design ${currentIndex + 1}`}
+                        </span>
+                        <span className="text-white/40 text-xs">
+                            {currentIndex + 1} / {images.length}
                         </span>
                     </div>
                     <button
@@ -116,8 +119,8 @@ export const ImageLightbox: React.FC<ImageLightboxProps> = ({
                                 }
                             }}
                             className={`rounded-full transition-all ${index === currentIndex
-                                    ? 'bg-[#D4AF37] w-8 h-2'
-                                    : 'bg-white/50 hover:bg-white/75 w-2 h-2'
+                                ? 'bg-[#D4AF37] w-8 h-2'
+                                : 'bg-white/50 hover:bg-white/75 w-2 h-2'
                                 }`}
                             aria-label={`Go to image ${index + 1}`}
                         />
