@@ -40,6 +40,7 @@ import SellerShipments from "./pages/seller/SellerShipments";
 import SellerInventory from "./pages/seller/SellerInventory";
 import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
+import AdminReports from "./pages/Admin/ReportsPage";
 
 function App() {
   return (
@@ -201,6 +202,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
                 <AdminBlogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <AdminReports />
               </ProtectedRoute>
             }
           />
