@@ -26,6 +26,7 @@ import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
+import OrderHistory from "./pages/OrderHistory";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -145,6 +146,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerDashboardLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/orders/history"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <OrderHistory />
               </ProtectedRoute>
             }
           />
