@@ -120,15 +120,9 @@ function AdminSidebar({
                   >
                     <UserCog className="w-4 h-4 shrink-0" />
                     <span className="text-sm font-medium">
-                      Admin Management
+                      Admin Management & System Control
                     </span>
                   </button>
-
-                  {navItem(
-                    "/admin/settings",
-                    "System Settings",
-                    Settings
-                  )}
                 </div>
               </>
             )}
