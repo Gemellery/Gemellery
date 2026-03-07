@@ -27,6 +27,7 @@ import SellerAllListings from "./pages/seller/SellerAllListings";
 import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
+import OrderHistory from "./pages/OrderHistory/index";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -278,7 +279,193 @@ function App() {
   return (
     <CartProvider>
       <BrowserRouter>
-        <AppRoutes />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/shipping-form" element={<ShippingForm />} />
+          <Route path="/product-detail/:id" element={<ProductDetail />} />
+          <Route path="/product-gallery" element={<ProductSpecifications />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+          <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+          <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+          <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+          <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:id" element={<BlogDetail />} />
+
+          <Route path="/seller/:id" element={<SellerProfile />} />
+
+          <Route
+            path="/seller/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/add-new-gem"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <AddNewGem />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/inventory"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerInventory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/listings"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerAllListings />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/analytics"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerAnalyticsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/shipments"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerShipments />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seller/settings"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <SellerSettings />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edit-gem/:id"
+            element={
+              <ProtectedRoute allowedRoles={["seller"]}>
+                <EditGem />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerDashboardLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/orders/history"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <OrderHistory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <AdminDashboardLayout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/verify-sellers"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <VerifySellers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/manage-gems"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <VerifyGems />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/manage-users"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <ManageUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/review-moderation"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <SellerReviews />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/manage-orders"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <AdminOrders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/blog-posts"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <AdminBlogs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
+                <AdminReports />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/manage-admins"
+            element={
+              <ProtectedRoute allowedRoles={["super_admin"]}>
+                <ManageAdmins />
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
       </BrowserRouter>
     </CartProvider>
   );
