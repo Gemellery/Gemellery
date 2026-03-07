@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { useNavigate } from "react-router-dom";
-import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Package, ChartNoAxesCombined, ArrowRight, Heart, ShieldCheck, ShieldAlert, Clock, ShieldX } from "lucide-react";
+import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Package, ArrowRight, Heart, ShieldCheck, ShieldAlert, Clock, ShieldX } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 
 function SellerDashboardLayout() {
@@ -262,30 +262,6 @@ function SellerDashboardLayout() {
                                 Across all listings
                             </span>
                         </div>
-                    </div>
-
-                </div>
-
-
-                <div className="hidden md:flex flex-col gap-5 md:flex-row md:gap-4 mb-6 border-[#f5e2aa]">
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
-                        <div className="flex items-start">
-                            <ChartNoAxesCombined className="text-[#1F7A73] size-15 mr-4" />
-                            <div className="flex flex-col">
-                                <h2 className="font-bold">AI Market Insight</h2>
-                                <h2 className="text-sm text-gray-500">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-                                    ut aliquip ex ea commodo consequat.
-                                </h2>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => navigate("/jewelry-designer")}
-                            className="bg-[#000000] text-white px-4 py-2 rounded-lg hover:bg-[#16635d]">
-                            View Analysis
-                        </button>
                     </div>
                 </div>
 
