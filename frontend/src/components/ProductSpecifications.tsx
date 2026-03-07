@@ -40,27 +40,26 @@ const ProductSpecifications: React.FC<ProductSpecificationsProps> = ({
   ]
 }) => {
   return (
-    <div className="bg-white p-8 rounded-lg">
+    <div>
       {/* Title */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
         {title}
       </h2>
 
-      {/* Specifications Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-        {specifications.map((spec, index) => (
-          <div key={index} className="flex flex-col">
-            {/* Label */}
-            <p className="text-xs font-bold text-red-500 tracking-wider mb-2 uppercase">
-              {spec.label}
-            </p>
-
-            {/* Value */}
-            <p className="text-lg font-semibold text-gray-900">
-              {spec.value}
-            </p>
-          </div>
-        ))}
+      {/* Specifications Grid — bordered card */}
+      <div className="border border-gray-200 rounded-2xl p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+          {specifications.map((spec, index) => (
+            <div key={index} className="flex flex-col">
+              <p className="text-[11px] font-bold text-red-500 tracking-wider mb-1.5 uppercase">
+                {spec.label}
+              </p>
+              <p className="text-sm font-semibold text-gray-900">
+                {spec.value}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

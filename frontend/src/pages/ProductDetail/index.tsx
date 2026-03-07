@@ -1,4 +1,5 @@
 import Navbar from '@/components/Navbar'
+import AdvancedFooter from '@/components/AdvancedFooter'
 import ProductGallery from '../../components/ProductGallery'
 import ProductInfo from '../../components/ProductInfo'
 import ProductActions from '../../components/ProductActions'
@@ -6,6 +7,10 @@ import ProductSpecifications from '../../components/ProductSpecifications'
 import ShippingInfo from '../../components/ShippingInfo'
 import GemPassport from '../../components/GemPassport'
 import ProductAIDesignStudio from '../../components/ProductAIDesignStudio'
+import ExpertAdvice from '../../components/ExpertAdvice'
+import Certification from '../../components/Certification'
+import ReviewsRatings from '../../components/ReviewsRatings'
+import { ChevronRight } from 'lucide-react'
 
 const ProductDetail = () => {
 
@@ -27,14 +32,30 @@ const ProductDetail = () => {
 
   return (
 
-    <div className="min-h-screen bg-gray-100">
-        <Navbar />
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar />
+
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-16 pt-8">
-        {/* Product Gallery and Info Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Left Column - Gallery */}
-          <div>
+      <div className="max-w-7xl mx-auto w-full px-4 md:px-6 pb-16 pt-4 flex-1">
+
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-8">
+          <a href="/" className="hover:text-gray-700 transition-colors">Home</a>
+          <ChevronRight size={14} />
+          <a href="/marketplace" className="hover:text-gray-700 transition-colors">Gemstones</a>
+          <ChevronRight size={14} />
+          <a href="/marketplace" className="hover:text-gray-700 transition-colors">Sapphires</a>
+          <ChevronRight size={14} />
+          <span className="text-gray-900 font-medium">3.5ct Royal Blue Sapphire</span>
+        </nav>
+
+        {/* ============================================= */}
+        {/* Top Section: Gallery (left) + Info (right)    */}
+        {/* ============================================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+
+          {/* LEFT COLUMN — Gallery + AI Studio */}
+          <div className="space-y-6">
             <ProductGallery
               images={[
                 "../public/sample_gems/alexandrite_18.jpg",
@@ -44,96 +65,86 @@ const ProductDetail = () => {
               ]}
               productName="3.5 Carat Vivid Royal Blue Sapphire"
             />
+
+            {/* AI Design Studio — below gallery */}
+            <ProductAIDesignStudio onTryAIDesign={handleTryAIDesign} />
           </div>
 
-          {/* Right Column - Info and Actions */}
-          <div className="space-y-6">
-            {/* Product Info */}
+          {/* RIGHT COLUMN — Info, Actions, Shipping, GemPassport */}
+          <div>
             <ProductInfo
               badge="NATURAL UNHEATED"
               rating={4.9}
               reviewCount={12}
               title="3.5 Carat Vivid Royal Blue Sapphire"
-              sku="SKU-2024-001"
               currentPrice={12500}
               originalPrice={14200}
               discount={12}
               seller={{
                 name: 'GemLanka Exports',
                 verified: true,
-                location: 'Anuradhapura, Sri Lanka',
+                location: 'Ratnapura, Sri Lanka',
                 memberSince: 2018
               }}
               shape="Cushion"
               dimensions="8.2 x 7.8 mm"
             />
 
-            {/* Product Actions */}
             <ProductActions
               onAddToCart={handleAddToCart}
               onBookViewing={handleBookViewing}
               onFavorite={handleFavorite}
-              showQuantitySelector={true}
+              showQuantitySelector={false}
             />
 
-            {/* Shipping Info */}
             <ShippingInfo />
+
+            <GemPassport
+              data={{
+                tokenId: '#LK-88392-GEM',
+                provenance: 'Verified Source',
+                treatment: 'None (Unheated)',
+                origin: 'Ratnapura, Sri Lanka',
+                certificationBody: 'Gemological Institute',
+                certificationDate: '2024-01-15',
+                gemType: 'Natural Blue Sapphire'
+              }}
+            />
           </div>
         </div>
 
-        {/* AI Design Studio Section */}
-        <div className="mb-12">
-          <ProductAIDesignStudio onTryAIDesign={handleTryAIDesign} />
-        </div>
+        {/* ============================================= */}
+        {/* Bottom Section: Specs + Reviews / Expert + Cert */}
+        {/* ============================================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-        {/* Product Specifications */}
-        <div className="mb-12">
-          <ProductSpecifications
-            title="Detailed Specifications"
-            specifications={[
-              {
-                label: 'GEMSTONE TYPE',
-                value: 'Natural Blue Sapphire (Corundum)'
-              },
-              {
-                label: 'CARAT WEIGHT',
-                value: '3.52 Carats'
-              },
-              {
-                label: 'COLOR GRADE',
-                value: 'Vivid Royal Blue (GIA Top Grade)'
-              },
-              {
-                label: 'CLARITY',
-                value: 'VVS1 (Eye Clean)'
-              },
-              {
-                label: 'ORIGIN',
-                value: 'Ratnapura, Sri Lanka'
-              },
-              {
-                label: 'TREATMENTS',
-                value: 'None (Unheated)'
-              }
-            ]}
-          />
-        </div>
+          {/* LEFT — Specifications + Reviews (wider) */}
+          <div className="lg:col-span-3 space-y-12">
+            <ProductSpecifications
+              title="Detailed Specifications"
+              specifications={[
+                { label: 'GEMSTONE TYPE', value: 'Natural Blue Sapphire (Corundum)' },
+                { label: 'CARAT WEIGHT', value: '3.52 Carats' },
+                { label: 'COLOR GRADE', value: 'Vivid Royal Blue (GIA Top Grade)' },
+                { label: 'CLARITY', value: 'VVS1 (Eye Clean)' },
+                { label: 'ORIGIN', value: 'Ratnapura, Sri Lanka 🇱🇰' },
+                { label: 'TREATMENTS', value: 'None (Unheated)' }
+              ]}
+            />
 
-        {/* Gem Passport */}
-        <div className="mb-12">
-          <GemPassport
-            data={{
-              tokenId: '#LK-88392-GEM',
-              provenance: 'Verified Source',
-              treatment: 'None (Unheated)',
-              origin: 'Ratnapura, Sri Lanka',
-              certificationBody: 'Gemological Institute',
-              certificationDate: '2024-01-15',
-              gemType: 'Natural Blue Sapphire'
-            }}
-          />
+            <ReviewsRatings />
+          </div>
+
+          {/* RIGHT — Expert Advice + Certification */}
+          <div className="lg:col-span-2 space-y-6">
+            <ExpertAdvice />
+            <Certification />
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <AdvancedFooter />
     </div>
   )
 }

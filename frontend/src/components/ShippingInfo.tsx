@@ -1,5 +1,5 @@
 import React from 'react'
-import { Truck, Shield, Clock } from 'lucide-react'
+import { Truck, Shield } from 'lucide-react'
 
 interface ShippingBenefit {
   icon: React.ReactNode
@@ -14,41 +14,28 @@ interface ShippingInfoProps {
 const ShippingInfo: React.FC<ShippingInfoProps> = ({
   benefits = [
     {
-      icon: <Truck size={24} className="text-red-500 flex-shrink-0" />,
+      icon: <Truck size={18} className="text-red-500 flex-shrink-0" />,
       title: 'Free insured global shipping',
       subtitle: 'via FedEx Priority'
     },
     {
-      icon: <Shield size={24} className="text-red-500 flex-shrink-0" />,
+      icon: <Shield size={18} className="text-red-500 flex-shrink-0" />,
       title: '30-Day Money Back Guarantee',
       subtitle: 'if not as described'
-    },
-    {
-      icon: <Clock size={24} className="text-red-500 flex-shrink-0" />,
-      title: 'Fast Delivery',
-      subtitle: 'Usually arrives within 5-7 business days'
     }
   ]
 }) => {
   return (
-    <div className="bg-white p-8 rounded-lg space-y-6">
-      {/* Shipping Benefits List */}
+    <div className="space-y-3 mt-4">
       {benefits.map((benefit, index) => (
-        <div key={index} className="flex items-start gap-4">
-          {/* Icon */}
-          <div className="pt-1">
-            {benefit.icon}
-          </div>
-
-          {/* Content */}
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900">
-              {benefit.title}
-              {benefit.subtitle && (
-                <span className="text-red-500 ml-2">{benefit.subtitle}</span>
-              )}
-            </p>
-          </div>
+        <div key={index} className="flex items-center gap-3">
+          {benefit.icon}
+          <p className="text-sm text-gray-700">
+            <span className="font-medium">{benefit.title}</span>
+            {benefit.subtitle && (
+              <span className="text-gray-500 ml-1.5">{benefit.subtitle}</span>
+            )}
+          </p>
         </div>
       ))}
     </div>

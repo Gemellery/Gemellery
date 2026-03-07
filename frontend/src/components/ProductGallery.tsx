@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { ZoomIn, ZoomOut } from 'lucide-react'
+import { ZoomIn, RotateCcw, CheckCircle, Play } from 'lucide-react'
 
 interface ProductGalleryProps {
   images?: string[]
   productName?: string
+  videoThumbnail?: string
 }
 
 const ProductGallery: React.FC<ProductGalleryProps> = ({
@@ -13,7 +14,8 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
     '/sample_gems/blue_sapphire_top.jpg',
     '/sample_gems/blue_sapphire_side2.jpg',
   ],
-  productName = 'Blue Sapphire'
+  productName = 'Blue Sapphire',
+  videoThumbnail
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [zoom, setZoom] = useState(1)
@@ -21,13 +23,13 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
-  const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev + 0.2, 3))
-  }
-
-  const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev - 0.2, 1))
-    setPosition({ x: 0, y: 0 })
+  const handleZoomToggle = () => {
+    if (zoom > 1) {
+      setZoom(1)
+      setPosition({ x: 0, y: 0 })
+    } else {
+      setZoom(2)
+    }
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -44,11 +46,8 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
         const rect = mainImageDiv.getBoundingClientRect()
         const newX = e.clientX - dragStart.x
         const newY = e.clientY - dragStart.y
-        
-        // Limit dragging bounds
         const maxX = (zoom - 1) * rect.width / 2
         const maxY = (zoom - 1) * rect.height / 2
-        
         setPosition({
           x: Math.max(-maxX, Math.min(maxX, newX)),
           y: Math.max(-maxY, Math.min(maxY, newY))
@@ -67,32 +66,30 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
     setPosition({ x: 0, y: 0 })
   }
 
-  const handlePrevThumbnail = () => {
-    setSelectedImageIndex(prev => (prev - 1 + images.length) % images.length)
-  }
-
-  const handleNextThumbnail = () => {
-    setSelectedImageIndex(prev => (prev + 1) % images.length)
-  }
-
   return (
-    <div className="flex flex-col gap-6 bg-white p-6 rounded-lg">
-      {/* Main Image Display with Zoom */}
+    <div className="flex flex-col gap-4">
+      {/* Main Image Display */}
       <div
         data-gallery-main
-        className="relative w-full bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center cursor-move"
-        style={{ height: '500px' }}
+        className="relative w-full bg-[#f5f2ed] rounded-2xl overflow-hidden flex items-center justify-center"
+        style={{ height: '460px' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* Verified Badge */}
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
+          <CheckCircle size={16} className="text-green-600 fill-green-600" />
+          <span className="text-xs font-semibold text-green-700">Verified</span>
+        </div>
+
         {/* Main Image */}
         <div className="relative w-full h-full flex items-center justify-center">
           <img
             src={images[selectedImageIndex]}
             alt={`${productName} view ${selectedImageIndex + 1}`}
-            className="object-contain transition-transform duration-200 select-none"
+            className="max-w-full max-h-full object-contain transition-transform duration-200 select-none"
             style={{
               transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
               cursor: zoom > 1 ? 'grab' : 'default'
@@ -101,77 +98,70 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
           />
         </div>
 
-        {/* Zoom Controls */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        {/* Controls - Bottom Right */}
+        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10">
           <button
-            onClick={handleZoomIn}
-            className="bg-white hover:bg-gray-100 rounded-full p-2 shadow-md transition-colors duration-200"
-            title="Zoom in"
+            onClick={() => {}}
+            className="bg-white/90 backdrop-blur-sm hover:bg-white rounded-full p-2.5 shadow-md transition-colors duration-200"
+            title="360° View"
           >
-            <ZoomIn size={20} className="text-gray-700" />
+            <RotateCcw size={18} className="text-gray-700" />
           </button>
           <button
-            onClick={handleZoomOut}
-            className="bg-white hover:bg-gray-100 rounded-full p-2 shadow-md transition-colors duration-200"
-            title="Zoom out"
+            onClick={handleZoomToggle}
+            className="bg-white/90 backdrop-blur-sm hover:bg-white rounded-full p-2.5 shadow-md transition-colors duration-200"
+            title="Zoom"
           >
-            <ZoomOut size={20} className="text-gray-700" />
+            <ZoomIn size={18} className="text-gray-700" />
           </button>
         </div>
 
-        {/* Zoom Level Indicator */}
+        {/* Zoom Indicator */}
         {zoom > 1 && (
-          <div className="absolute bottom-4 left-4 bg-black text-white px-3 py-1 rounded text-sm">
+          <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-xs font-medium">
             {Math.round(zoom * 100)}%
           </div>
         )}
       </div>
 
-      {/* Thumbnail Carousel */}
-      <div className="relative flex items-center justify-center gap-2">
-        {/* Left Arrow */}
+      {/* Thumbnail Row */}
+      <div className="flex gap-3 px-1">
+        {images.map((image, index) => (
+          <button
+            key={index}
+            onClick={() => handleThumbnailClick(index)}
+            className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all duration-200 ${
+              selectedImageIndex === index
+                ? 'ring-2 ring-red-500 ring-offset-2 scale-105'
+                : 'ring-1 ring-gray-200 hover:ring-gray-300'
+            }`}
+          >
+            <img
+              src={image}
+              alt={`${productName} thumbnail ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </button>
+        ))}
+
+        {/* Video Thumbnail */}
         <button
-          onClick={handlePrevThumbnail}
-          className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-200"
-          title="Previous image"
+          onClick={() => {}}
+          className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden ring-1 ring-gray-200 hover:ring-gray-300 transition-all duration-200 relative bg-gray-900"
         >
-          <span className="text-lg">‹</span>
+          {videoThumbnail ? (
+            <img src={videoThumbnail} alt="Video" className="w-full h-full object-cover opacity-70" />
+          ) : (
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+              <Play size={20} className="text-white fill-white" />
+            </div>
+          )}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-7 h-7 bg-white/90 rounded-full flex items-center justify-center">
+              <Play size={12} className="text-gray-900 fill-gray-900 ml-0.5" />
+            </div>
+          </div>
         </button>
-
-        {/* Thumbnails Container */}
-        <div className="flex gap-3 overflow-x-auto px-2 py-2 pb-3 max-w-full">
-          {images.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => handleThumbnailClick(index)}
-              className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all duration-200 ${
-                selectedImageIndex === index
-                  ? 'ring-2 ring-red-500 scale-105'
-                  : 'ring-1 ring-gray-200 hover:ring-gray-300'
-              }`}
-            >
-              <img
-                src={image}
-                alt={`${productName} thumbnail ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
-
-        {/* Right Arrow */}
-        <button
-          onClick={handleNextThumbnail}
-          className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-200"
-          title="Next image"
-        >
-          <span className="text-lg">›</span>
-        </button>
-      </div>
-
-      {/* Image Counter */}
-      <div className="text-center text-sm text-gray-500">
-        Image {selectedImageIndex + 1} of {images.length}
       </div>
     </div>
   )
