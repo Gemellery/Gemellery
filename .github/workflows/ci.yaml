@@ -68,6 +68,7 @@ jobs:
   blockchain:
     name: Blockchain Build & Test
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('blockchain/hardhat.config.*') != '' }}
 
     defaults:
       run:
