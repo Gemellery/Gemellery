@@ -72,6 +72,15 @@ function Cart() {
   };
 
   const handleCheckout = () => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Save current location and redirect to sign in
+      localStorage.setItem('redirectAfterLogin', '/checkout');
+      navigate('/signin', { state: { from: '/checkout', message: 'Please sign in to proceed with checkout' } });
+      return;
+    }
+    
     // Navigate to checkout page
     navigate('/checkout');
   };
