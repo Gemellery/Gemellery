@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   getBuyerDashboardSummary,
   getRecentOrders,
+  getAllOrders,
+  getOrderDetails,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -22,6 +24,20 @@ router.get(
   authGuard,
   authorizeRole("buyer"),
   getRecentOrders
+);
+
+router.get(
+  "/orders/history",
+  authGuard,
+  authorizeRole("buyer"),
+  getAllOrders
+);
+
+router.get(
+  "/orders/:id",
+  authGuard,
+  authorizeRole("buyer"),
+  getOrderDetails
 );
 
 router.get(
