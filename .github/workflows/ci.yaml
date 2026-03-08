@@ -84,3 +84,30 @@ jobs:
 
       - name: Build Frontend (without strict type check)
         run: npx vite build
+
+  blockchain:
+    name: Blockchain Build & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: blockchain
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Compile Smart Contracts
+        run: npx hardhat compile
+
+      - name: Run Contract Tests
+        run: npx hardhat test
+
