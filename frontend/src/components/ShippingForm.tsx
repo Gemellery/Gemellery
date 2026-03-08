@@ -15,9 +15,13 @@ import AdvancedFooter from "./AdvancedFooter";
 import * as shippingAPI from "@/lib/shipping/api.ts";
 import * as orderAPI from "@/lib/order/api.ts";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
+import { useCart } from "@/context/CartContext";
 
 
 function Checkout() {
+  /* ---------------- Cart Items ---------------- */
+  const { items: cartItems, totalAmount, isLoading: isCartLoading } = useCart();
+
   /* ---------------- Shipping ---------------- */
   const [shipping, setShipping] = useState({
     firstName: "",
@@ -50,8 +54,8 @@ function Checkout() {
   /* ---------------- Payment ---------------- */
   const [paymentMethod, setPaymentMethod] = useState("card");
 
-  /* ---------------- Pricing ---------------- */
-  const SUBTOTAL = 12450;
+  /* ---------------- Pricing (Dynamic from Cart) ---------------- */
+  const SUBTOTAL = totalAmount || 0;
   const EXPORT_FEE = gia ? 150 : 0;
   const TAX = 0;
   const TOTAL = SUBTOTAL + EXPORT_FEE + TAX;
@@ -107,6 +111,12 @@ function Checkout() {
   };
 
   const handleCheckout = async () => {
+    // Validate that cart is not empty
+    if (cartItems.length === 0) {
+      setCheckoutError("Your cart is empty. Please add items before checkout.");
+      return;
+    }
+
     // Validate that a shipping address is selected
     if (!selectedAddressId) {
       setCheckoutError("Please select or add a shipping address before checkout.");
@@ -521,18 +531,45 @@ function Checkout() {
             <div className="bg-[#f4efe6] rounded-xl p-6 space-y-4">
               <h3 className="text-sm font-semibold">Order Summary</h3>
 
-              <div className="flex gap-3">
-                <img src="/sample_gems/gem 3.2ct Royal Blue Ceylon Sapphire.png" className="w-16 h-16 rounded-lg border" />
-                <div className="text-sm">
-                  <p className="font-medium">3.2ct Royal Blue Ceylon Sapphire</p>
-                  <p className="text-xs text-gray-500">Cushion Cut, Unheated</p>
-                  <p className="text-emerald-600 font-semibold mt-1">
-                    ${SUBTOTAL.toLocaleString()}
-                  </p>
+              {/* Loading State */}
+              {isCartLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader className="w-5 h-5 animate-spin text-emerald-600" />
+                  <span className="ml-2 text-sm text-gray-500">Loading cart...</span>
                 </div>
-              </div>
+              ) : cartItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 text-sm">
+                  <p>No items in cart</p>
+                </div>
+              ) : (
+                <>
+                  {/* Cart Items */}
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {cartItems.map((item) => (
+                      <div key={item.cart_item_id} className="flex gap-3">
+                        <div className="w-16 h-16 rounded-lg border bg-white flex items-center justify-center flex-shrink-0">
+                          <span className="text-2xl"></span>
+                        </div>
+                        <div className="text-sm flex-1">
+                          <p className="font-medium">{item.gem_name}</p>
+                          <p className="text-xs text-gray-500">
+                            {item.carat && `${item.carat}ct`}
+                            {item.cut && `, ${item.cut}`}
+                            {item.color && `, ${item.color}`}
+                          </p>
+                          {item.quantity > 1 && (
+                            <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                          )}
+                          <p className="text-emerald-600 font-semibold mt-1">
+                            ${(item.price * item.quantity).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-              <hr />
+                  <hr /></>
+              )}
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -570,7 +607,7 @@ function Checkout() {
 
               <button 
                 onClick={handleCheckout}
-                disabled={isCheckingOut || !selectedAddressId}
+                disabled={isCheckingOut || !selectedAddressId || cartItems.length === 0 || isCartLoading}
                 className="w-full bg-[#a33a42] hover:bg-[#8f3238] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-3 rounded-full text-sm font-medium flex items-center justify-center gap-2"
               >
                 {isCheckingOut ? (
