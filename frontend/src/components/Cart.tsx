@@ -1,5 +1,6 @@
 // Cart.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Minus, Lock, Sparkles, CheckCircle, Truck, Shield } from 'lucide-react';
 import Navbar from './Navbar';
 import AdvancedFooter from '../components/AdvancedFooter';
@@ -37,6 +38,7 @@ function Cart() {
   const { items: cartItems, isLoading, error, removeFromCart, updateCartItem } = useCart();
   const [promoCode, setPromoCode] = useState<string>('');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   // Calculate subtotal from cart items
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -70,7 +72,8 @@ function Cart() {
   };
 
   const handleCheckout = () => {
-    console.log('Proceeding to checkout');
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   if (isLoading) {
