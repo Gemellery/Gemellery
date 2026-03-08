@@ -516,9 +516,6 @@ function OrderHistory() {
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      {!showDetails && <Footer />}
     </div>
   );
 }

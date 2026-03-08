@@ -90,13 +90,27 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/marketplace" element={<Marketplace />} />
-      <Route path="/shipping-form" element={<ShippingForm />} />
+      <Route 
+        path="/shipping-form" 
+        element={
+          <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
+            <ShippingForm />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/checkout" 
+        element={
+          <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
+            <ShippingForm />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="/product-detail/:id" element={<ProductDetail />} />
       <Route path="/product-gallery" element={<ProductSpecifications />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/jewelry-designer" element={<JewelryDesigner />} />
       <Route path="/jewelry_designer" element={<JewelryDesigner />} />
@@ -284,6 +298,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/shipping-form" element={<ShippingForm />} />
+          <Route path="/checkout" element={<ShippingForm />} />
           <Route path="/product-detail/:id" element={<ProductDetail />} />
           <Route path="/product-gallery" element={<ProductSpecifications />} />
           <Route path="/cart" element={<Cart />} />
