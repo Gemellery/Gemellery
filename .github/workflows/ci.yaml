@@ -65,7 +65,7 @@ jobs:
       - name: Build Frontend (without strict type check)
         run: npx vite build
 
-blockchain:
+  blockchain:
     name: Blockchain Build & Test
     runs-on: ubuntu-latest
 
