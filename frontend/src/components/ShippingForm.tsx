@@ -13,7 +13,7 @@ import {
 import Navbar from "./Navbar";
 import AdvancedFooter from "./AdvancedFooter";
 import * as shippingAPI from "@/lib/shipping/api.ts";
-import * as orderAPI from "@/lib/order/api";
+import * as orderAPI from "@/lib/order/api.ts";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
 
 
