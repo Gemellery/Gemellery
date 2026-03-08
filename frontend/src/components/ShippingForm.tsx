@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Edit,
   ShieldCheck,
@@ -12,6 +13,7 @@ import {
 import Navbar from "./Navbar";
 import AdvancedFooter from "./AdvancedFooter";
 import * as shippingAPI from "@/lib/shipping/api.ts";
+import * as orderAPI from "@/lib/order/api";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
 
 
@@ -35,6 +37,11 @@ function Checkout() {
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [addressSuccess, setAddressSuccess] = useState<string | null>(null);
+
+  /* ---------------- Checkout State ---------------- */
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   /* ---------------- Export Options ---------------- */
   const [gia, setGia] = useState(false);
@@ -97,6 +104,41 @@ function Checkout() {
     setSelectedAddressId(address.address_id);
     populateFormFromAddress(address);
     setShowAddressForm(false);
+  };
+
+  const handleCheckout = async () => {
+    // Validate that a shipping address is selected
+    if (!selectedAddressId) {
+      setCheckoutError("Please select or add a shipping address before checkout.");
+      return;
+    }
+
+    // Validate payment method
+    if (!paymentMethod) {
+      setCheckoutError("Please select a payment method.");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setCheckoutError(null);
+
+    try {
+      const response = await orderAPI.checkoutOrder({
+        payment_method: paymentMethod,
+        shipping_address_id: selectedAddressId,
+      });
+
+      // Success! Redirect to order confirmation or history page
+      if (response.order_id) {
+        navigate(`/order-history`);
+      }
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Failed to complete checkout";
+      setCheckoutError(error);
+      console.error("Checkout error:", err);
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   const handleSaveAddress = async (e: React.FormEvent) => {
@@ -518,8 +560,27 @@ function Checkout() {
                 <span>${TOTAL.toLocaleString()}</span>
               </div>
 
-              <button className="w-full bg-[#a33a42] hover:bg-[#8f3238] text-white py-3 rounded-full text-sm font-medium">
-                Pay ${TOTAL.toLocaleString()}
+              {/* Checkout Error Message */}
+              {checkoutError && (
+                <div className="flex gap-2 bg-red-50 p-3 rounded-lg text-xs text-red-600">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <p>{checkoutError}</p>
+                </div>
+              )}
+
+              <button 
+                onClick={handleCheckout}
+                disabled={isCheckingOut || !selectedAddressId}
+                className="w-full bg-[#a33a42] hover:bg-[#8f3238] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-3 rounded-full text-sm font-medium flex items-center justify-center gap-2"
+              >
+                {isCheckingOut ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>Pay ${TOTAL.toLocaleString()}</>
+                )}
               </button>
 
               <p className="text-xs text-center text-gray-500 flex justify-center gap-1">
