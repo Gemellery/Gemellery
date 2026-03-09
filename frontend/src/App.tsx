@@ -69,6 +69,7 @@ function App() {
           <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/500" element={<ServerError />} />
 
           <Route path="/seller/:id" element={<SellerProfile />} />
 
