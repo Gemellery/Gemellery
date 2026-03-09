@@ -16,7 +16,7 @@ export default function NotFound() {
             <img
                 src="/src/assets/logos/Elegance Jewelry.png"
                 alt="Gemellery"
-                className="h-16 w-auto object-contain"
+                className="h-18 w-auto object-contain"
             />
         </div>
        
