@@ -5,13 +5,12 @@ export default function AccessDenied() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center relative overflow-hidden px-6">
-      <div className="absolute -top-20 -right-20 w-[400px] h-[400px] rounded-full border border-indigo-700/10 pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-[550px] h-[550px] rounded-full border border-indigo-700/10 pointer-events-none" />
-      <div className="absolute top-[12%] left-[6%] w-12 h-12 border border-indigo-700/10 rotate-45 pointer-events-none" />
-      <div className="absolute bottom-[14%] right-[7%] w-9 h-9 border border-indigo-700/10 rotate-45 pointer-events-none" />
+      <div className="absolute -top-20 -right-20 w-[400px] h-[400px] rounded-full border border-stone-300/60 pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 w-[550px] h-[550px] rounded-full border border-stone-300/60 pointer-events-none" />
+      <div className="absolute top-[12%] left-[6%] w-12 h-12 border border-stone-300/60 rotate-45 pointer-events-none" />
+      <div className="absolute bottom-[14%] right-[7%] w-9 h-9 border border-stone-300/60 rotate-45 pointer-events-none" />
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
-        {/* Lock Gem SVG Icon */}
         <div className="flex justify-center mb-8">
           <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
             <polygon points="40,8 72,28 72,52 40,72 8,52 8,28" fill="rgba(99,102,241,0.10)" stroke="#6366f1" strokeWidth="1.5" />
