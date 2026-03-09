@@ -23,6 +23,7 @@ import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import blogRoutes from "./routes/blogRoutes";
 import contactRoutes from './routes/contactRoutes';
+import { notFound, errorHandler } from "./middleware/errorMiddleware";
 
 const app = express();
 
