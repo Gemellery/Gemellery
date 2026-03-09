@@ -11,7 +11,11 @@ export default function ServerError() {
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
         <div className="flex justify-center mb-8">
-         
+            <img
+                src="/src/assets/logos/Elegance Jewelry.png"
+                alt="Gemellery"
+                className="h-18 w-auto object-contain"
+            />  
         </div>
 
         <p className="text-8xl font-light tracking-[0.2em] text-yellow-700 leading-none mb-4">500</p>
