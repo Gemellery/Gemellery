@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center relative overflow-hidden px-6">
       {/* Decorative background rings */}
-      <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full border border-yellow-700/10 pointer-events-none" />
+      <div className="absolute -top-31 -right-32 w-[500px] h-[500px] rounded-full border border-yellow-700/10 pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full border border-yellow-700/10 pointer-events-none" />
       <div className="absolute top-1/2 left-[6%] -translate-y-1/2 w-14 h-14 border border-yellow-700/15 rotate-45 pointer-events-none" />
       <div className="absolute top-[12%] right-[8%] w-8 h-8 border border-yellow-700/10 rotate-45 pointer-events-none" />
