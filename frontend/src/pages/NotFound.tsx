@@ -25,8 +25,7 @@ export default function NotFound() {
         <div className="w-14 h-px bg-yellow-700/60 mx-auto mb-6" />
         <h1 className="text-2xl font-normal tracking-[0.2em] uppercase text-foreground mb-5">Page Not Found</h1>
         <p className="text-muted-foreground leading-relaxed mb-12 text-sm">
-          The gem you're searching for seems to have gone missing from our
-          collection. It may have been moved, renamed, or simply doesn't exist.
+          The page you're looking for doesn't exist or has been moved.
         </p>
 
         <div className="flex gap-4 justify-center flex-wrap">
