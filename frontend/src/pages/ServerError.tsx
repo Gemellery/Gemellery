@@ -5,12 +5,11 @@ export default function ServerError() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center relative overflow-hidden px-6">
-      <div className="absolute -top-24 -left-24 w-[450px] h-[450px] rounded-full border border-red-800/10 pointer-events-none" />
-      <div className="absolute -bottom-44 -right-44 w-[650px] h-[650px] rounded-full border border-red-800/10 pointer-events-none" />
-      <div className="absolute top-0 right-[15%] w-px h-full bg-red-800/5 pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-[450px] h-[450px] rounded-full border border-stone-300/60 pointer-events-none" />
+      <div className="absolute -bottom-44 -right-44 w-[650px] h-[650px] rounded-full border border-stone-300/60 pointer-events-none" />
+      <div className="absolute top-0 right-[15%] w-px h-full bg-stone-200/60 pointer-events-none" />
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
-        {/* Broken Gem SVG Icon */}
         <div className="flex justify-center mb-8">
           <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
             <polygon points="40,8 8,28 8,52 40,72 40,40"  fill="rgba(180,60,60,0.12)" stroke="#b43c3c" strokeWidth="1.5" />
