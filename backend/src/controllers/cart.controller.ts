@@ -64,14 +64,25 @@ export const getCart = async (req: any, res: Response) => {
         const [rows]: any = await pool.query(
             `SELECT 
                 ci.cart_item_id,
+                c.cart_id,
                 g.gem_id,
                 g.gem_name,
+                g.gem_type,
                 g.price,
+                g.carat,
+                g.cut,
+                g.clarity,
+                g.color,
+                g.origin,
+                g.ngja_certificate_no AS certification,
+                g.ngja_certificate_url,
                 ci.quantity,
-                (g.price * ci.quantity) AS total_price
+                (g.price * ci.quantity) AS total_price,
+                u.full_name AS seller_name
             FROM cart c
             JOIN cart_items ci ON c.cart_id = ci.cart_id
             JOIN gem g ON ci.gem_id = g.gem_id
+            LEFT JOIN user u ON g.seller_id = u.user_id
             WHERE c.user_id = ?`,
             [user_id]
         );

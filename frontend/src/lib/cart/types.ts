@@ -16,7 +16,7 @@ export interface CartItem {
   color?: string;
   origin?: string;
   certification?: string;
-  image_url?: string;
+  ngja_certificate_url?: string;
   seller_name?: string;
 }
 
