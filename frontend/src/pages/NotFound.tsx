@@ -12,6 +12,13 @@ export default function NotFound() {
       <div className="absolute top-[12%] right-[8%] w-8 h-8 border border-yellow-700/10 rotate-45 pointer-events-none" />
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
+        <div className="flex justify-center mb-8">
+            <img
+                src="/src/assets/logos/Elegance Jewelry.png"
+                alt="Gemellery"
+                className="h-16 w-auto object-contain"
+            />
+        </div>
        
 
         <p className="text-8xl font-light tracking-[0.2em] text-yellow-700 leading-none mb-4">404</p>
