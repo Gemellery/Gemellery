@@ -12,13 +12,8 @@ export default function AccessDenied() {
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
         <div className="flex justify-center mb-8">
-          <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
-            <polygon points="40,8 72,28 72,52 40,72 8,52 8,28" fill="rgba(184,134,11,0.10)" stroke="#b8860b" strokeWidth="1.5" />
-            <rect x="30" y="38" width="20" height="16" rx="2" fill="none" stroke="#b8860b" strokeWidth="1.5" />
-            <path d="M33 38 V33 Q40 25 47 33 V38" fill="none" stroke="#b8860b" strokeWidth="1.5" strokeLinecap="round" />
-            <circle cx="40" cy="45" r="2.5" fill="#b8860b" opacity="0.7" />
-            <line x1="40" y1="47.5" x2="40" y2="51" stroke="#b8860b" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+            
+          
         </div>
 
         <p className="text-8xl font-light tracking-[0.2em] text-yellow-700 leading-none mb-4">403</p>
