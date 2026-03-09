@@ -11,14 +11,7 @@ export default function ServerError() {
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
         <div className="flex justify-center mb-8">
-          <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
-            <polygon points="40,8 8,28 8,52 40,72 40,40"  fill="rgba(184,134,11,0.12)" stroke="#b8860b" strokeWidth="1.5" />
-            <polygon points="42,6 74,26 74,54 42,74 42,40" fill="rgba(184,134,11,0.08)" stroke="#b8860b" strokeWidth="1.5" strokeDasharray="4 2" />
-            <line x1="40" y1="8"  x2="42" y2="40" stroke="#b8860b" strokeWidth="2" />
-            <line x1="42" y1="40" x2="40" y2="72" stroke="#b8860b" strokeWidth="2" />
-            <line x1="8"  y1="28" x2="40" y2="40" stroke="#b8860b" strokeWidth="0.8" opacity="0.5" />
-            <line x1="8"  y1="52" x2="40" y2="40" stroke="#b8860b" strokeWidth="0.8" opacity="0.5" />
-          </svg>
+         
         </div>
 
         <p className="text-8xl font-light tracking-[0.2em] text-yellow-700 leading-none mb-4">500</p>
