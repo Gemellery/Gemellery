@@ -41,6 +41,7 @@ import SellerInventory from "./pages/seller/SellerInventory";
 import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import AdminReports from "./pages/Admin/ReportsPage";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
