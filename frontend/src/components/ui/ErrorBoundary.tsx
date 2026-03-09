@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -52,7 +52,9 @@ function ServerErrorFallback({ onReset }: { onReset: () => void }) {
 
         <p className="text-8xl font-light tracking-[0.2em] text-red-700 leading-none mb-4">500</p>
         <div className="w-14 h-px bg-red-700/60 mx-auto mb-6" />
-        <h1 className="text-2xl font-normal tracking-[0.2em] uppercase text-foreground mb-5">Something Went Wrong</h1>
+        <h1 className="text-2xl font-normal tracking-[0.2em] uppercase text-foreground mb-5">
+          Something Went Wrong
+        </h1>
         <p className="text-muted-foreground leading-relaxed mb-12 text-sm">
           An unexpected error occurred. Our craftsmen have been notified and
           are working to restore everything to its polished state.
