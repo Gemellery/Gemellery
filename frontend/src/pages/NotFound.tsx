@@ -12,18 +12,7 @@ export default function NotFound() {
       <div className="absolute top-[12%] right-[8%] w-8 h-8 border border-yellow-700/10 rotate-45 pointer-events-none" />
 
       <div className="relative z-10 text-center max-w-lg w-full py-16">
-        {/* Gem SVG Icon */}
-        <div className="flex justify-center mb-8">
-          <svg width="72" height="72" viewBox="0 0 80 80" fill="none">
-            <polygon points="40,8 72,28 72,52 40,72 8,52 8,28" fill="none" stroke="#b8860b" strokeWidth="1.5" />
-            <polygon points="40,8 72,28 40,40" fill="rgba(184,134,11,0.15)" stroke="#b8860b" strokeWidth="0.8" />
-            <polygon points="40,8 8,28 40,40"  fill="rgba(184,134,11,0.08)" stroke="#b8860b" strokeWidth="0.8" />
-            <polygon points="8,28 8,52 40,40"  fill="rgba(184,134,11,0.12)" stroke="#b8860b" strokeWidth="0.8" />
-            <polygon points="72,28 72,52 40,40" fill="rgba(184,134,11,0.18)" stroke="#b8860b" strokeWidth="0.8" />
-            <polygon points="8,52 40,72 40,40"  fill="rgba(184,134,11,0.10)" stroke="#b8860b" strokeWidth="0.8" />
-            <polygon points="40,72 72,52 40,40" fill="rgba(184,134,11,0.14)" stroke="#b8860b" strokeWidth="0.8" />
-          </svg>
-        </div>
+       
 
         <p className="text-8xl font-light tracking-[0.2em] text-yellow-700 leading-none mb-4">404</p>
         <div className="w-14 h-px bg-yellow-700/60 mx-auto mb-6" />
