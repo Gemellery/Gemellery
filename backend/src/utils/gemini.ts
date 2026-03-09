@@ -1,17 +1,18 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// ============================================
-// Gemini AI Configuration
-// ============================================
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const apiKey = process.env.GEMINI_API_KEY || "";
 
-// Use Gemini 2.0 Flash for image generation
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+const genAI = new GoogleGenerativeAI(apiKey);
 
-// ============================================
-// Types
-// ============================================
+const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash-image",
+    generationConfig: {
+        // @ts-ignore - responseModalities is valid but not in types
+        responseModalities: ["Text", "Image"],
+    }
+});
+
 
 export interface GemProperties {
     gemType: string;
@@ -43,13 +44,7 @@ export interface GeneratedDesign {
     mimeType: string;
 }
 
-// ============================================
-// Prompt Builder
-// ============================================
 
-/**
- * Build an enhanced jewelry design prompt from gem specifications
- */
 export function buildJewelryPrompt(input: DesignPromptInput): string {
     const { gemProperties, designPrompt, materials } = input;
 
@@ -99,9 +94,6 @@ Generate a beautiful, elegant jewelry design that showcases the gemstone promine
     return prompt;
 }
 
-/**
- * Build a refinement prompt for modifying an existing design
- */
 export function buildRefinementPrompt(
     originalPrompt: string,
     refinementInstructions: string,
@@ -120,14 +112,7 @@ Keep the same gemstone and overall style, but apply the requested modifications.
 Maintain professional jewelry photography quality.`;
 }
 
-// ============================================
-// Image Generation Functions
-// ============================================
 
-/**
- * Generate jewelry design images using Gemini
- * Returns base64 encoded images
- */
 export async function generateJewelryDesigns(
     input: DesignPromptInput,
     numImages: number = 3
@@ -165,18 +150,29 @@ export async function generateJewelryDesigns(
             });
 
             const response = result.response;
-            const text = response.text();
+            const candidates = response.candidates;
 
-            // For now, we'll return a placeholder since Gemini 2.0 Flash text model
-            // doesn't directly generate images. We'll need to use Imagen or another approach.
-            // This is a limitation we'll work around.
-            console.log(`[Gemini] Design ${i + 1} prompt processed. Response length: ${text.length}`);
+            if (!candidates || candidates.length === 0) {
+                console.warn(`[Gemini] Design ${i + 1}: No candidates in response`);
+                continue;
+            }
 
-            // Create a placeholder design with the prompt response
-            designs.push({
-                imageBase64: "", // Will be populated by actual image generation
-                mimeType: "image/png",
-            });
+            // Look for an image part in the response
+            let imageBase64 = "";
+            let mimeType = "image/png";
+
+            for (const part of candidates[0].content.parts) {
+                if ((part as any).inlineData) {
+                    imageBase64 = (part as any).inlineData.data;
+                    mimeType = (part as any).inlineData.mimeType || "image/png";
+                    console.log(`[Gemini] Design ${i + 1}: Got image! Size: ${imageBase64.length} chars`);
+                    break;
+                } else if ((part as any).text) {
+                    console.log(`[Gemini] Design ${i + 1}: Got text response (${(part as any).text.length} chars) — model may not support image output`);
+                }
+            }
+
+            designs.push({ imageBase64, mimeType });
         } catch (error) {
             console.error(`[Gemini] Error generating design ${i + 1}:`, error);
             // Continue with remaining images
@@ -186,9 +182,6 @@ export async function generateJewelryDesigns(
     return designs;
 }
 
-/**
- * Refine an existing jewelry design
- */
 export async function refineJewelryDesign(
     originalPrompt: string,
     refinementInstructions: string,
@@ -205,13 +198,27 @@ export async function refineJewelryDesign(
 
     try {
         const result = await retryWithBackoff(async () => {
-            const response = await model.generateContent({
-                contents: [
-                    {
-                        role: "user",
-                        parts: [{ text: prompt }],
+            // Build content parts - include image if available for true image editing
+            const parts: any[] = [{ text: prompt }];
+
+            if (baseImageBase64 && baseImageBase64.length > 100) {
+                // Strip data URI prefix if present (e.g. "data:image/png;base64,...")
+                const rawBase64 = baseImageBase64.includes(',')
+                    ? baseImageBase64.split(',')[1]
+                    : baseImageBase64;
+                parts.unshift({
+                    inlineData: {
+                        mimeType: "image/png",
+                        data: rawBase64,
                     },
-                ],
+                });
+                console.log("[Gemini] Sending base image for refinement (image editing mode)");
+            } else {
+                console.log("[Gemini] No base image provided, generating fresh refinement");
+            }
+
+            const response = await model.generateContent({
+                contents: [{ role: "user", parts }],
                 generationConfig: {
                     temperature: 0.8,
                     topP: 0.95,
@@ -223,27 +230,36 @@ export async function refineJewelryDesign(
         });
 
         const response = result.response;
-        const text = response.text();
+        const candidates = response.candidates;
 
-        console.log(`[Gemini] Refinement processed. Response length: ${text.length}`);
+        if (!candidates || candidates.length === 0) {
+            console.warn("[Gemini] Refinement: No candidates in response");
+            return null;
+        }
 
-        return {
-            imageBase64: "",
-            mimeType: "image/png",
-        };
+        // Extract image from response
+        let imageBase64 = "";
+        let mimeType = "image/png";
+
+        for (const part of candidates[0].content.parts) {
+            if ((part as any).inlineData) {
+                imageBase64 = (part as any).inlineData.data;
+                mimeType = (part as any).inlineData.mimeType || "image/png";
+                console.log(`[Gemini] Refinement: Got image! Size: ${imageBase64.length} chars`);
+                break;
+            } else if ((part as any).text) {
+                console.log(`[Gemini] Refinement: Got text (${(part as any).text.length} chars)`);
+            }
+        }
+
+        return { imageBase64, mimeType };
     } catch (error) {
         console.error("[Gemini] Error refining design:", error);
         return null;
     }
 }
 
-// ============================================
-// Utility Functions
-// ============================================
 
-/**
- * Retry a function with exponential backoff
- */
 async function retryWithBackoff<T>(
     fn: () => Promise<T>,
     maxRetries: number = 3,
@@ -272,16 +288,10 @@ async function retryWithBackoff<T>(
     throw lastError || new Error("Max retries exceeded");
 }
 
-/**
- * Sleep for a specified duration
- */
 function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Check if Gemini API key is configured
- */
 export function isGeminiConfigured(): boolean {
     return !!process.env.GEMINI_API_KEY;
 }

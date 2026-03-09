@@ -42,11 +42,11 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
     const strengthLabel = strength === 0.3 ? 'Subtle' : strength === 0.5 ? 'Moderate' : 'Major';
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4" style={{ fontFamily: "'Market Sans', sans-serif" }}>
             {/* Prompt Input */}
-            <div className="space-y-2">
-                <label className="block text-sm font-medium text-white">
-                    How would you like to modify this design?
+            <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                    How should we adjust your design?
                 </label>
 
                 <textarea
@@ -57,9 +57,9 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
                     rows={3}
                     maxLength={300}
                     disabled={isRefining}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-700 bg-[#1a1f35] text-white
-            focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37] focus:ring-opacity-30
-            resize-none disabled:bg-gray-800 disabled:cursor-not-allowed placeholder-gray-500"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-900
+            focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20
+            resize-none disabled:bg-gray-100 disabled:cursor-not-allowed placeholder-gray-400"
                 />
 
                 <div className="flex justify-between items-center text-xs">
@@ -90,9 +90,9 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
                             key={index}
                             onClick={() => setPrompt(suggestion)}
                             disabled={isRefining}
-                            className="text-left px-3 py-2 text-sm bg-[#1a1f35] rounded-lg border border-gray-700
-                hover:border-[#D4AF37] hover:bg-[#D4AF37]/10 transition-colors
-                disabled:opacity-50 disabled:cursor-not-allowed text-gray-300"
+                            className="text-left px-3 py-2 text-sm bg-gray-50 rounded-lg border border-gray-200
+                hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 transition-colors
+                disabled:opacity-50 disabled:cursor-not-allowed text-gray-600"
                         >
                             {suggestion}
                         </button>
@@ -116,8 +116,8 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
                         onClick={() => setStrength(0.3)}
                         disabled={isRefining}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${strength === 0.3
-                                ? 'bg-[#D4AF37] text-[#0A1128]'
-                                : 'bg-[#1a1f35] text-gray-400 border border-gray-700 hover:border-gray-600'
+                            ? 'bg-[#D4AF37] text-[#0A1128]'
+                            : 'bg-[#131B33] text-gray-400 border border-gray-700 hover:border-gray-600'
                             }`}
                     >
                         Subtle
@@ -126,8 +126,8 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
                         onClick={() => setStrength(0.5)}
                         disabled={isRefining}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${strength === 0.5
-                                ? 'bg-[#D4AF37] text-[#0A1128]'
-                                : 'bg-[#1a1f35] text-gray-400 border border-gray-700 hover:border-gray-600'
+                            ? 'bg-[#D4AF37] text-[#0A1128]'
+                            : 'bg-[#131B33] text-gray-400 border border-gray-700 hover:border-gray-600'
                             }`}
                     >
                         Moderate
@@ -136,8 +136,8 @@ export const RefinementPrompt: React.FC<RefinementPromptProps> = ({
                         onClick={() => setStrength(0.7)}
                         disabled={isRefining}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${strength === 0.7
-                                ? 'bg-[#D4AF37] text-[#0A1128]'
-                                : 'bg-[#1a1f35] text-gray-400 border border-gray-700 hover:border-gray-600'
+                            ? 'bg-[#D4AF37] text-[#0A1128]'
+                            : 'bg-[#131B33] text-gray-400 border border-gray-700 hover:border-gray-600'
                             }`}
                     >
                         Major

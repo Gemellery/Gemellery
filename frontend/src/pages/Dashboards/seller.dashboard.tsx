@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
 import { useNavigate } from "react-router-dom";
-import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Eye, MessageSquare, ChartNoAxesCombined, ArrowRight, Heart } from "lucide-react";
+import { Menu, Plus, BadgeCheck, BanknoteArrowDown, Package, ArrowRight, Heart, ShieldCheck, ShieldAlert, Clock, ShieldX } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 
 function SellerDashboardLayout() {
@@ -23,6 +23,7 @@ function SellerDashboardLayout() {
     const [seller, setSeller] = useState<any>(null);
     const [gems, setGems] = useState<Gem[]>([]);
     const [gemsLoading, setGemsLoading] = useState(true);
+    const [dashboardStats, setDashboardStats] = useState<any>(null);
 
     useEffect(() => {
         const fetchSellerProfile = async () => {
@@ -77,6 +78,22 @@ function SellerDashboardLayout() {
         setUser(storedUser);
     }, []);
 
+    useEffect(() => {
+        const fetchDashboardSummary = async () => {
+            try {
+                const res = await fetch("http://localhost:5001/api/seller/dashboard-summary", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (!res.ok) throw new Error("Failed to fetch dashboard summary");
+                const data = await res.json();
+                setDashboardStats(data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchDashboardSummary();
+    }, []);
+
     return (
         <div className="flex h-screen overflow-hidden">
             <SellerSidebar sellerName={user?.full_name || user?.email}
@@ -96,7 +113,11 @@ function SellerDashboardLayout() {
                             Welcome back, {user?.full_name}
                         </h3>
                         <p className="flex items-center text-sm text-gray-500 gap-2">
-                            <BadgeCheck className="text-[#1F7A73] size-5" />
+                            {seller?.verification_status === "approved" ? (
+                                <BadgeCheck className="text-[#1F7A73] size-5" />
+                            ) : (
+                                <ShieldAlert className="text-yellow-500 size-5" />
+                            )}
                             {seller?.business_name || "Loading business..."}
                         </p>
                     </div>
@@ -108,6 +129,75 @@ function SellerDashboardLayout() {
                     </button>
                 </div>
 
+                {/* Verification Status Banner */}
+                {seller && (
+                    <div className={`rounded-2xl p-4 mb-6 flex items-center gap-4 border ${
+                        seller.verification_status === "approved"
+                            ? "bg-green-50 border-green-200"
+                            : seller.verification_status === "pending"
+                            ? "bg-yellow-50 border-yellow-200"
+                            : seller.verification_status === "rejected"
+                            ? "bg-red-50 border-red-200"
+                            : "bg-orange-50 border-orange-200"
+                    }`}>
+                        <div className={`p-3 rounded-xl ${
+                            seller.verification_status === "approved"
+                                ? "bg-green-100"
+                                : seller.verification_status === "pending"
+                                ? "bg-yellow-100"
+                                : seller.verification_status === "rejected"
+                                ? "bg-red-100"
+                                : "bg-orange-100"
+                        }`}>
+                            {seller.verification_status === "approved" && <ShieldCheck className="text-green-600 size-6" />}
+                            {seller.verification_status === "pending" && <Clock className="text-yellow-600 size-6" />}
+                            {seller.verification_status === "rejected" && <ShieldX className="text-red-600 size-6" />}
+                            {seller.verification_status === "suspended" && <ShieldAlert className="text-orange-600 size-6" />}
+                        </div>
+                        <div className="flex-1">
+                            <h4 className={`font-semibold text-sm ${
+                                seller.verification_status === "approved"
+                                    ? "text-green-800"
+                                    : seller.verification_status === "pending"
+                                    ? "text-yellow-800"
+                                    : seller.verification_status === "rejected"
+                                    ? "text-red-800"
+                                    : "text-orange-800"
+                            }`}>
+                                {seller.verification_status === "approved" && "Verified Seller"}
+                                {seller.verification_status === "pending" && "Verification Pending"}
+                                {seller.verification_status === "rejected" && "Verification Rejected"}
+                                {seller.verification_status === "suspended" && "Account Suspended"}
+                            </h4>
+                            <p className={`text-xs mt-0.5 ${
+                                seller.verification_status === "approved"
+                                    ? "text-green-600"
+                                    : seller.verification_status === "pending"
+                                    ? "text-yellow-600"
+                                    : seller.verification_status === "rejected"
+                                    ? "text-red-600"
+                                    : "text-orange-600"
+                            }`}>
+                                {seller.verification_status === "approved" && "Your seller account has been verified. You can list and sell gems."}
+                                {seller.verification_status === "pending" && "Your account is under review. You'll be notified once verified by an admin."}
+                                {seller.verification_status === "rejected" && "Your verification was rejected. Please contact support for more details."}
+                                {seller.verification_status === "suspended" && "Your account has been suspended. Please contact support to resolve this."}
+                            </p>
+                        </div>
+                        <span className={`text-xs font-medium px-3 py-1 rounded-full ${
+                            seller.verification_status === "approved"
+                                ? "bg-green-200 text-green-800"
+                                : seller.verification_status === "pending"
+                                ? "bg-yellow-200 text-yellow-800"
+                                : seller.verification_status === "rejected"
+                                ? "bg-red-200 text-red-800"
+                                : "bg-orange-200 text-orange-800"
+                        }`}>
+                            {seller.verification_status.charAt(0).toUpperCase() + seller.verification_status.slice(1)}
+                        </span>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
 
                     {/* Total Revenue */}
@@ -117,37 +207,43 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500">Total Revenue</span>
-                            <span className="text-2xl font-bold text-gray-900">$5,000</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                +12% from last month
+                            <span className="text-2xl font-bold text-gray-900">
+                                ${dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString()}` : "Loading..."}
+                            </span>
+                            <span className={`text-xs mt-1 ${dashboardStats?.revenueTrend >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% from last month` : ""}
                             </span>
                         </div>
                     </div>
 
-                    {/* Profile Views */}
+                    {/* Total Listings */}
                     <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
                         <div className="p-4 rounded-xl bg-white">
-                            <Eye className="text-[#1F7A73] size-7" />
+                            <Package className="text-[#1F7A73] size-7" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Profile Views</span>
-                            <span className="text-2xl font-bold text-gray-900">456</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                +8% this week
+                            <span className="text-sm text-gray-500">Active Listings</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.totalListings ?? "Loading..."}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                                Available gems
                             </span>
                         </div>
                     </div>
 
-                    {/* Inquiry Rate */}
+                    {/* Total Orders */}
                     <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
                         <div className="p-4 rounded-xl bg-white">
-                            <MessageSquare className="text-[#1F7A73] size-7" />
+                            <BadgeCheck className="text-[#1F7A73] size-7" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Inquiry Rate</span>
-                            <span className="text-2xl font-bold text-gray-900">25%</span>
-                            <span className="text-xs text-green-600 mt-1">
-                                High engagement
+                            <span className="text-sm text-gray-500">Total Orders</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.totalOrders ?? "Loading..."}
+                            </span>
+                            <span className="text-xs text-gray-500 mt-1">
+                                All time
                             </span>
                         </div>
                     </div>
@@ -159,33 +255,13 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500">Wishlisted Gems</span>
-                            <span className="text-2xl font-bold text-gray-900">48</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {dashboardStats?.wishlistCount ?? "Loading..."}
+                            </span>
                             <span className="text-xs text-gray-500 mt-1">
                                 Across all listings
                             </span>
                         </div>
-                    </div>
-
-                </div>
-
-
-                <div className="hidden md:flex flex-col gap-5 md:flex-row md:gap-4 mb-6 border-[#f5e2aa]">
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
-                        <div className="flex items-start">
-                            <ChartNoAxesCombined className="text-[#1F7A73] size-15 mr-4" />
-                            <div className="flex flex-col">
-                                <h2 className="font-bold">AI Market Insight</h2>
-                                <h2 className="text-sm text-gray-500">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-                                    ut aliquip ex ea commodo consequat.
-                                </h2>
-                            </div>
-                        </div>
-                        <button className="bg-[#000000] text-white px-4 py-2 rounded-lg hover:bg-[#16635d]">
-                            View Analysis
-                        </button>
                     </div>
                 </div>
 
@@ -265,14 +341,14 @@ function SellerDashboardLayout() {
                     <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
                         <div className="flex flex-col">
                             <h2 className="font-bold">Verification Rate</h2>
-                            <h2 className="text-sm text-gray-500">98%</h2>
+                            <h2 className="text-sm text-gray-500">{dashboardStats ? `${dashboardStats.verificationRate}%` : "Loading..."}</h2>
                         </div>
                     </div>
 
                     <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
                         <div className="flex flex-col">
                             <h2 className="font-bold">Active Shipments</h2>
-                            <h2 className="text-sm text-gray-500">45</h2>
+                            <h2 className="text-sm text-gray-500">{dashboardStats?.activeShipments ?? "Loading..."}</h2>
                         </div>
                     </div>
                 </div>

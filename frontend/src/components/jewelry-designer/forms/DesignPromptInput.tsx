@@ -28,8 +28,8 @@ export const DesignPromptInput: React.FC<DesignPromptInputProps> = ({
     ];
 
     return (
-        <div className="space-y-3">
-            <label className="block text-sm font-medium text-white">
+        <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
+            <label className="block text-sm font-semibold text-gray-800">
                 Describe your dream jewelry design <span className="text-red-500">*</span>
             </label>
 
@@ -40,16 +40,17 @@ export const DesignPromptInput: React.FC<DesignPromptInputProps> = ({
                     placeholder={`Examples:\n${PROMPT_EXAMPLES.map(e => `- ${e}`).join('\n')}`}
                     className={`
             w-full px-4 py-3 rounded-xl border resize-none
-            bg-[#1a1f35] text-white placeholder-gray-500
+            bg-gray-50 text-gray-900 placeholder-gray-400
             ${errors.designPrompt
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                            : 'border-gray-700 hover:border-gray-600 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37] focus:ring-opacity-30'
+                            ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
+                            : 'border-gray-300 hover:border-gray-400 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20'
                         }
           `}
+                    style={{ fontFamily: "'Market Sans', sans-serif" }}
                 />
 
                 {/* Character counter */}
-                <div className="absolute bottom-3 right-3 text-xs text-gray-500">
+                <div className="absolute bottom-3 right-3 text-xs text-gray-400">
                     {characterCount}/{maxChars}
                 </div>
             </div>
@@ -62,7 +63,8 @@ export const DesignPromptInput: React.FC<DesignPromptInputProps> = ({
             <button
                 type="button"
                 onClick={() => setShowTips(!showTips)}
-                className="flex items-center text-sm text-[#D4AF37] hover:text-[#e5c349] font-medium"
+                className="flex items-center text-sm text-[#B8860B] hover:text-[#D4AF37] font-semibold"
+                style={{ fontFamily: "'Market Sans', sans-serif" }}
             >
                 <Lightbulb className="w-4 h-4 mr-1" />
                 Design Tips
@@ -75,10 +77,10 @@ export const DesignPromptInput: React.FC<DesignPromptInputProps> = ({
 
             {/* Tips Panel */}
             {showTips && (
-                <div className="p-4 rounded-xl border border-gray-700 bg-[#1a1f35]">
+                <div className="p-4 rounded-xl border border-gray-200 bg-gray-50">
                     <ul className="space-y-2">
                         {tips.map((tip, index) => (
-                            <li key={index} className="flex items-start text-sm text-gray-400">
+                            <li key={index} className="flex items-start text-sm text-gray-600">
                                 <span className="text-[#D4AF37] mr-2">•</span>
                                 {tip}
                             </li>

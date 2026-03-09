@@ -34,11 +34,37 @@ const ConciergeContactPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Message sent successfully!');
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const response = await fetch('http://localhost:5001/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        inquiryType: formData.inquiryType,
+        message: formData.message,
+        subscribe: formData.subscribe,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert('Message sent successfully! We will get back to you within 24 hours.');
+      setFormData({
+        firstName: '', lastName: '', email: '',
+        inquiryType: 'General Inquiry', message: '', subscribe: false,
+      });
+    } else {
+      alert(`Error: ${data.error}`);
+    }
+  } catch (error) {
+    alert('Network error. Please check your connection and try again.');
+  }
+};
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);

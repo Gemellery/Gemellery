@@ -1,25 +1,74 @@
+// MUST be first - load env vars before any other module initializes
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes";
 import countryRoutes from "./routes/country.routes";
 import jewelryDesignRoutes from "./routes/jewelry-design.routes";
 import path from "path";
 import sellerRoutes from "./routes/seller.routes";
 import gemRoutes from "./routes/gem.routes";
+import cartRoutes from "./routes/cart.routes";
+import orderRoutes from "./routes/order.routes";
+import shippingRoutes from "./routes/shipping.routes";
+import buyerRoutes from "./routes/buyer.routes";
+import superAdminRoutes from "./routes/superAdmin.routes";
+import adminSellerRoutes from "./routes/adminSeller.routes";
+import adminGemRoutes from "./routes/adminGem.routes";
+import adminUserRoutes from "./routes/adminUser.routes";
+import adminReviewRoutes from "./routes/adminReview.routes";
+import adminOrderRoutes from "./routes/adminOrder.routes";
+import adminBlogRoutes from "./routes/adminBlog.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
+import blogRoutes from "./routes/blogRoutes";
+import contactRoutes from './routes/contactRoutes';
 
-dotenv.config();
+import adminDashboardRoutes from "./routes/adminDashboard.routes";
+import adminRoutes from "./routes/admin.routes";
+import sellerShipmentRoutes from "./routes/sellerShipment.routes";
+import reportRoutes from "./routes/report.routes";
+
+import systemSettingsRoutes from "./routes/systemSettings.routes";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 app.use("/api/auth", authRoutes);
 app.use("/api/countries", countryRoutes);
 app.use("/api/jewelry-design", jewelryDesignRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/shipping", shippingRoutes);
+app.use("/api/buyer", buyerRoutes);
+app.use("/api/super-admin", superAdminRoutes);
+app.use("/api/admin", adminSellerRoutes);
+app.use("/api/admin", adminGemRoutes);
+app.use("/api/admin", adminUserRoutes);
+app.use("/api/admin", adminReviewRoutes);
+app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/admin/blogs", adminBlogRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use('/api/contact', contactRoutes);
+
+app.use("/api/seller", sellerShipmentRoutes);
+app.use("/api/admin", adminDashboardRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/admin/reports", reportRoutes);
+
+app.use("/api/system-settings", systemSettingsRoutes);
 
 const PORT = 5001;
 app.listen(PORT, () => {
