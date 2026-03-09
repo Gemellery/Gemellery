@@ -42,6 +42,7 @@ import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import AdminReports from "./pages/Admin/ReportsPage";
 import NotFound from "./pages/NotFound";
+import ServerError from "./pages/ServerError";
 
 function App() {
   return (
