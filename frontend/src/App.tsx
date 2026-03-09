@@ -43,6 +43,7 @@ import BlogDetail from "./pages/Blog/BlogDetail";
 import AdminReports from "./pages/Admin/ReportsPage";
 import NotFound from "./pages/NotFound";
 import ServerError from "./pages/ServerError";
+import AccessDenied from "./pages/AccessDenied";
 
 function App() {
   return (
