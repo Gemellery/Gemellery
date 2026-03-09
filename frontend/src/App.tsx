@@ -44,6 +44,7 @@ import AdminReports from "./pages/Admin/ReportsPage";
 import NotFound from "./pages/NotFound";
 import ServerError from "./pages/ServerError";
 import AccessDenied from "./pages/AccessDenied";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 function App() {
   return (
