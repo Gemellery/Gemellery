@@ -392,9 +392,9 @@ function About() {
               <Link to="/marketplace" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors text-center">
                 Browse Collection
               </Link>
-              <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors">
+              <Link to="/contact" className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors text-center">
                 Contact Support
-              </button>
+              </Link>
             </div>
           </div>
         </section>
