@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, Gem, X, Package } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, X, Package, Home } from "lucide-react";
 
 interface SellerSidebarProps {
     sellerName: string;
@@ -40,6 +40,12 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
                     </div>
 
                     <nav className="mt-8 space-y-4">
+                            <button
+                                onClick={() => navigate("/")}
+                                className="flex items-center gap-3 text-left w-full text-red-600 font-semibold hover:text-red-700 transition-colors duration-200 ease-in-out">
+                                <Home className="w-4 h-4" />
+                                Home
+                            </button>
                         <button
                             onClick={() => navigate("/seller/dashboard")}
                             className="flex items-center gap-3 text-left w-full hover:underline">
