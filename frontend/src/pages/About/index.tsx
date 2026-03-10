@@ -228,10 +228,10 @@ function About() {
                 </div>
               </div>
 
-              <button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full inline-flex items-center gap-2 transition-colors">
+              <Link to="/jewelry-designer" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full inline-flex items-center gap-2 transition-colors text-center">
                 Try the Design Studio
                 <ArrowRight size={18} />
-              </button>
+              </Link>
             </div>
 
             <div className="relative">
