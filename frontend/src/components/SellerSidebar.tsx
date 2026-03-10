@@ -66,12 +66,6 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
                             <Container className="w-4 h-4" />
                             Shipments
                         </button>
-                        <button
-                            onClick={() => navigate("/jewelry-designer")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
-                            <Gem className="w-4 h-4" />
-                            AI Studio
-                        </button>
                     </nav>
                 </div>
 
