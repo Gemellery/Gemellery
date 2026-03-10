@@ -113,7 +113,7 @@ function About() {
                 For centuries, the gemstone industry has been shrouded in mystery. Buyers couldn't trace their stones, and miners didn't receive fair value.
               </p>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                GemeJewry exists to eliminate this opacity. We've built a digital ecosystem that connects certified Sri Lankan sellers directly with global buyers, ensuring every sapphire, ruby, and spinel comes with a digital passport of authenticity.
+                Gemellery exists to eliminate this opacity. We've built a digital ecosystem that connects certified Sri Lankan sellers directly with global buyers, ensuring every sapphire, ruby, and spinel comes with a digital passport of authenticity.
               </p>
 
               <div className="grid grid-cols-2 gap-6">
@@ -210,7 +210,7 @@ function About() {
                 <span className="italic text-teal-700">Perfected by AI.</span>
               </h2>
               <p className="text-gray-700 mb-8 leading-relaxed">
-                Don't just buy a gemstone. Create a legacy. Our proprietary AI design studio allows you to collaborate with your gems' craftsmen in GaleJs and Colombo to bring it to life, exactly as you wish (with realistic renderings).
+                Don't just buy a gemstone. Create a legacy. Our proprietary AI design studio allows you to collaborate with your gems' craftsmen in Galle and Colombo to bring it to life, exactly as you wish (with realistic renderings).
               </p>
 
               <div className="space-y-4 mb-8">
@@ -385,7 +385,7 @@ function About() {
             
             <h2 className="text-4xl font-bold mb-4">Ready to find your treasure?</h2>
             <p className="text-gray-600 mb-8">
-              Join thousands of collectors and creators who trust GemeJewry for their most precious acquisitions.
+              Join thousands of collectors and creators who trust Gemellery for their most precious acquisitions.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
