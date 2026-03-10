@@ -1,4 +1,5 @@
 import Navbar from '@/components/Navbar'
+import AdvancedFooter from '@/components/AdvancedFooter'
 import ProductGallery from '../../components/ProductGallery'
 import ProductInfo from '../../components/ProductInfo'
 import ProductActions from '../../components/ProductActions'
@@ -6,6 +7,11 @@ import ProductSpecifications from '../../components/ProductSpecifications'
 import ShippingInfo from '../../components/ShippingInfo'
 import GemPassport from '../../components/GemPassport'
 import ProductAIDesignStudio from '../../components/ProductAIDesignStudio'
+import ReviewsRatings from '../../components/ReviewsRatings'
+import Certification from '../../components/Certification'
+import RatingSummary from '../../components/RatingSummary'
+import SellerOtherListings from '../../components/SellerOtherListings'
+import { ChevronRight } from 'lucide-react'
 
 const ProductDetail = () => {
 
@@ -26,15 +32,13 @@ const ProductDetail = () => {
   }
 
   return (
-
-    <div className="min-h-screen bg-gray-100">
-        <Navbar />
+    <div className="min-h-screen bg-white">
+      <Navbar />
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-16 pt-8">
-        {/* Product Gallery and Info Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Left Column - Gallery */}
-          <div>
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-8 pb-16 pt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
+          {/* Gallery + AI Studio */}
+          <div className="space-y-6">
             <ProductGallery
               images={[
                 "../public/sample_gems/alexandrite_18.jpg",
@@ -44,10 +48,13 @@ const ProductDetail = () => {
               ]}
               productName="3.5 Carat Vivid Royal Blue Sapphire"
             />
+
+            {/* AI Design Studio */}
+            <ProductAIDesignStudio onTryAIDesign={handleTryAIDesign} />
           </div>
 
-          {/* Right Column - Info and Actions */}
-          <div className="space-y-6">
+          {/* Info, Actions, Shipping, Gem Passport */}
+          <div className="space-y-8 lg:pl-4">
             {/* Product Info */}
             <ProductInfo
               badge="NATURAL UNHEATED"
@@ -61,11 +68,24 @@ const ProductDetail = () => {
               seller={{
                 name: 'GemLanka Exports',
                 verified: true,
-                location: 'Anuradhapura, Sri Lanka',
+                location: 'Ratnapura, Sri Lanka',
                 memberSince: 2018
               }}
               shape="Cushion"
               dimensions="8.2 x 7.8 mm"
+            />
+
+            {/* Gem Passport */}
+            <GemPassport
+              data={{
+                tokenId: '#LK-88392-GEM',
+                provenance: 'Verified Source',
+                treatment: 'None (Unheated)',
+                origin: 'Ratnapura, Sri Lanka',
+                certificationBody: 'Gemological Institute',
+                certificationDate: '2024-01-15',
+                gemType: 'Natural Blue Sapphire'
+              }}
             />
 
             {/* Product Actions */}
@@ -73,67 +93,64 @@ const ProductDetail = () => {
               onAddToCart={handleAddToCart}
               onBookViewing={handleBookViewing}
               onFavorite={handleFavorite}
-              showQuantitySelector={true}
+              showQuantitySelector={false}
             />
 
             {/* Shipping Info */}
             <ShippingInfo />
+
           </div>
         </div>
 
-        {/* AI Design Studio Section */}
-        <div className="mb-12">
-          <ProductAIDesignStudio onTryAIDesign={handleTryAIDesign} />
+        {/* Divider */}
+        <div className="border-t border-gray-100 mb-12"></div>
+
+        {/* ===== Details + Certification ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-12">
+          {/* Specifications */}
+          <div className="lg:col-span-3 space-y-12">
+            <ProductSpecifications
+              title="Detailed Specifications"
+              specifications={[
+                { label: 'GEMSTONE TYPE', value: 'Natural Blue Sapphire (Corundum)' },
+                { label: 'CARAT WEIGHT', value: '3.52 Carats' },
+                { label: 'COLOR GRADE', value: 'Vivid Royal Blue (GIA Top Grade)' },
+                { label: 'CLARITY', value: 'VVS1 (Eye Clean)' },
+                { label: 'ORIGIN', value: 'Ratnapura, Sri Lanka 🇱🇰' },
+                { label: 'TREATMENTS', value: 'None (Unheated)' }
+              ]}
+            />
+          </div>
+
+          {/* Certification */}
+          <div className="lg:col-span-2 space-y-8">
+            <Certification />
+          </div>
         </div>
 
-        {/* Product Specifications */}
+        {/* ===== Seller Other Listings (full-width horizontal scroll) ===== */}
         <div className="mb-12">
-          <ProductSpecifications
-            title="Detailed Specifications"
-            specifications={[
-              {
-                label: 'GEMSTONE TYPE',
-                value: 'Natural Blue Sapphire (Corundum)'
-              },
-              {
-                label: 'CARAT WEIGHT',
-                value: '3.52 Carats'
-              },
-              {
-                label: 'COLOR GRADE',
-                value: 'Vivid Royal Blue (GIA Top Grade)'
-              },
-              {
-                label: 'CLARITY',
-                value: 'VVS1 (Eye Clean)'
-              },
-              {
-                label: 'ORIGIN',
-                value: 'Ratnapura, Sri Lanka'
-              },
-              {
-                label: 'TREATMENTS',
-                value: 'None (Unheated)'
-              }
-            ]}
+          <div className="border-t border-gray-100 mb-10" />
+          <SellerOtherListings
+            sellerName="GemLanka Exports"
+            sellerLocation="Ratnapura, Sri Lanka"
+            totalListings={48}
           />
         </div>
 
-        {/* Gem Passport */}
-        <div className="mb-12">
-          <GemPassport
-            data={{
-              tokenId: '#LK-88392-GEM',
-              provenance: 'Verified Source',
-              treatment: 'None (Unheated)',
-              origin: 'Ratnapura, Sri Lanka',
-              certificationBody: 'Gemological Institute',
-              certificationDate: '2024-01-15',
-              gemType: 'Natural Blue Sapphire'
-            }}
-          />
+        {/* ===== Reviews + Rating Summary ===== */}
+        <div className="border-t border-gray-100 mb-10" />
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+          <div className="lg:col-span-3 space-y-8">
+            <ReviewsRatings />
+          </div>
+          <div className="lg:col-span-2 space-y-8">
+            <RatingSummary />
+          </div>
         </div>
       </div>
+
+      <AdvancedFooter />
     </div>
   )
 }
