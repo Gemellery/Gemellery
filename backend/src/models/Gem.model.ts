@@ -62,6 +62,7 @@ export interface CreateGemParams {
   clarity?: string;
   color?: string;
   origin?: string;
+  mining_region?: string;
   price?: number;
   description?: string;
   ngja_certificate_no: string;
@@ -379,25 +380,32 @@ export const gemModel = {
 
   /** New gem creation */
   createGem: async (params: CreateGemParams): Promise<number> => {
+
     const conn = await pool.getConnection();
 
     try {
       await conn.beginTransaction();
 
-      // Check for duplicate certificate
-      const exists = await gemModel.certificateExists(params.ngja_certificate_no, conn);
+      const exists = await gemModel.certificateExists(
+        params.ngja_certificate_no,
+        conn
+      );
+
       if (exists) {
         await conn.rollback();
-        throw { code: 'DUPLICATE_CERTIFICATE', message: 'This NGJA certificate number is already registered.' };
+        throw {
+          code: "DUPLICATE_CERTIFICATE",
+          message: "This NGJA certificate number is already registered.",
+        };
       }
 
-      // Insert the gem
-      const [gemResult]: any = await conn.query(
+      const [result]: any = await conn.query(
         `INSERT INTO gem
-          (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
-           price, description, ngja_certificate_no, ngja_certificate_url,
-           updated_date, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
+      (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
+       mining_region, price, description,
+       ngja_certificate_no, ngja_certificate_url,
+       updated_date, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
         [
           params.seller_id,
           params.gem_name,
@@ -407,6 +415,7 @@ export const gemModel = {
           params.clarity || null,
           params.color || null,
           params.origin || null,
+          params.mining_region || null,
           params.price || null,
           params.description || null,
           params.ngja_certificate_no,
@@ -414,32 +423,35 @@ export const gemModel = {
         ]
       );
 
-      const gem_id = gemResult.insertId;
+      const gem_id = result.insertId;
 
-      // Insert images if any
       if (params.images && params.images.length > 0) {
-        const imageValues = params.images.map((filename: string) => [gem_id, filename]);
+        const values = params.images.map((img) => [gem_id, img]);
+
         await conn.query(
           `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
-          [imageValues]
+          [values]
         );
       }
 
       await conn.commit();
       return gem_id;
 
-    } catch (error: any) {
+    } catch (err: any) {
+
       await conn.rollback();
 
-      // Re-throw with proper error code for duplicate entry
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw { code: 'DUPLICATE_CERTIFICATE', message: 'This NGJA certificate number is already used for another gem.' };
+      if (err.code === "ER_DUP_ENTRY") {
+        throw {
+          code: "DUPLICATE_CERTIFICATE",
+          message: "This NGJA certificate number already exists.",
+        };
       }
 
-      throw error;
+      throw err;
 
     } finally {
       conn.release();
     }
-  },
+  }
 };
