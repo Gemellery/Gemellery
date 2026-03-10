@@ -45,9 +45,9 @@ function About() {
               <Link to="/marketplace" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors text-center">
                 Explore Marketplace
               </Link>
-              <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors">
+              <Link to="/blog" className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors text-center">
                 Watch Our Story
-              </button>
+              </Link>
             </div>
           </div>
         </section>
