@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGem, getGems, getGemById, getGemForEdit, updateGem } from "../controllers/gem.controller";
+import { createGem, getGems, getGemById, getGemForEdit, updateGem, getGemEnums } from "../controllers/gem.controller";
 import { upload } from "../middleware/upload.middleware";
 import { validateGem } from "../middleware/validateGem.middleware";
 import { authGuard, authorizeRole } from "../middleware/auth.middleware";
@@ -37,6 +37,8 @@ router.put(
     ]),
     updateGem
 );
+
+router.get("/enums", getGemEnums);
 
 // Get all gems with optional filters and pagination
 router.get("/", getGems);

@@ -8,7 +8,7 @@ import type { GemQueryParams } from "../models/Gem.model";
 // ============================================================
 export const createGem = async (req: Request, res: Response) => {
   try {
-    const seller_id = req.user.id;
+    const seller_id = (req as any).user.id;
 
     const {
       gem_name,
@@ -18,6 +18,7 @@ export const createGem = async (req: Request, res: Response) => {
       clarity,
       color,
       origin,
+      mining_region,
       price,
       description,
       ngja_certificate_no,
@@ -29,7 +30,6 @@ export const createGem = async (req: Request, res: Response) => {
     const images =
       (req.files as any)?.images?.map((f: any) => f.filename) || [];
 
-    // Call the model — one line!
     const gem_id = await gemModel.createGem({
       seller_id,
       gem_name,
@@ -39,6 +39,7 @@ export const createGem = async (req: Request, res: Response) => {
       clarity,
       color,
       origin,
+      mining_region,
       price,
       description,
       ngja_certificate_no,
@@ -54,12 +55,44 @@ export const createGem = async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error(err);
 
-    // Handle known error codes from the model
     if (err.code === "DUPLICATE_CERTIFICATE") {
       return res.status(409).json({ error: err.message });
     }
 
     return res.status(500).json({ error: "Failed to create gem" });
+  }
+};
+
+export const getGemEnums = async (req: Request, res: Response) => {
+  try {
+
+    const [rows]: any = await pool.query(`
+      SELECT 
+        COLUMN_NAME,
+        COLUMN_TYPE
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_NAME = 'gem'
+      AND COLUMN_NAME IN ('gem_type','cut','clarity','origin','mining_region')
+    `);
+
+    const enums: any = {};
+
+    rows.forEach((row: any) => {
+
+      const values = row.COLUMN_TYPE
+        .replace("enum(", "")
+        .replace(")", "")
+        .replace(/'/g, "")
+        .split(",");
+
+      enums[row.COLUMN_NAME] = values;
+    });
+
+    res.json(enums);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to load enum values" });
   }
 };
 
@@ -71,33 +104,33 @@ export const createGem = async (req: Request, res: Response) => {
  * Get a gem by ID for the owning seller (includes all fields for editing).
  */
 export const getGemForEdit = async (req: Request, res: Response) => {
-    try {
-        const gemId = req.params.id;
-        const sellerId = req.user!.id;
+  try {
+    const gemId = req.params.id;
+    const sellerId = req.user!.id;
 
-        const [rows]: any = await pool.query(
-            `SELECT g.gem_id, g.gem_name, g.gem_type, g.carat, g.cut, g.clarity,
+    const [rows]: any = await pool.query(
+      `SELECT g.gem_id, g.gem_name, g.gem_type, g.carat, g.cut, g.clarity,
                     g.color, g.origin, g.price, g.description,
                     g.ngja_certificate_no, g.ngja_certificate_url, g.status
              FROM gem g
              WHERE g.gem_id = ? AND g.seller_id = ?`,
-            [gemId, sellerId]
-        );
+      [gemId, sellerId]
+    );
 
-        if (rows.length === 0) {
-            return res.status(404).json({ error: "Gem not found or you don't own it" });
-        }
-
-        const [images]: any = await pool.query(
-            `SELECT image_id, image_url FROM gem_images WHERE gem_id = ?`,
-            [gemId]
-        );
-
-        return res.json({ ...rows[0], images });
-    } catch (err) {
-        console.error("Error fetching gem for edit:", err);
-        return res.status(500).json({ error: "Failed to fetch gem" });
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Gem not found or you don't own it" });
     }
+
+    const [images]: any = await pool.query(
+      `SELECT image_id, image_url FROM gem_images WHERE gem_id = ?`,
+      [gemId]
+    );
+
+    return res.json({ ...rows[0], images });
+  } catch (err) {
+    console.error("Error fetching gem for edit:", err);
+    return res.status(500).json({ error: "Failed to fetch gem" });
+  }
 };
 
 // ============================================================
@@ -108,95 +141,95 @@ export const getGemForEdit = async (req: Request, res: Response) => {
  * Update gemstone details (seller only, must own the gem).
  */
 export const updateGem = async (req: Request, res: Response) => {
-    const conn = await pool.getConnection();
+  const conn = await pool.getConnection();
 
-    try {
-        await conn.beginTransaction();
+  try {
+    await conn.beginTransaction();
 
-        const gemId = req.params.id;
-        const sellerId = req.user!.id;
+    const gemId = req.params.id;
+    const sellerId = req.user!.id;
 
-        // Verify ownership
-        const [existing]: any = await conn.query(
-            "SELECT gem_id FROM gem WHERE gem_id = ? AND seller_id = ?",
-            [gemId, sellerId]
-        );
+    // Verify ownership
+    const [existing]: any = await conn.query(
+      "SELECT gem_id FROM gem WHERE gem_id = ? AND seller_id = ?",
+      [gemId, sellerId]
+    );
 
-        if (existing.length === 0) {
-            await conn.rollback();
-            return res.status(404).json({ error: "Gem not found or you don't own it" });
-        }
+    if (existing.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ error: "Gem not found or you don't own it" });
+    }
 
-        const {
-            gem_name,
-            gem_type,
-            carat,
-            cut,
-            clarity,
-            color,
-            origin,
-            price,
-            description,
-        } = req.body;
+    const {
+      gem_name,
+      gem_type,
+      carat,
+      cut,
+      clarity,
+      color,
+      origin,
+      price,
+      description,
+    } = req.body;
 
-        // Update gem details
-        await conn.query(
-            `UPDATE gem SET
+    // Update gem details
+    await conn.query(
+      `UPDATE gem SET
                 gem_name = ?, gem_type = ?, carat = ?, cut = ?, clarity = ?,
                 color = ?, origin = ?, price = ?, description = ?,
                 updated_date = CURDATE()
              WHERE gem_id = ? AND seller_id = ?`,
-            [
-                gem_name,
-                gem_type || null,
-                carat || null,
-                cut || null,
-                clarity || null,
-                color || null,
-                origin || null,
-                price || null,
-                description || null,
-                gemId,
-                sellerId,
-            ]
-        );
+      [
+        gem_name,
+        gem_type || null,
+        carat || null,
+        cut || null,
+        clarity || null,
+        color || null,
+        origin || null,
+        price || null,
+        description || null,
+        gemId,
+        sellerId,
+      ]
+    );
 
-        // Handle new images if uploaded
-        const newImages = (req.files as any)?.images?.map((f: any) => f.filename) || [];
+    // Handle new images if uploaded
+    const newImages = (req.files as any)?.images?.map((f: any) => f.filename) || [];
 
-        if (newImages.length > 0) {
-            const imageValues = newImages.map((filename: string) => [gemId, filename]);
-            await conn.query(
-                `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
-                [imageValues]
-            );
-        }
-
-        // Handle deleted images
-        const deletedImageIds = req.body.deleted_image_ids;
-        if (deletedImageIds) {
-            const ids = typeof deletedImageIds === "string"
-                ? JSON.parse(deletedImageIds)
-                : deletedImageIds;
-
-            if (Array.isArray(ids) && ids.length > 0) {
-                await conn.query(
-                    `DELETE FROM gem_images WHERE image_id IN (?) AND gem_id = ?`,
-                    [ids, gemId]
-                );
-            }
-        }
-
-        await conn.commit();
-
-        return res.json({ message: "Gem updated successfully" });
-    } catch (err) {
-        await conn.rollback();
-        console.error("Error updating gem:", err);
-        return res.status(500).json({ error: "Failed to update gem" });
-    } finally {
-        conn.release();
+    if (newImages.length > 0) {
+      const imageValues = newImages.map((filename: string) => [gemId, filename]);
+      await conn.query(
+        `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
+        [imageValues]
+      );
     }
+
+    // Handle deleted images
+    const deletedImageIds = req.body.deleted_image_ids;
+    if (deletedImageIds) {
+      const ids = typeof deletedImageIds === "string"
+        ? JSON.parse(deletedImageIds)
+        : deletedImageIds;
+
+      if (Array.isArray(ids) && ids.length > 0) {
+        await conn.query(
+          `DELETE FROM gem_images WHERE image_id IN (?) AND gem_id = ?`,
+          [ids, gemId]
+        );
+      }
+    }
+
+    await conn.commit();
+
+    return res.json({ message: "Gem updated successfully" });
+  } catch (err) {
+    await conn.rollback();
+    console.error("Error updating gem:", err);
+    return res.status(500).json({ error: "Failed to update gem" });
+  } finally {
+    conn.release();
+  }
 };
 
 // ============================================================

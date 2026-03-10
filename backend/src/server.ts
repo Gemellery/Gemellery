@@ -46,6 +46,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/countries", countryRoutes);
 app.use("/api/jewelry-design", jewelryDesignRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/seller", sellerShipmentRoutes);
 app.use("/api/seller", sellerRoutes);
 app.use("/api/gems", gemRoutes);
 app.use("/api/cart", cartRoutes);
