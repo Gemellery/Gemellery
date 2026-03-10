@@ -389,9 +389,9 @@ function About() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+              <Link to="/marketplace" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors text-center">
                 Browse Collection
-              </button>
+              </Link>
               <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors">
                 Contact Support
               </button>
