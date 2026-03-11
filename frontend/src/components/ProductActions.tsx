@@ -1,32 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ShoppingCart, Calendar, Heart } from 'lucide-react'
+import { addToCart } from '@/lib/cart/api'
+import { addToWishlist, removeFromWishlist, checkWishlist } from '@/lib/wishlist/api'
 
 interface ProductActionsProps {
-  onAddToCart?: (quantity: number) => void
+  gemId?: number
   onBookViewing?: () => void
-  onFavorite?: (isFavorited: boolean) => void
   quantity?: number
   showQuantitySelector?: boolean
 }
 
 const ProductActions: React.FC<ProductActionsProps> = ({
-  onAddToCart,
+  gemId,
   onBookViewing,
-  onFavorite,
-  quantity: initialQuantity = 1,
-  showQuantitySelector = true
+  quantity: initialQuantity = 1
 }) => {
   const [quantity] = useState(initialQuantity)
   const [isFavorited, setIsFavorited] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [isBooking, setIsBooking] = useState(false)
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false)
+
+  // Check initial wishlist status
+  useEffect(() => {
+    const fetchWishlistStatus = async () => {
+      if (gemId) {
+        try {
+          const status = await checkWishlist(gemId)
+          setIsFavorited(status)
+        } catch (error) {
+          console.error("Failed to check wishlist status", error)
+        }
+      }
+    }
+    fetchWishlistStatus()
+  }, [gemId])
 
   const handleAddToCart = async () => {
+    if (!gemId) return
     setIsAddingToCart(true)
     try {
-      if (onAddToCart) {
-        await onAddToCart(quantity)
-      }
+      await addToCart(gemId, quantity)
+      alert("Item added to cart successfully!")
+    } catch (error) {
+      console.error(error)
+      alert(error instanceof Error ? error.message : "Failed to add to cart")
     } finally {
       setIsAddingToCart(false)
     }
@@ -43,11 +61,22 @@ const ProductActions: React.FC<ProductActionsProps> = ({
     }
   }
 
-  const handleFavorite = () => {
-    const newFavoritedState = !isFavorited
-    setIsFavorited(newFavoritedState)
-    if (onFavorite) {
-      onFavorite(newFavoritedState)
+  const handleFavorite = async () => {
+    if (!gemId || isWishlistLoading) return
+    setIsWishlistLoading(true)
+    try {
+      if (isFavorited) {
+        await removeFromWishlist(gemId)
+        setIsFavorited(false)
+      } else {
+        await addToWishlist(gemId)
+        setIsFavorited(true)
+      }
+    } catch (error) {
+      console.error(error)
+      alert(error instanceof Error ? error.message : "Failed to update wishlist")
+    } finally {
+      setIsWishlistLoading(false)
     }
   }
 
@@ -56,7 +85,7 @@ const ProductActions: React.FC<ProductActionsProps> = ({
       {/* Add to Cart Button */}
       <button
         onClick={handleAddToCart}
-        disabled={isAddingToCart}
+        disabled={isAddingToCart || !gemId}
         className="w-full bg-[#1a3a2a] hover:bg-[#142e22] disabled:bg-[#1a3a2a]/70 text-white font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.99]"
       >
         <ShoppingCart size={17} />
@@ -76,7 +105,8 @@ const ProductActions: React.FC<ProductActionsProps> = ({
 
         <button
           onClick={handleFavorite}
-          className={`w-[52px] h-[52px] flex items-center justify-center rounded-xl transition-all duration-200 flex-shrink-0 active:scale-90 ${
+          disabled={isWishlistLoading || !gemId}
+          className={`w-[52px] h-[52px] flex items-center justify-center rounded-xl transition-all duration-200 flex-shrink-0 active:scale-90 disabled:opacity-50 ${
             isFavorited 
               ? 'bg-red-50 border-2 border-red-400' 
               : 'border-2 border-gray-200 hover:border-red-300 hover:bg-red-50/30'
