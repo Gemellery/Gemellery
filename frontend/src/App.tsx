@@ -113,11 +113,13 @@ function AppRoutes() {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/jewelry-designer" element={<JewelryDesigner />} />
-      <Route path="/jewelry_designer" element={<JewelryDesigner />} />
-      <Route path="/jewelry-designer/results" element={<JewelryResults />} />
-      <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
-      <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+      <Route element={<DesignHistoryLayout />}>
+        <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+        <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+        <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+        <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+        <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+      </Route>
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
 
@@ -308,11 +310,13 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/jewelry-designer" element={<JewelryDesigner />} />
-          <Route path="/jewelry_designer" element={<JewelryDesigner />} />
-          <Route path="/jewelry-designer/results" element={<JewelryResults />} />
-          <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
-          <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          <Route element={<DesignHistoryLayout />}>
+            <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+            <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+            <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+            <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+            <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          </Route>
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
 
