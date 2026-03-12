@@ -97,16 +97,11 @@ function SellerAllListings() {
                             <div className="relative">
                                 <div className="rounded-2xl p-2">
                                     <img
-                                        src={
-                                            gem.image_url
-                                                ? `http://localhost:5001/uploads/gem_images/${gem.image_url}`
-                                                : "/placeholder-gem.png"
-                                        }
+                                        src={gem.image_url || "/placeholder-gem.png"}
                                         alt={gem.gem_name}
                                         className="w-full h-48 object-contain rounded-xl"
                                         onError={(e) => {
-                                            (e.target as HTMLImageElement).src =
-                                                "/placeholder-gem.png";
+                                            (e.target as HTMLImageElement).src = "/placeholder-gem.png";
                                         }}
                                     />
                                 </div>

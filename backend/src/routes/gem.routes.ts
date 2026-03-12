@@ -33,7 +33,8 @@ router.put(
     authGuard,
     authorizeRole("seller"),
     upload.fields([
-        { name: "images", maxCount: 5 },
+        { name: "certificate", maxCount: 1 },
+        { name: "images", maxCount: 5 }
     ]),
     updateGem
 );
