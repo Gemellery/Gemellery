@@ -76,31 +76,31 @@ export default function AiChat() {
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:w-[400px]">
-          <div className="flex items-center justify-between bg-amber-500 p-4 text-white">
+        <div className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white/40 backdrop-blur-2xl border border-white/30 shadow-2xl sm:w-[400px]">
+          <div className="flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/80 to-[#F5D061]/80 backdrop-blur border-b border-white/20 p-4 text-[#0A1128]">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
               <h3 className="font-semibold">Gemellery AI Guide</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="rounded-full p-1 hover:bg-amber-600 transition-colors"
+              className="rounded-full p-1 hover:bg-black/10 transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-transparent">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2 ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-2 shadow-sm backdrop-blur-md ${
                     msg.role === "user"
-                      ? "bg-amber-500 text-white rounded-br-none"
-                      : "bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-none"
+                      ? "bg-gradient-to-r from-[#D4AF37]/90 to-[#F5D061]/90 text-[#0A1128] rounded-br-none border border-white/30"
+                      : "bg-white/60 text-gray-800 border border-white/50 rounded-bl-none"
                   }`}
                 >
                   <p className="text-sm break-words whitespace-pre-wrap leading-relaxed">
@@ -111,7 +111,7 @@ export default function AiChat() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="rounded-2xl bg-white px-4 py-3 shadow-sm border border-gray-100 rounded-bl-none">
+                <div className="rounded-2xl bg-white/60 backdrop-blur-md px-4 py-3 shadow-sm border border-white/50 rounded-bl-none">
                   <Loader2 className="h-4 w-4 animate-spin text-amber-500" />
                 </div>
               </div>
@@ -119,8 +119,8 @@ export default function AiChat() {
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t bg-white p-4">
-            <div className="flex items-end gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 focus-within:border-amber-500 focus-within:ring-1 focus-within:ring-amber-500">
+          <div className="border-t border-white/30 bg-white/20 p-4 backdrop-blur-md">
+            <div className="flex items-end gap-2 rounded-xl border border-white/40 bg-white/30 p-1 focus-within:border-[#D4AF37] transition-all duration-300">
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
