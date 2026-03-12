@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, Gem, X, Package } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, ChartColumn, Container, X, Package, Home } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface SellerSidebarProps {
     sellerName: string;
@@ -9,6 +10,7 @@ interface SellerSidebarProps {
 
 function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -40,44 +42,49 @@ function SellerSidebar({ sellerName, isOpen, onClose }: SellerSidebarProps) {
                     </div>
 
                     <nav className="mt-8 space-y-4">
+                            <button
+                                onClick={() => navigate("/")}
+                                className={`flex items-center gap-3 text-left w-full text-red-600 font-semibold hover:text-red-700 transition-colors duration-200 ease-in-out${location.pathname === '/' ? ' underline decoration-black decoration-2' : ''}`}
+                            >
+                                <Home className="w-4 h-4" />
+                                Home
+                            </button>
                         <button
                             onClick={() => navigate("/seller/dashboard")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
+                            className={`flex items-center gap-3 text-left w-full hover:underline${location.pathname === '/seller/dashboard' ? ' underline decoration-black decoration-2' : ''}`}
+                        >
                             <LayoutDashboard className="w-4 h-4" />
                             Dashboard
                         </button>
 
                         <button
                             onClick={() => navigate("/seller/inventory")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
+                            className={`flex items-center gap-3 text-left w-full hover:underline${location.pathname === '/seller/inventory' ? ' underline decoration-black decoration-2' : ''}`}
+                        >
                             <Package className="w-4 h-4" />
                             Inventory
                         </button>
 
                         <button
                             onClick={() => navigate("/seller/analytics")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
+                            className={`flex items-center gap-3 text-left w-full hover:underline${location.pathname === '/seller/analytics' ? ' underline decoration-black decoration-2' : ''}`}
+                        >
                             <ChartColumn className="w-4 h-4" />
                             Analytics
                         </button>
                         <button
                             onClick={() => navigate("/seller/shipments")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
+                            className={`flex items-center gap-3 text-left w-full hover:underline${location.pathname === '/seller/shipments' ? ' underline decoration-black decoration-2' : ''}`}
+                        >
                             <Container className="w-4 h-4" />
                             Shipments
-                        </button>
-                        <button
-                            onClick={() => navigate("/jewelry-designer")}
-                            className="flex items-center gap-3 text-left w-full hover:underline">
-                            <Gem className="w-4 h-4" />
-                            AI Studio
                         </button>
                     </nav>
                 </div>
 
                 <div className="p-6 border-t space-y-3">
                     <button
-                        onClick={() => navigate("/seller/SellerSettings")}
+                        onClick={() => navigate("/seller/settings")}
                         className="flex items-center gap-3 w-full text-left hover:underline">
                         <Settings className="w-4 h-4" />
                         Settings

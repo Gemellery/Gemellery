@@ -23,6 +23,7 @@ type StatusFilter = "active" | "inactive" | "frozen" | "all";
 
 
 function ManageAdmins() {
+
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [countries, setCountries] = useState<Country[]>([]);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("active");
@@ -31,6 +32,8 @@ function ManageAdmins() {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
+
+    const [maintenance, setMaintenance] = useState(false);
 
     const [form, setForm] = useState({
         email: "",
@@ -43,14 +46,14 @@ function ManageAdmins() {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    /* ================= LOAD DATA ================= */
-
+    // Data loading
     useEffect(() => {
         loadAdmins();
     }, [statusFilter]);
 
     useEffect(() => {
         loadCountries();
+        loadMaintenance();
     }, []);
 
     const loadAdmins = async () => {
@@ -59,7 +62,6 @@ function ManageAdmins() {
                 `http://localhost:5001/api/super-admin/admins?status=${statusFilter}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             const data = await res.json();
             setAdmins(data.success ? data.data : []);
         } catch {
@@ -77,7 +79,56 @@ function ManageAdmins() {
         }
     };
 
-    /* ================= CREATE / EDIT ================= */
+    // load maintenace
+    const loadMaintenance = async () => {
+        try {
+            const res = await fetch("http://localhost:5001/api/system-settings");
+            const data = await res.json();
+            if (data.success) {
+                setMaintenance(data.data.maintenance_mode === 1);
+            }
+        } catch {
+            toast.error("Failed to load maintenance mode");
+        }
+    };
+
+
+    //   toggle maintenace
+    const toggleMaintenance = async () => {
+        try {
+            const res = await fetch(
+                "http://localhost:5001/api/system-settings/maintenance",
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        maintenance_mode: maintenance ? 0 : 1
+                    })
+                }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.error(data.message || "Failed to update maintenance");
+                return;
+            }
+
+            setMaintenance(!maintenance);
+
+            toast.success(
+                maintenance
+                    ? "Maintenance Disabled"
+                    : "Maintenance Enabled"
+            );
+
+        } catch {
+            toast.error("Server error");
+        }
+    };
 
     const openCreate = () => {
         setEditingAdmin(null);
@@ -104,6 +155,7 @@ function ManageAdmins() {
     };
 
     const saveAdmin = async () => {
+
         if (!form.email || !form.full_name || !form.country_id) {
             toast.error("Please complete required fields");
             return;
@@ -135,13 +187,13 @@ function ManageAdmins() {
             toast.success(editingAdmin ? "Admin updated" : "Admin created");
             setModalOpen(false);
             loadAdmins();
+
         } catch {
             toast.error("Something went wrong");
         }
     };
 
-    /* ================= STATUS UPDATE ================= */
-
+    //   Update status
     const executeStatusChange = async (
         admin: Admin,
         newStatus: "active" | "inactive" | "frozen"
@@ -168,18 +220,16 @@ function ManageAdmins() {
 
             toast.success("Status updated");
 
-            // Update UI instantly (no reload needed)
             setAdmins((prev) =>
                 prev.map((a) =>
                     a.user_id === admin.user_id ? { ...a, status: newStatus } : a
                 )
             );
+
         } catch {
             toast.error("Server error");
         }
     };
-
-    /* ================= UI ================= */
 
     const filtered = admins.filter(
         (a) =>
@@ -196,7 +246,9 @@ function ManageAdmins() {
     };
 
     return (
+
         <div className="flex h-screen bg-gray-100">
+
             <AdminSidebar
                 adminName={user.full_name || user.email}
                 role={user.role}
@@ -206,33 +258,95 @@ function ManageAdmins() {
 
             <div className="flex-1 overflow-y-auto p-6 md:ml-64">
 
+
                 {/* Mobile Header */}
+
                 <div className="flex items-center gap-4 mb-6 md:hidden">
                     <button onClick={() => setIsOpen(true)}>
                         <Menu className="w-6 h-6" />
                     </button>
+
                     <h1 className="text-xl font-semibold">
                         Admin Management
                     </h1>
                 </div>
-                
+
 
                 {/* Desktop Header */}
+
                 <div className="hidden md:flex justify-between items-center mb-6">
+
                     <h1 className="text-2xl font-semibold">
-                        Admin Management
+                        Admin Management & System Control
                     </h1>
 
-                    <button
-                        type="button"
-                        onClick={openCreate}
-                        className="bg-teal-600 text-white px-5 py-2 rounded shadow hover:bg-teal-700 transition"
-                    >
-                        + Create Admin
-                    </button>
+                    <div className="flex gap-3">
+
+                        <button
+                            type="button"
+                            onClick={openCreate}
+                            className="bg-teal-600 text-white px-5 py-2 rounded shadow hover:bg-teal-700 transition"
+                        >
+                            + Create Admin
+                        </button>
+
+                    </div>
+
                 </div>
 
-                {/* FILTER + SEARCH */}
+                {/* Maintenance */}
+                <div className="bg-white border rounded-xl shadow-sm p-6 mb-6">
+
+                    <div className="flex items-center justify-between">
+
+                        <div>
+
+                            <h2 className="text-lg font-semibold text-gray-800">
+                                System Maintenance Mode
+                            </h2>
+
+                            <p className="text-sm text-gray-500 mt-1 max-w-lg">
+                                Enable maintenance mode to temporarily restrict platform access for buyers
+                                and sellers while performing updates, fixes, or infrastructure changes.
+                                Administrators will still be able to access the dashboard.
+                            </p>
+
+                        </div>
+
+                        <button
+                            onClick={toggleMaintenance}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium transition shadow-sm
+                                    ${maintenance
+                                    ? "bg-red-600 text-white hover:bg-red-700"
+                                    : "bg-emerald-600 text-white hover:bg-emerald-700"
+                                }`}>
+
+                            {maintenance ? "Disable Maintenance" : "Enable Maintenance"}
+
+                        </button>
+
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2 text-sm">
+
+                        <span className="font-medium text-gray-600">
+                            Current Status:
+                        </span>
+
+                        <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold
+                                    ${maintenance
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-green-100 text-green-700"
+                                }`}
+                        >
+                            {maintenance ? "Maintenance Active" : "System Online"}
+                        </span>
+
+                    </div>
+
+                </div>
+
                 <div className="flex justify-between mb-6">
                     <input
                         placeholder="Search..."
@@ -255,7 +369,6 @@ function ManageAdmins() {
                     </select>
                 </div>
 
-                {/* TABLE */}
                 <div className="bg-white rounded-xl shadow border overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50">
@@ -353,7 +466,6 @@ function ManageAdmins() {
                     </table>
                 </div>
 
-                {/* CREATE / EDIT MODAL */}
                 {modalOpen && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
                         <div className="bg-white w-96 p-6 rounded-xl shadow-2xl">

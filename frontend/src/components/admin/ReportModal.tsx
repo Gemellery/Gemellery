@@ -13,37 +13,60 @@ function ReportModal({ reportType, onClose }: Props) {
     const [endDate, setEndDate] = useState("");
 
     const [loading, setLoading] = useState(false);
-
-    const [summary, setSummary] = useState<{
-        totalOrders: number;
-        totalSales: number;
-    } | null>(null);
-
+    const [summary, setSummary] = useState<any>(null);
     const [rows, setRows] = useState<any[]>([]);
+
+    const BASE_URL = "http://localhost:5001/api/admin/reports";
+
+    const ENDPOINTS: Record<ReportType, string> = {
+        sales: "sales",
+        seller_performance: "seller-performance",
+        user_activity: "user-activity",
+        order_status: "order-status",
+        seller_ratings: "seller-ratings",
+    };
 
     const generateReport = async () => {
 
-        if (!startDate || !endDate) {
-            alert("Please select a date range");
-            return;
-        }
-
         try {
+
+            if (reportType === "sales" && (!startDate || !endDate)) {
+                alert("Please select a date range");
+                return;
+            }
 
             setLoading(true);
 
-            const res = await fetch(
-                `http://localhost:5001/api/admin/reports/sales?startDate=${startDate}&endDate=${endDate}`
-            );
+            let url = `${BASE_URL}/${ENDPOINTS[reportType]}`;
 
+            if (reportType === "sales") {
+                url += `?startDate=${startDate}&endDate=${endDate}`;
+            }
+
+            const res = await fetch(url);
             const data = await res.json();
 
-            setSummary({
-                totalOrders: data.totalOrders,
-                totalSales: data.totalSales
-            });
+            /* SALES REPORT */
 
-            setRows(data.sales);
+            if (reportType === "sales") {
+                setSummary({
+                    totalOrders: data.totalOrders,
+                    totalSales: data.totalSales,
+                });
+
+                setRows(data.sales || []);
+            }
+
+            /* OTHER REPORTS */
+
+            else {
+                setSummary(null);
+
+                if (data.sellers) setRows(data.sellers);
+                else if (data.users) setRows(data.users);
+                else if (data.orders) setRows(data.orders);
+                else setRows([]);
+            }
 
         } catch (err) {
 
@@ -60,22 +83,94 @@ function ReportModal({ reportType, onClose }: Props) {
 
     const exportCSV = () => {
 
-        window.open(
-            `http://localhost:5001/api/admin/reports/sales/csv?startDate=${startDate}&endDate=${endDate}`
-        );
+        let url = `${BASE_URL}/${ENDPOINTS[reportType]}/csv`;
+
+        if (reportType === "sales") {
+            url += `?startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        window.open(url);
 
     };
 
-    const formatTitle = (type: string) => {
-        return type.replace("_", " ").toUpperCase();
+    const formatTitle = (type: string) =>
+        type.replace("_", " ").toUpperCase();
+
+    const renderTableHeader = () => {
+
+        if (reportType === "sales") {
+            return (
+                <tr>
+                    <th className="p-3 text-left">Order</th>
+                    <th className="p-3 text-left">Date</th>
+                    <th className="p-3 text-left">Seller</th>
+                    <th className="p-3 text-left">Gem</th>
+                    <th className="p-3 text-left">Qty</th>
+                    <th className="p-3 text-left">Price</th>
+                    <th className="p-3 text-left">Total</th>
+                </tr>
+            );
+        }
+
+        return (
+            <tr>
+                {Object.keys(rows[0] || {}).map((key) => (
+                    <th key={key} className="p-3 text-left capitalize">
+                        {key.replace("_", " ")}
+                    </th>
+                ))}
+            </tr>
+        );
+    };
+
+    const renderTableRows = () => {
+
+        if (reportType === "sales") {
+            return rows.map((row, index) => (
+                <tr key={index} className="border-t">
+
+                    <td className="p-3">{row.order_id}</td>
+
+                    <td className="p-3">
+                        {new Date(row.order_date).toLocaleDateString()}
+                    </td>
+
+                    <td className="p-3">{row.seller || "N/A"}</td>
+
+                    <td className="p-3">{row.gem_name || "N/A"}</td>
+
+                    <td className="p-3">{row.quantity ?? "-"}</td>
+
+                    <td className="p-3">
+                        {row.price ? `$${row.price}` : "-"}
+                    </td>
+
+                    <td className="p-3 font-medium">${row.total}</td>
+
+                </tr>
+            ));
+        }
+
+        return rows.map((row, i) => (
+            <tr key={i} className="border-t">
+                {Object.values(row).map((val: any, j) => (
+                    <td key={j} className="p-3">
+                        {val ?? "-"}
+                    </td>
+                ))}
+            </tr>
+        ));
     };
 
     return (
-
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
             <div className="bg-white w-full max-w-5xl rounded-xl shadow-lg max-h-[85vh] flex flex-col">
 
+                {/* Header */}
+
                 <div className="flex justify-between items-center p-5 border-b">
+
                     <h2 className="text-lg font-semibold">
                         {formatTitle(reportType)} REPORT
                     </h2>
@@ -88,7 +183,7 @@ function ReportModal({ reportType, onClose }: Props) {
 
                 <div className="p-6 space-y-4 overflow-y-auto">
 
-                    {/* Date filter */}
+                    {/* Date Filter only for sales */}
 
                     <div className="grid grid-cols-2 gap-4">
 
@@ -128,7 +223,8 @@ function ReportModal({ reportType, onClose }: Props) {
 
                     <button
                         onClick={generateReport}
-                        className="w-full bg-black text-white py-2 rounded-lg">
+                        className="w-full bg-black text-white py-2 rounded-lg"
+                    >
                         Generate Report
                     </button>
 
@@ -138,10 +234,9 @@ function ReportModal({ reportType, onClose }: Props) {
                         </div>
                     )}
 
-                    {/* Summary */}
+                    {/* Sales Summary */}
 
                     {summary && (
-
                         <div className="grid grid-cols-2 gap-4 mt-6">
 
                             <div className="border rounded-lg p-4">
@@ -163,12 +258,11 @@ function ReportModal({ reportType, onClose }: Props) {
                             </div>
 
                         </div>
-
                     )}
 
-                    {/* Export CSV */}
+                    {/* CSV Export */}
 
-                    {summary && (
+                    {rows.length > 0 && (
 
                         <div className="flex gap-3 mt-4">
 
@@ -189,65 +283,25 @@ function ReportModal({ reportType, onClose }: Props) {
 
                         <div className="mt-6 overflow-x-auto">
 
-                            <h3 className="font-semibold mb-3">
-                                Sales Details
-                            </h3>
-
                             <table className="w-full text-sm border rounded-lg">
+
                                 <thead className="bg-gray-50 sticky top-0">
-                                    <tr>
-                                        <th className="p-3 text-left">Order</th>
-                                        <th className="p-3 text-left">Date</th>
-                                        <th className="p-3 text-left">Seller</th>
-                                        <th className="p-3 text-left">Gem</th>
-                                        <th className="p-3 text-left">Qty</th>
-                                        <th className="p-3 text-left">Price</th>
-                                        <th className="p-3 text-left">Total</th>
-                                    </tr>
+                                    {renderTableHeader()}
                                 </thead>
+
                                 <tbody>
-                                    {rows.map((row, index) => (
-
-                                        <tr key={index} className="border-t">
-
-                                            <td className="p-3">
-                                                {row.order_id}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {new Date(row.order_date).toLocaleDateString()}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {row.seller || "N/A"}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {row.gem_name || "N/A"}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {row.quantity ?? "-"}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {row.price ? `$${row.price}` : "-"}
-                                            </td>
-
-                                            <td className="p-3 font-medium">
-                                                ${row.total}
-                                            </td>
-
-                                        </tr>
-                                    ))}
+                                    {renderTableRows()}
                                 </tbody>
+
                             </table>
+
                         </div>
+
                     )}
+
                 </div>
             </div>
         </div>
-
     );
 }
 

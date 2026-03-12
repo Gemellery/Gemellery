@@ -92,7 +92,7 @@ export const register = async (req: Request, res: Response) => {
             }
 
             const licenseUrl = req.file
-                ? `/uploads/seller_licenses/${req.file.filename}`
+                ? (req.file as any).location
                 : null;
 
             await conn.query(
