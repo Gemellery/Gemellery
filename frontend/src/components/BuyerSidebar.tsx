@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { LogOut, Settings, LayoutDashboard, Flower, Rows3, BadgeDollarSign, X, History, Home } from "lucide-react";
-import AiHelpCard from "./AiChat";
 
 interface BuyerSidebarProps {
   buyerName: string;
@@ -82,9 +81,6 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
             >
               <BadgeDollarSign className="w-4 h-4" /> Payment Methods
             </button>
-            <div>
-              <AiHelpCard />
-            </div>
 
           </nav>
         </div>
