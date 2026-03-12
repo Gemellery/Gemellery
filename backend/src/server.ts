@@ -64,8 +64,6 @@ app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use('/api/contact', contactRoutes);
-app.use(notFound);
-app.use(errorHandler);
 
 app.use("/api/seller", sellerShipmentRoutes);
 app.use("/api/admin", adminDashboardRoutes);
@@ -73,6 +71,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin/reports", reportRoutes);
 
 app.use("/api/system-settings", systemSettingsRoutes);
+
+// Error routes
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = 5001;
 app.listen(PORT, () => {
