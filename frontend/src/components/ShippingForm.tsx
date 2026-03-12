@@ -177,7 +177,7 @@ function Checkout() {
 
       setAddressSuccess("Shipping address saved successfully!");
       setSelectedAddressId(newAddressId);
-      
+
       // Reload addresses to reflect changes
       await loadAddresses();
       setShowAddressForm(false);
@@ -195,7 +195,7 @@ function Checkout() {
 
   const handleDeleteAddress = async (e: React.MouseEvent, addressId: number) => {
     e.stopPropagation(); // Prevent triggering handleSelectAddress
-    
+
     if (!confirm("Are you sure you want to delete this address?")) {
       return;
     }
@@ -207,7 +207,7 @@ function Checkout() {
     try {
       await shippingAPI.deleteShippingAddress(addressId);
       setAddressSuccess("Address deleted successfully!");
-      
+
       // If the deleted address was selected, clear selection
       if (selectedAddressId === addressId) {
         setSelectedAddressId(null);
@@ -228,13 +228,13 @@ function Checkout() {
   };
 
   return (
-    
+
     <div className="min-h-screen bg-[#fcfbf8] p-6">
       {/* NavBar */}
       <Navbar />
-      <main className="flex-1 overflow-auto py-6">  
-      
-      
+      <main className="flex-1 overflow-auto py-6">
+
+
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* ================= LEFT SIDE ================= */}
@@ -300,11 +300,10 @@ function Checkout() {
                         <div
                           key={address.address_id}
                           onClick={() => handleSelectAddress(address)}
-                          className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                            selectedAddressId === address.address_id
+                          className={`p-4 border rounded-lg cursor-pointer transition-all ${selectedAddressId === address.address_id
                               ? "border-emerald-600 bg-emerald-50"
                               : "border-gray-200 hover:border-gray-300"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start gap-3">
                             <input
@@ -547,8 +546,15 @@ function Checkout() {
                   <div className="space-y-3 max-h-64 overflow-y-auto">
                     {cartItems.map((item) => (
                       <div key={item.cart_item_id} className="flex gap-3">
-                        <div className="w-16 h-16 rounded-lg border bg-white flex items-center justify-center flex-shrink-0">
-                          <span className="text-2xl"></span>
+                        <div className="w-16 h-16 rounded-lg border overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.image || "/sample_gems/default.jpg"}
+                            alt={item.gem_name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/sample_gems/default.jpg";
+                            }}
+                          />
                         </div>
                         <div className="text-sm flex-1">
                           <p className="font-medium">{item.gem_name}</p>
@@ -605,7 +611,7 @@ function Checkout() {
                 </div>
               )}
 
-              <button 
+              <button
                 onClick={handleCheckout}
                 disabled={isCheckingOut || !selectedAddressId || cartItems.length === 0 || isCartLoading}
                 className="w-full bg-[#a33a42] hover:bg-[#8f3238] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-3 rounded-full text-sm font-medium flex items-center justify-center gap-2"
@@ -639,7 +645,7 @@ function Checkout() {
         </div>
       </main>
 
-      {/* Footer */}  
+      {/* Footer */}
       <AdvancedFooter />
     </div>
   );
