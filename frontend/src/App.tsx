@@ -49,6 +49,7 @@ import NotFound from "./pages/NotFound";
 import ServerError from "./pages/ServerError";
 import AccessDenied from "./pages/AccessDenied";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
+import AiChat from "./components/AiChat";
 
 
 function MaintenancePage() {
@@ -495,6 +496,7 @@ function App() {
 
         </Routes>
       </BrowserRouter>
+      <AiChat />
     </CartProvider>
   );
 }
