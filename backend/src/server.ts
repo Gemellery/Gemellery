@@ -23,6 +23,7 @@ import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import blogRoutes from "./routes/blogRoutes";
 import contactRoutes from './routes/contactRoutes';
+import { notFound, errorHandler } from "./middleware/errorMiddleware";
 
 import adminDashboardRoutes from "./routes/adminDashboard.routes";
 import adminRoutes from "./routes/admin.routes";
@@ -63,6 +64,8 @@ app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use('/api/contact', contactRoutes);
+app.use(notFound);
+app.use(errorHandler);
 
 app.use("/api/seller", sellerShipmentRoutes);
 app.use("/api/admin", adminDashboardRoutes);

@@ -45,6 +45,10 @@ import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import AdminReports from "./pages/Admin/ReportsPage";
 import Maintenance from "./pages/MaintenancePage";
+import NotFound from "./pages/NotFound";
+import ServerError from "./pages/ServerError";
+import AccessDenied from "./pages/AccessDenied";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 
 function MaintenancePage() {
@@ -122,6 +126,9 @@ function AppRoutes() {
       </Route>
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/500" element={<ServerError />} />
+          <Route path="/403" element={<AccessDenied />} />
+          <Route path="*" element={<NotFound />} />
 
       <Route path="/seller/:id" element={<SellerProfile />} />
 
