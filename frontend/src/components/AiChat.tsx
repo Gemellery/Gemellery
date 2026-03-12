@@ -126,13 +126,13 @@ export default function AiChat() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Ask me anything..."
-                className="max-h-32 min-h-[44px] w-full resize-none bg-transparent px-3 py-2 text-sm text-gray-800 outline-none"
+                className="max-h-24 min-h-[32px] w-full resize-none bg-transparent px-3 py-1 text-sm text-gray-800 outline-none"
                 rows={1}
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading}
-                className="mb-1 mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white transition-colors hover:bg-amber-600 disabled:opacity-50 disabled:hover:bg-amber-500"
+                className="mb-1 mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white transition-colors hover:bg-amber-600 disabled:opacity-50 disabled:hover:bg-amber-500"
               >
                 <Send className="h-4 w-4" />
               </button>
