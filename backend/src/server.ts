@@ -23,6 +23,7 @@ import adminBlogRoutes from "./routes/adminBlog.routes";
 import wishlistRoutes from "./routes/wishlist.routes";
 import blogRoutes from "./routes/blogRoutes";
 import contactRoutes from './routes/contactRoutes';
+import chatbotRoutes from './routes/chatbot.routes';
 import { notFound, errorHandler } from "./middleware/errorMiddleware";
 
 import adminDashboardRoutes from "./routes/adminDashboard.routes";
@@ -71,6 +72,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/admin/reports", reportRoutes);
 
 app.use("/api/system-settings", systemSettingsRoutes);
+app.use("/api/chat", chatbotRoutes);
 
 // Error routes
 app.use(notFound);
