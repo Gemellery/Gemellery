@@ -25,10 +25,10 @@ export const createGem = async (req: Request, res: Response) => {
     } = req.body;
 
     const certificate =
-      (req.files as any)?.certificate?.[0]?.filename || null;
+      (req.files as any)?.certificate?.[0]?.location || null;
 
     const images =
-      (req.files as any)?.images?.map((f: any) => f.filename) || [];
+      (req.files as any)?.images?.map((f: any) => f.location) || [];
 
     const gem_id = await gemModel.createGem({
       seller_id,
