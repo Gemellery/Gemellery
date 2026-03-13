@@ -141,8 +141,8 @@ function FAQ() {
         <section className="w-full max-w-3xl mx-auto px-6 pb-16 space-y-10">
           {filteredData.length === 0 ? (
             <div className="text-center py-20 text-gray-400 text-lg">
-              😕 No results found for "
-              <span className="text-[#D4AF37]">{searchQuery}</span>"
+              <span>No results found for </span>
+              <span className="text-[#D4AF37]">{searchQuery}</span>
             </div>
           ) : (
             filteredData.map((category) => (
@@ -209,10 +209,10 @@ function FAQ() {
                 Still have questions?
               </h3>
               <p className="text-[#0A1128]/70 text-sm">
-                Can't find the answer you're looking for? Our team is happy to help.
+                {"Can't find the answer you're looking for? Our team is happy to help."}
               </p>
             </div>
-            
+            <a
               href="/contact"
               className="px-8 py-3 bg-[#0A1128] text-white font-semibold rounded-full hover:bg-[#0A1128]/80 transition-all duration-300 whitespace-nowrap shadow-md"
             >
