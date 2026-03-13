@@ -328,6 +328,7 @@ function App() {
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
           <Route path="/500" element={<ServerError />} />
+          <Route path="/403" element={<AccessDenied />} />
 
           <Route path="/seller/:id" element={<SellerProfile />} />
 
