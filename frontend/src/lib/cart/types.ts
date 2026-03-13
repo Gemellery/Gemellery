@@ -18,6 +18,8 @@ export interface CartItem {
   certification?: string;
   ngja_certificate_url?: string;
   seller_name?: string;
+
+  image?: string; 
 }
 
 /* === Full cart === */

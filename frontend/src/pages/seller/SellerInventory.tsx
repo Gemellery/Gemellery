@@ -72,7 +72,7 @@ export default function SellerInventory() {
 
   // Pagination state and logic
   const [page, setPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 10;
   const paginatedGems: GemItem[] = gems.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.ceil(gems.length / pageSize);
 
