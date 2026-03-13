@@ -1,5 +1,7 @@
+import { useState } from "react"; 
 import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
+
 
 function FAQ() {
   return (
