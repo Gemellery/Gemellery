@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import AdvancedFooter from '@/components/AdvancedFooter'
 import ProductGallery from '../../components/ProductGallery'
@@ -11,25 +13,72 @@ import ReviewsRatings from '../../components/ReviewsRatings'
 import Certification from '../../components/Certification'
 import RatingSummary from '../../components/RatingSummary'
 import SellerOtherListings from '../../components/SellerOtherListings'
-import { ChevronRight } from 'lucide-react'
+import { FileText } from 'lucide-react'
+import { fetchGemById } from '@/lib/gems/api'
+import type { GemData } from '@/lib/gems/types'
 
 const ProductDetail = () => {
+  const { id } = useParams<{ id: string }>()
+  const [product, setProduct] = useState<GemData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleAddToCart = (quantity: number) => {
-    console.log(`Added ${quantity} items to cart`)
-  }
+  useEffect(() => {
+    const loadGemData = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await fetchGemById(id);
+        setProduct(data);
+      } catch (err) {
+        console.error('Failed to fetch gem details:', err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadGemData();
+  }, [id]);
 
   const handleBookViewing = () => {
     console.log('Book viewing request submitted')
   }
 
-  const handleFavorite = (isFavorited: boolean) => {
-    console.log(`Product ${isFavorited ? 'added to' : 'removed from'} favorites`)
-  }
-
   const handleTryAIDesign = () => {
     console.log('Opening AI Design Studio')
   }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="max-w-[1280px] mx-auto px-6 py-20 text-center">
+          <h2 className="text-2xl font-serif text-slate-800 mb-4">Product Not Found</h2>
+          <p className="text-slate-600 mb-8">{error || "The gemstone you're looking for doesn't exist or is currently unavailable."}</p>
+          <a href="/marketplace" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-700 hover:bg-emerald-800 transition-colors">
+            Return to Marketplace
+          </a>
+        </div>
+        <AdvancedFooter />
+      </div>
+    );
+  }
+
+  // Format images array ensuring proper URL paths
+  const displayImages = product.images?.length > 0 
+    ? product.images.map((img: string) => img.startsWith('/') ? img : `/uploads/${img}`)
+    : ['/placeholder-gem.jpg'];
 
   return (
     <div className="min-h-screen bg-white">
@@ -40,13 +89,8 @@ const ProductDetail = () => {
           {/* Gallery + AI Studio */}
           <div className="space-y-6">
             <ProductGallery
-              images={[
-                "../public/sample_gems/alexandrite_18.jpg",
-                '../public/sample_gems/aquamarine_8.jpg',
-                '../public/sample_gems/solitaire.jpg',
-                '../public/sample_gems/sapphire blue_6.jpg',
-              ]}
-              productName="3.5 Carat Vivid Royal Blue Sapphire"
+              images={displayImages}
+              productName={product.gem_name}
             />
 
             {/* AI Design Studio */}
@@ -56,44 +100,17 @@ const ProductDetail = () => {
           {/* Info, Actions, Shipping, Gem Passport */}
           <div className="space-y-8 lg:pl-4">
             {/* Product Info */}
-            <ProductInfo
-              badge="NATURAL UNHEATED"
-              rating={4.9}
-              reviewCount={12}
-              title="3.5 Carat Vivid Royal Blue Sapphire"
-              sku="SKU-2024-001"
-              currentPrice={12500}
-              originalPrice={14200}
-              discount={12}
-              seller={{
-                name: 'GemLanka Exports',
-                verified: true,
-                location: 'Ratnapura, Sri Lanka',
-                memberSince: 2018
-              }}
-              shape="Cushion"
-              dimensions="8.2 x 7.8 mm"
-            />
+            <ProductInfo product={product} />
 
             {/* Gem Passport */}
-            <GemPassport
-              data={{
-                tokenId: '#LK-88392-GEM',
-                provenance: 'Verified Source',
-                treatment: 'None (Unheated)',
-                origin: 'Ratnapura, Sri Lanka',
-                certificationBody: 'Gemological Institute',
-                certificationDate: '2024-01-15',
-                gemType: 'Natural Blue Sapphire'
-              }}
-            />
+            <div className="mt-15">
+              <GemPassport {...product} />
+            </div>
 
             {/* Product Actions */}
             <ProductActions
-              onAddToCart={handleAddToCart}
+              gemId={product.gem_id}
               onBookViewing={handleBookViewing}
-              onFavorite={handleFavorite}
-              showQuantitySelector={false}
             />
 
             {/* Shipping Info */}
@@ -109,33 +126,23 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-12">
           {/* Specifications */}
           <div className="lg:col-span-3 space-y-12">
-            <ProductSpecifications
-              title="Detailed Specifications"
-              specifications={[
-                { label: 'GEMSTONE TYPE', value: 'Natural Blue Sapphire (Corundum)' },
-                { label: 'CARAT WEIGHT', value: '3.52 Carats' },
-                { label: 'COLOR GRADE', value: 'Vivid Royal Blue (GIA Top Grade)' },
-                { label: 'CLARITY', value: 'VVS1 (Eye Clean)' },
-                { label: 'ORIGIN', value: 'Ratnapura, Sri Lanka 🇱🇰' },
-                { label: 'TREATMENTS', value: 'None (Unheated)' }
-              ]}
-            />
+            <ProductSpecifications/>
           </div>
 
           {/* Certification */}
           <div className="lg:col-span-2 space-y-8">
-            <Certification />
+            <Certification 
+              certifications={product.ngja_certificate_no ? [
+                {
+                  icon: <FileText size={16} className="text-gray-600" />,
+                  title: `NGJA Report: ${product.ngja_certificate_no}`,
+                  subtitle: product.ngja_certificate_url ? 'Digital Copy Available' : 'Physical Copy Included',
+                  verified: true,
+                  certificateUrl: product.ngja_certificate_url
+                }
+              ] : []} 
+            />
           </div>
-        </div>
-
-        {/* ===== Seller Other Listings (full-width horizontal scroll) ===== */}
-        <div className="mb-12">
-          <div className="border-t border-gray-100 mb-10" />
-          <SellerOtherListings
-            sellerName="GemLanka Exports"
-            sellerLocation="Ratnapura, Sri Lanka"
-            totalListings={48}
-          />
         </div>
 
         {/* ===== Reviews + Rating Summary ===== */}
@@ -148,6 +155,17 @@ const ProductDetail = () => {
             <RatingSummary />
           </div>
         </div>
+
+        {/* ===== Seller Other Listings (full-width horizontal scroll) ===== */}
+        <div className="mb-12">
+          <div className="border-t border-gray-100 mb-10" />
+          <SellerOtherListings
+            sellerName={product.seller_name || 'Seller'}
+            sellerLocation={product.mining_region || product.origin || 'Sri Lanka'}
+            totalListings={12} // Mock data for now
+          />
+        </div>
+
       </div>
 
       <AdvancedFooter />
