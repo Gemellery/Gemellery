@@ -50,7 +50,7 @@ import ServerError from "./pages/ServerError";
 import AccessDenied from "./pages/AccessDenied";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import AiChat from "./components/AiChat";
-
+import FAQ from "./pages/FAQ";
 
 function MaintenancePage() {
   return (
