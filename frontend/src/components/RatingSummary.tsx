@@ -13,10 +13,10 @@ interface RatingSummaryProps {
 }
 
 const RatingSummary: React.FC<RatingSummaryProps> = ({
-  averageRating = 5.0,
-  totalRatings = 14,
+  averageRating = 0,
+  totalRatings = 0,
   breakdown = [
-    { stars: 5, count: 14 },
+    { stars: 5, count: 0 },
     { stars: 4, count: 0 },
     { stars: 3, count: 0 },
     { stars: 2, count: 0 },

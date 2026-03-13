@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import AdvancedFooter from '@/components/AdvancedFooter'
@@ -16,10 +16,13 @@ import SellerOtherListings from '../../components/SellerOtherListings'
 import { FileText } from 'lucide-react'
 import { fetchGemById } from '@/lib/gems/api'
 import type { GemData } from '@/lib/gems/types'
+import { fetchSellerProfile } from '@/services/sellerService'
+import type { SellerProfileResponse } from '@/types/seller.types'
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>()
   const [product, setProduct] = useState<GemData | null>(null)
+  const [sellerProfile, setSellerProfile] = useState<SellerProfileResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -32,6 +35,15 @@ const ProductDetail = () => {
         setError(null);
         const data = await fetchGemById(id);
         setProduct(data);
+        
+        if (data.seller_id) {
+          try {
+            const profile = await fetchSellerProfile(data.seller_id.toString());
+            setSellerProfile(profile);
+          } catch (profileErr) {
+            console.error('Failed to fetch seller profile:', profileErr);
+          }
+        }
       } catch (err) {
         console.error('Failed to fetch gem details:', err);
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -42,6 +54,18 @@ const ProductDetail = () => {
 
     loadGemData();
   }, [id]);
+
+  const ratingBreakdown = useMemo(() => {
+    const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    if (sellerProfile?.reviews) {
+      sellerProfile.reviews.forEach(r => {
+        if (r.rating >= 1 && r.rating <= 5) {
+          dist[r.rating as keyof typeof dist] = (dist[r.rating as keyof typeof dist] || 0) + 1
+        }
+      })
+    }
+    return [5, 4, 3, 2, 1].map(stars => ({ stars, count: dist[stars as keyof typeof dist] }))
+  }, [sellerProfile?.reviews]);
 
   const handleBookViewing = () => {
     console.log('Book viewing request submitted')
@@ -145,24 +169,33 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* ===== Reviews + Rating Summary ===== */}
         <div className="border-t border-gray-100 mb-10" />
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+        {/* ===== Reviews + Rating Summary ===== */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-12">
           <div className="lg:col-span-3 space-y-8">
-            <ReviewsRatings />
+            <ReviewsRatings
+              reviews={sellerProfile?.reviews || []}
+            />
           </div>
           <div className="lg:col-span-2 space-y-8">
-            <RatingSummary />
+            <RatingSummary 
+              averageRating={sellerProfile?.averageRating || 0}
+              totalRatings={sellerProfile?.totalReviews || 0}
+              breakdown={ratingBreakdown}
+            />
           </div>
         </div>
 
+        <div className="border-t border-gray-100 mb-12"></div>
+
+
         {/* ===== Seller Other Listings (full-width horizontal scroll) ===== */}
         <div className="mb-12">
-          <div className="border-t border-gray-100 mb-10" />
           <SellerOtherListings
             sellerName={product.seller_name || 'Seller'}
             sellerLocation={product.mining_region || product.origin || 'Sri Lanka'}
-            totalListings={12} // Mock data for now
+            totalListings={sellerProfile?.gems?.length || 0}
           />
         </div>
 
