@@ -1,4 +1,5 @@
 import { useState } from "react"; 
+import { Search } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
 
