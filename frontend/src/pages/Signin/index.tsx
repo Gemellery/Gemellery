@@ -311,7 +311,7 @@ function SignIn() {
 
                       <div>
                         <label className="block text-xs font-semibold text-black mb-1">
-                          BUSINESS REGISTRATION NO
+                          BUSINESS REGISTRATION NO / NIC NUMBER
                         </label>
                         <input
                           type="text"
