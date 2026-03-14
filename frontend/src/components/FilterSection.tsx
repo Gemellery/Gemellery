@@ -576,10 +576,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
       <CollapsibleSection title="Price Range" isExpanded={expandedSections.priceRange} onToggle={() => toggleSection('priceRange')}>
         <div className="space-y-1">
           {[
-            { label: 'Under USD. 100,000', value: 'under100k' },
-            { label: 'USD. 100,000 - 250,000', value: '100kto250k' },
-            { label: 'USD. 250,000 - 500,000', value: '250kto500k' },
-            { label: 'Over USD. 500,000', value: 'above500k' },
+            { label: 'Under Rs. 100,000', value: 'under100k' },
+            { label: 'Rs. 100,000 - 250,000', value: '100kto250k' },
+            { label: 'Rs. 250,000 - 500,000', value: '250kto500k' },
+            { label: 'Over Rs. 500,000', value: 'above500k' },
           ].map(item => (
             <FilterCheckbox
               key={item.value}

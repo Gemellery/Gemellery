@@ -14,11 +14,11 @@ export function parsePrice(price: string | undefined | null): number {
 
 /* === formatPrice === */
 export function formatPrice(
-  price: string | undefined | null,
-  currency: string = 'USD'
+  price: string | number | undefined | null,
+  currency: string = 'LKR'
 ): string {
-  const numericPrice = parsePrice(price);
-  return new Intl.NumberFormat('en-US', {
+  const numericPrice = typeof price === 'number' ? price : parsePrice(price);
+  return new Intl.NumberFormat('en-LK', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
