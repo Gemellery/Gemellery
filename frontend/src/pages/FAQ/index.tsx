@@ -182,7 +182,9 @@ function FAQ() {
         <section className="w-full max-w-3xl mx-auto px-6 pb-16 space-y-10">
           {filteredData.length === 0 ? (
             <div className="text-center py-24">
-              <div className="text-4xl mb-4">🔍</div>
+              <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Search className="w-6 h-6 text-gray-400" />
+              </div>
               <p className="text-gray-500 text-base mb-1">
                 No results found for{" "}
                 <span className="text-[#D4AF37] font-semibold">{searchQuery}</span>
