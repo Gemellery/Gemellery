@@ -222,11 +222,11 @@ function FAQ() {
                     return (
                       <div
                         key={key}
-                        className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                        className={`rounded-xl transition-all duration-200 overflow-hidden ${
                           isOpen
-                            ? "border-l-[3px] border-l-[#D4AF37] border-t-gray-100 border-r-gray-100 border-b-gray-100 bg-amber-50/30"
-                            : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
-                        }`}
+                            ? "border-l-[3px] border-l-[#D4AF37] border-t border-t-gray-100 border-r border-r-gray-100 border-b border-b-gray-100 bg-[#D4AF37]/[0.03]"
+                            : "border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
+                  }`}
                       >
                         <button
                           onClick={() => setOpenIndex(isOpen ? null : key)}
@@ -261,7 +261,7 @@ function FAQ() {
                 {catIdx < filteredData.length - 1 && (
                   <div className="flex items-center justify-center gap-2 mt-8">
                     <div className="h-px w-12 bg-gray-100" />
-                    <Gem className="w-3 h-3 text-[#D4AF37]/40" />
+                    <Gem className="w-3 h-3 text-[#D4AF37]" />
                     <div className="h-px w-12 bg-gray-100" />
                   </div>
                 )}
