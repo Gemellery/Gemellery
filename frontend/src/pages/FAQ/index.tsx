@@ -200,14 +200,18 @@ function FAQ() {
               <div key={category.category}>
 
                 {/* Category Header */}
+                {/* Category Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
-                    <category.icon className="w-3.5 h-3.5 text-gray-500" />
-                  </div>
-                  <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-                    {category.category}
-                  </h2>
-                  <div className="flex-1 h-px bg-gray-100" />
+                    <div className="w-7 h-7 rounded-lg bg-[#0A1128] flex items-center justify-center flex-shrink-0">
+                      <category.icon className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    </div>
+                    <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                      {category.category}
+                    </h2>
+                    <div className="flex-1 h-px bg-gray-100" />
+                    <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
+                    {category.items.length} questions
+                    </span>
                 </div>
 
                 {/* Questions */}
