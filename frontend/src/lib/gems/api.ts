@@ -2,17 +2,8 @@ import { API_CONFIG } from '@/lib/api.config';
 import type { GemListItem, GemFilters, GemApiResponse, GemData, GemResponse } from '@/lib/gems/types';
 
 /* === Image URL builder === */
-export function getGemImageUrl(path: string): string {
-  if (!path) return "/sample_gems/placeholder.jpg";
-
-  // If already full URL (S3)
-  if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
-  }
-
-  // fallback for local uploads (if ever used)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-  return `${API_BASE}/uploads/${path}`;
+export function getGemImageUrl(filename: string): string {
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${filename}`;
 }
 
 /* === Parse image === */
@@ -131,7 +122,7 @@ export async function fetchGems(
 /* === fetchGemById === */
 export async function fetchGemById(id: string): Promise<GemData> {
   const url = `${API_CONFIG.BASE_URL}${API_CONFIG.GEMS_ENDPOINT}/${id}`;
-
+  
   const response = await fetch(url);
 
   if (!response.ok) {
