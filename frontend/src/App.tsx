@@ -29,6 +29,7 @@ import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
 import OrderHistory from "./pages/OrderHistory/index";
+import WishlistPage from "./pages/buyer/BuyerWishlist";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -213,6 +214,15 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+          <Route
+            path="/buyer/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
 
       <Route
         path="/admin/dashboard"
@@ -407,6 +417,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerDashboardLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <WishlistPage />
               </ProtectedRoute>
             }
           />
