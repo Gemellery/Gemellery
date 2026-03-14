@@ -28,7 +28,14 @@ export const register = async (req: Request, res: Response) => {
         ngja_registration_no,
     } = req.body;
 
-    if (!email || !password || !role || (role === "seller" && !business_name) || (role === "seller" && !business_reg_no) || (role === "seller" && !ngja_registration_no)) {
+    if (
+        !email ||
+        !password ||
+        !role ||
+        (role === "seller" && !business_name) ||
+        (role === "seller" && !business_reg_no) ||
+        (role === "seller" && !ngja_registration_no)
+    ) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -39,13 +46,14 @@ export const register = async (req: Request, res: Response) => {
     if (role === "seller" && !req.file) {
         return res.status(400).json({
             message: "Seller license is required"
-        })
+        });
     }
 
     const conn = await pool.getConnection();
 
     try {
         await conn.beginTransaction();
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const [userResult]: any = await conn.query(
@@ -56,6 +64,14 @@ export const register = async (req: Request, res: Response) => {
         );
 
         const user_id = userResult.insertId;
+
+        if (address) {
+            await conn.query(
+                `INSERT INTO address (address, user_id)
+                 VALUES (?, ?)`,
+                [address, user_id]
+            );
+        }
 
         if (role === "seller") {
 
@@ -76,9 +92,9 @@ export const register = async (req: Request, res: Response) => {
 
             const [ngjaRows]: any = await conn.query(
                 `SELECT *
-         FROM ngja_registered_sellers
-         WHERE ngja_registration_no = ?
-         AND UPPER(business_name) = ?`,
+                 FROM ngja_registered_sellers
+                 WHERE ngja_registration_no = ?
+                 AND UPPER(business_name) = ?`,
                 [normalizedNgja, normalizedBusiness]
             );
 
@@ -97,17 +113,27 @@ export const register = async (req: Request, res: Response) => {
 
             await conn.query(
                 `INSERT INTO seller
-         (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url, verification_status)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-                [user_id, normalizedBusiness, business_reg_no, normalizedNgja, licenseUrl, verificationStatus]
+                (seller_id, business_name, business_reg_no, ngja_registration_no, seller_license_url, verification_status)
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    user_id,
+                    normalizedBusiness,
+                    business_reg_no,
+                    normalizedNgja,
+                    licenseUrl,
+                    verificationStatus
+                ]
             );
         }
 
         await conn.commit();
-        return res.status(201).json({ message: "Account created successfully" });
 
+        return res.status(201).json({
+            message: "Account created successfully"
+        });
 
     } catch (err: any) {
+
         await conn.rollback();
 
         if (err.code === "ER_DUP_ENTRY") {
@@ -119,7 +145,9 @@ export const register = async (req: Request, res: Response) => {
         }
 
         console.error(err);
+
         return res.status(500).json({ message: "Server error" });
+
     } finally {
         conn.release();
     }
