@@ -261,11 +261,17 @@ export const gemModel = {
           g.blockchain_status as blockchainStatus,
           g.tx_hash as txHash,
           u.full_name as seller_name,
+          s.business_name,
+          s.verification_status as seller_verification_status,
           g.verification_status as verificationStatus,
           CASE 
             WHEN LOWER(g.verification_status) = 'approved' THEN 1
             ELSE 0
           END as verified,
+          CASE 
+            WHEN LOWER(s.verification_status) = 'approved' THEN 1
+            ELSE 0
+          END as seller_verified,
           g.status,
           g.created_at as createdAt,
           u.joined_date as seller_joined_date,
@@ -279,7 +285,7 @@ export const gemModel = {
         GROUP BY g.gem_id, g.gem_name, g.gem_type, g.price, g.carat, g.cut,
                  g.clarity, g.color, g.origin, g.mining_region, g.description,
                  g.ngja_certificate_no, g.ngja_certificate_url, g.seller_id,
-                 u.full_name, u.joined_date, ngja.regional_branch, g.verification_status, 
+                 u.full_name, s.business_name, s.verification_status, u.joined_date, ngja.regional_branch, g.verification_status, 
                  g.status, g.created_at, g.token_id, g.blockchain_status, g.tx_hash  
         ORDER BY g.created_at DESC
         LIMIT ? OFFSET ?
@@ -345,9 +351,15 @@ export const gemModel = {
             WHEN LOWER(g.verification_status) = 'approved' THEN 1
             ELSE 0
           END as verified,
+          CASE 
+            WHEN LOWER(s.verification_status) = 'approved' THEN 1
+            ELSE 0
+          END as seller_verified,
           g.status,
           g.created_at,
           u.full_name as seller_name,
+          s.business_name,
+          s.verification_status as seller_verification_status,
           u.joined_date as seller_joined_date,
           g.seller_id,
           ngja.regional_branch as seller_regional_branch
