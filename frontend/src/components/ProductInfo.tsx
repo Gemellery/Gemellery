@@ -2,12 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle, Diamond, Scale, Dot } from 'lucide-react'
 import type { GemData } from '@/lib/gems/types'
+import { formatPrice } from '@/lib/gems/utils'
 
-const lkrFormatter = new Intl.NumberFormat('en-LK', {
-  style: 'currency',
-  currency: 'LKR',
-  maximumFractionDigits: 0,
-});
+
 
 const ProductInfo: React.FC<{ product: GemData }> = ({ product }) => {
   return (
@@ -20,7 +17,7 @@ const ProductInfo: React.FC<{ product: GemData }> = ({ product }) => {
       {/* Price Section */}
       <div className="flex items-baseline gap-3 pt-1">
         <span className="text-[28px] text-gray-900 tracking-tight">
-          {lkrFormatter.format(product.price)}
+          {formatPrice(product.price)}
         </span>
       </div>
 
