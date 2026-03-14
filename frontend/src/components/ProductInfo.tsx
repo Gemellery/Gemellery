@@ -29,13 +29,17 @@ const ProductInfo: React.FC<{ product: GemData }> = ({ product }) => {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">
-              {(product.seller_name || 'S').charAt(0).toUpperCase()}
+              {(product.business_name || product.seller_name || 'S').charAt(0).toUpperCase()}
             </span>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <h3 className="font-semibold text-gray-900 text-sm">{product.seller_name || 'Verified Seller'}</h3>
-              <CheckCircle size={13} className="text-emerald-500" />
+              <h3 className="font-semibold text-gray-900 text-sm">
+                {product.business_name || product.seller_name || 'Verified Seller'}
+              </h3>
+              {product.seller_verified && (
+                <CheckCircle size={13} className="text-emerald-500" />
+              )}
             </div>
             <p className="flex items-center text-[11px] text-gray-500 whitespace-nowrap">
               {product.seller_regional_branch || product.mining_region || product.origin}

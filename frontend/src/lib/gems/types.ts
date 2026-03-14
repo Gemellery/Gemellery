@@ -15,6 +15,9 @@ export interface GemListItem {
   images: string[] | string | null;
   seller_id: number;
   seller_name: string;
+  business_name?: string;
+  seller_verification_status?: string;
+  seller_verified?: boolean | number;
   seller_joined_date?: string;
   seller_regional_branch?: string;
   verificationStatus: string;
@@ -89,6 +92,9 @@ export interface GemData {
     status: string;
     created_at: string;
     seller_name: string;
+    business_name?: string;
+    seller_verification_status?: string;
+    seller_verified?: boolean | number;
     seller_joined_date?: string;
     seller_regional_branch?: string;
     seller_id: number;

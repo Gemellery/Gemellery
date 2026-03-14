@@ -190,10 +190,10 @@ const ProductDetail = () => {
         <div className="border-t border-gray-100 mb-12"></div>
 
 
-        {/* ===== Seller Other Listings (full-width horizontal scroll) ===== */}
+        {/* ===== Seller Other Listings ===== */}
         <div className="mb-12">
           <SellerOtherListings
-            sellerName={product.seller_name || 'Seller'}
+            sellerName={product.business_name || product.seller_name || 'Seller'}
             sellerLocation={product.mining_region || product.origin || 'Sri Lanka'}
             totalListings={sellerProfile?.gems?.length || 0}
           />
