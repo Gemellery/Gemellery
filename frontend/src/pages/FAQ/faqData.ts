@@ -1,3 +1,6 @@
+import { Gem, ShoppingBag, Store, Sparkles, Truck, UserCircle } from "lucide-react";
+import type { ElementType } from "react";
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -5,14 +8,14 @@ export interface FAQItem {
 
 export interface FAQCategory {
   category: string;
-  icon: string;
+  icon: ElementType;
   items: FAQItem[];
 }
 
 export const faqData: FAQCategory[] = [
   {
     category: "About Gemellery",
-    icon: "💎",
+    icon: Gem,
     items: [
       {
         question: "What is Gemellery?",
@@ -30,11 +33,11 @@ export const faqData: FAQCategory[] = [
   },
   {
     category: "Buying Gemstones",
-    icon: "🛒",
+    icon: ShoppingBag,
     items: [
       {
         question: "How do I purchase a gemstone?",
-        answer: "Browse our marketplace, select a gemstone, add it to your cart, and proceed to checkout. You'll need to create or sign into your buyer account.",
+        answer: "Browse our marketplace, select a gemstone, add it to your cart, and proceed to checkout. You will need to create or sign into your buyer account.",
       },
       {
         question: "Are the gemstones authentic?",
@@ -46,13 +49,13 @@ export const faqData: FAQCategory[] = [
       },
       {
         question: "What payment methods are accepted?",
-        answer: "We accept major credit/debit cards, and we're continuously expanding our payment options for international buyers.",
+        answer: "We accept major credit/debit cards, and we are continuously expanding our payment options for international buyers.",
       },
     ],
   },
   {
     category: "Selling on Gemellery",
-    icon: "💼",
+    icon: Store,
     items: [
       {
         question: "How do I become a seller on Gemellery?",
@@ -64,13 +67,13 @@ export const faqData: FAQCategory[] = [
       },
       {
         question: "How long does seller verification take?",
-        answer: "The verification process typically takes 2–5 business days. You'll receive an email notification once your account is approved.",
+        answer: "The verification process typically takes 2 to 5 business days. You will receive an email notification once your account is approved.",
       },
     ],
   },
   {
     category: "AI Design Studio",
-    icon: "✨",
+    icon: Sparkles,
     items: [
       {
         question: "What is the AI Design Studio?",
@@ -88,15 +91,15 @@ export const faqData: FAQCategory[] = [
   },
   {
     category: "Shipping & Orders",
-    icon: "🚚",
+    icon: Truck,
     items: [
       {
         question: "How long does shipping take?",
-        answer: "Shipping times vary by location. Domestic orders typically arrive within 3–5 business days. International orders may take 7–14 business days.",
+        answer: "Shipping times vary by location. Domestic orders typically arrive within 3 to 5 business days. International orders may take 7 to 14 business days.",
       },
       {
         question: "Can I track my order?",
-        answer: "Yes. Once your order is shipped, you'll receive a tracking number via email to monitor your delivery status.",
+        answer: "Yes. Once your order is shipped, you will receive a tracking number via email to monitor your delivery status.",
       },
       {
         question: "Do you ship internationally?",
@@ -106,11 +109,11 @@ export const faqData: FAQCategory[] = [
   },
   {
     category: "Account & Support",
-    icon: "👤",
+    icon: UserCircle,
     items: [
       {
         question: "How do I reset my password?",
-        answer: "Click 'Forgot Password' on the Sign In page, enter your email address, and follow the instructions sent to your inbox.",
+        answer: "Click Forgot Password on the Sign In page, enter your email address, and follow the instructions sent to your inbox.",
       },
       {
         question: "How can I contact Gemellery support?",
