@@ -1,22 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { ZoomIn, ZoomOut, RotateCcw, Play, CheckCircle, X, ChevronLeft, ChevronRight, Maximize2, Grid3X3 } from 'lucide-react'
+import { ZoomIn, ZoomOut, RotateCcw, CheckCircle, X, ChevronLeft, ChevronRight, Maximize2, Grid3X3 } from 'lucide-react'
 
 interface ProductGalleryProps {
   images?: string[]
   productName?: string
-  hasVideo?: boolean
 }
 
 const ProductGallery: React.FC<ProductGalleryProps> = ({
-  images = [
-    '/sample_gems/blue_sapphire_main.jpg',
-    '/sample_gems/blue_sapphire_side1.jpg',
-    '/sample_gems/blue_sapphire_top.jpg',
-    '/sample_gems/blue_sapphire_side2.jpg',
-  ],
-  productName = 'Blue Sapphire',
-  hasVideo = true
+  images = [],
+  productName = ''
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -240,24 +233,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
             </button>
           ))}
           
-          {/* Video Thumbnail */}
-          {hasVideo && (
-            <button
-              className="flex-shrink-0 rounded-xl overflow-hidden border-2 border-gray-200/80 hover:border-gray-400 transition-all duration-300 relative bg-gray-900 opacity-70 hover:opacity-100"
-              style={{ width: 64, height: 64 }}
-            >
-              <img
-                src={images[0]}
-                alt="Video thumbnail"
-                className="w-full h-full object-cover opacity-40"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-7 h-7 bg-white/95 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
-                  <Play size={10} className="text-gray-800 ml-0.5" fill="currentColor" />
-                </div>
-              </div>
-            </button>
-          )}
+
         </div>
       </div>
 
@@ -434,23 +410,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                       />
                     </button>
                   ))}
-                  {hasVideo && (
-                    <button
-                      className="relative flex-shrink-0 rounded-lg overflow-hidden opacity-40 hover:opacity-80 transition-all duration-300 hover:scale-105 bg-gray-900"
-                      style={{ width: 56, height: 56 }}
-                    >
-                      <img
-                        src={images[0]}
-                        alt="Video thumbnail"
-                        className="w-full h-full object-cover opacity-40"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
-                          <Play size={9} className="text-gray-800 ml-0.5" fill="currentColor" />
-                        </div>
-                      </div>
-                    </button>
-                  )}
+
                 </div>
               </div>
             </>

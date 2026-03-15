@@ -193,9 +193,11 @@ const ProductDetail = () => {
         {/* ===== Seller Other Listings ===== */}
         <div className="mb-12">
           <SellerOtherListings
+            sellerId={product.seller_id}
             sellerName={product.business_name || product.seller_name || 'Seller'}
             sellerLocation={product.mining_region || product.origin || 'Sri Lanka'}
             totalListings={sellerProfile?.gems?.length || 0}
+            listings={sellerProfile?.gems || []}
           />
         </div>
 
