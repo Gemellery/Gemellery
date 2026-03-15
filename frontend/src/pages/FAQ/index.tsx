@@ -79,7 +79,7 @@ function FAQ() {
               Questions
             </h1>
             <p className="text-base md:text-lg text-gray-500 max-w-lg mx-auto mb-8 leading-relaxed">
-              Everything you need to know about Gemellery — gemstones, orders, sellers, and more.
+             Your complete guide to Gemellery — explore gemstones, track orders, discover sellers, and more.
             </p>
 
             {/* Search Bar inside Hero */}
