@@ -201,7 +201,7 @@ function FAQ() {
             filteredData.map((category, catIdx) => (
               <div key={category.category}>
 
-                {/* Category Header */}
+                
                 {/* Category Header */}
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-7 h-7 rounded-lg bg-[#0A1128] flex items-center justify-center flex-shrink-0">
