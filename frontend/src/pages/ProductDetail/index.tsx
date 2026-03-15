@@ -29,13 +29,13 @@ const ProductDetail = () => {
   useEffect(() => {
     const loadGemData = async () => {
       if (!id) return;
-      
+
       try {
         setIsLoading(true);
         setError(null);
         const data = await fetchGemById(id);
         setProduct(data);
-        
+
         if (data.seller_id) {
           try {
             const profile = await fetchSellerProfile(data.seller_id.toString());
@@ -100,9 +100,15 @@ const ProductDetail = () => {
   }
 
   // Format images array ensuring proper URL paths
-  const displayImages = product.images?.length > 0 
-    ? product.images.map((img: string) => img.startsWith('/') ? img : `/uploads/${img}`)
+  const displayImages = product.images?.length > 0
+    ? product.images.map((img: string) => {
+      if (img.startsWith('http://') || img.startsWith('https://')) {
+        return img; // already a full S3 URL
+      }
+      return `/uploads/${img}`; // fallback for local images
+    })
     : ['/placeholder-gem.jpg'];
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -150,12 +156,12 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-12">
           {/* Specifications */}
           <div className="lg:col-span-3 space-y-12">
-            <ProductSpecifications/>
+            <ProductSpecifications />
           </div>
 
           {/* Certification */}
           <div className="lg:col-span-2 space-y-8">
-            <Certification 
+            <Certification
               certifications={product.ngja_certificate_no ? [
                 {
                   icon: <FileText size={16} className="text-gray-600" />,
@@ -164,7 +170,7 @@ const ProductDetail = () => {
                   verified: true,
                   certificateUrl: product.ngja_certificate_url
                 }
-              ] : []} 
+              ] : []}
             />
           </div>
         </div>
@@ -179,7 +185,7 @@ const ProductDetail = () => {
             />
           </div>
           <div className="lg:col-span-2 space-y-8">
-            <RatingSummary 
+            <RatingSummary
               averageRating={sellerProfile?.averageRating || 0}
               totalRatings={sellerProfile?.totalReviews || 0}
               breakdown={ratingBreakdown}
