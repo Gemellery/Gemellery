@@ -9,6 +9,8 @@ function Navbar() {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  
   const formatRole = (role: string) =>
     role.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
@@ -51,6 +53,20 @@ function Navbar() {
   //   navigate("/signin");
   // };
 
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      navigate(`/marketplace?search=${encodeURIComponent(searchQuery.trim())}`);
+      setMenuOpen(false);
+      setSearchQuery("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchSubmit();
+    }
+  };
+
   return (
     <nav className="w-full sticky top-0 z-50 pt-6 md:pt-4">
       {/* Main navbar container with rounded bottom corners */}
@@ -65,14 +81,20 @@ function Navbar() {
             onClick={() => navigate("/")}
           />
 
-          {/* Search Bar - Desktop */}
+          {/* Search Bar */}
           <div className="hidden md:flex items-center bg-white/20 backdrop-blur rounded-full px-4 py-2 border border-white/40 hover:border-white/60 focus-within:border-[#D4AF37] transition-all duration-300">
             <input
               type="text"
               placeholder="Search Gemstones..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="bg-transparent outline-none text-base text-gray-900 placeholder-gray-600 w-48 lg:w-64"
             />
-            <Search className="w-4 h-4 text-gray-700" />
+            <Search 
+              className="w-4 h-4 text-gray-700 cursor-pointer hover:text-[#D4AF37] transition" 
+              onClick={handleSearchSubmit}
+            />
           </div>
 
           {/* Desktop Navigation Links */}
@@ -159,9 +181,15 @@ function Navbar() {
             <input
               type="text"
               placeholder="Search Gemstones..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="bg-transparent outline-none text-base text-gray-900 placeholder-gray-600 w-full"
             />
-            <Search className="w-4 h-4 text-gray-700" />
+            <Search 
+              className="w-4 h-4 text-gray-700 cursor-pointer hover:text-[#D4AF37] transition shrink-0" 
+              onClick={handleSearchSubmit}
+            />
           </div>
 
           {/* Mobile Navigation */}

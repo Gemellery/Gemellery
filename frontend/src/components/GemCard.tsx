@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Heart, Shield, Sparkles } from 'lucide-react'
-import { MdOutlineScale } from "react-icons/md";
-import { FaRegGem } from "react-icons/fa";
-import { IoMdGlobe } from "react-icons/io";
-import { GrCertificate } from "react-icons/gr";
+import { Heart, ShieldCheck, Sparkles, Scale, Gem, Globe } from 'lucide-react'
 import { useCart } from '@/context/CartContext';
 import * as wishlistApi from '@/lib/wishlist/api';
 
@@ -15,12 +11,11 @@ interface GemCardProps {
   weight: string
   cut: string
   origin: string
-  certification: string
   verified: boolean | number | string
   image: string
 }
 
-const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin, certification, verified, image }) => {
+const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin, verified, image }) => {
   const navigate = useNavigate()
   const { addToCart } = useCart()
   const [buttonText, setButtonText] = useState('Add to Cart')
@@ -125,81 +120,77 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
   return (
     <div 
       onClick={handleCardClick}
-      className="w-full max-w-xs bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex flex-col h-full"
+      className="w-full max-w-[320px] bg-white rounded-[20px] pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden cursor-pointer hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100"
     >
       {/* Image Container */}
-      <div className="relative bg-linear-to-br from-amber-50 to-amber-100 h-56 sm:h-64 md:h-72 shrink-0 flex items-center justify-center overflow-hidden group">
+      <div className="relative bg-[#FDF8EE] h-64 shrink-0 flex items-center justify-center overflow-hidden group">
         <img 
-          src={image || `https://placehold.co/400x300/fff8e1/b45309?text=${encodeURIComponent(name)}`} 
+          src={image || `https://placehold.co/400x300/FDF8EE/b45309?text=${encodeURIComponent(name)}`} 
           alt={name}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://placehold.co/400x300/fff8e1/b45309?text=${encodeURIComponent(name)}`
+            (e.target as HTMLImageElement).src = `https://placehold.co/400x300/FDF8EE/b45309?text=${encodeURIComponent(name)}`
           }}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 will-change-transform mix-blend-multiply"
         />
         
         {/* Verified Badge */}
         {isVerified && (
-          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white/95 rounded-full px-2.5 py-1.5 sm:px-3 sm:py-2 flex items-center gap-1.5 shadow-md hover:shadow-lg transition backdrop-blur-sm">
-            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-            <span className="text-xs sm:text-sm font-semibold text-gray-800">Verified</span>
+          <div className="absolute top-4 left-4 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
+            <ShieldCheck className="w-[18px] h-[18px] text-[#2E8B57]" />
+            <span className="text-[13px] font-bold text-gray-800 tracking-tight">Verified</span>
           </div>
         )}
 
-        {/* Wishlist Button — NOW FUNCTIONAL */}
+        {/* Wishlist Button */}
         <button 
           onClick={handleToggleWishlist}
           disabled={wishlistLoading}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/95 rounded-full p-2 sm:p-2.5 shadow-md hover:shadow-lg hover:bg-red-50 transition backdrop-blur-sm group/wishlist disabled:opacity-50"
+          className="absolute top-4 right-4 bg-white rounded-full p-2.5 shadow-sm hover:scale-110 transition-transform group/wishlist disabled:opacity-50"
         >
           <Heart 
-            className={`w-5 h-5 sm:w-6 sm:h-6 transition ${
+            className={`w-[18px] h-[18px] transition-colors ${
               isWishlisted 
-                ? 'text-red-600 fill-red-600' 
-                : 'text-gray-400 group-hover/wishlist:text-red-600'
+                ? 'text-[#CE0024] fill-[#CE0024]' 
+                : 'text-gray-400 group-hover/wishlist:text-[#CE0024]'
             }`} 
           />
         </button>
       </div>
 
       {/* Content Container */}
-      <div className="bg-white p-4 sm:p-5 flex flex-col grow">
+      <div className="bg-white px-5 pt-4 pb-1 flex flex-col grow">
         {/* Title and Price */}
-        <div className="flex justify-between items-start mb-3 sm:mb-4 gap-2">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-2">{name}</h2>
-          <span className="text-xl sm:text-2xl font-bold text-red-600 whitespace-nowrap">{price}</span>
+        <div className="flex flex-col items-start mb-4 gap-1">
+          <h2 className="text-[17px] font-black tracking-tight text-[#111111] line-clamp-1">{name}</h2>
+          <span className="text-[19px] font-black tracking-tight text-[#CE0024] whitespace-nowrap">{price}</span>
         </div>
 
-        {/* Details Grid*/}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-4 sm:mb-5 grow">
-          <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition">
-            <span className="text-base sm:text-lg shrink-0"><MdOutlineScale /></span>
-            <span className="text-xs sm:text-sm font-medium truncate">{weight}</span>
+        {/* Details Row (Pill style) */}
+        <div className="flex items-center gap-1.5 mb-5 w-full">
+          <div className="flex flex-1 items-center justify-center gap-1 bg-[#F4F6F8] px-2 py-1.5 rounded-full min-w-0">
+            <Scale className="w-3.5 h-3.5 text-[#5A6A85] shrink-0" />
+            <span className="text-[12px] font-semibold text-[#5A6A85] tracking-tight truncate">{weight}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition">
-            <span className="text-base sm:text-lg shrink-0"><FaRegGem /></span>
-            <span className="text-xs sm:text-sm font-medium truncate">{cut}</span>
+          <div className="flex flex-1 items-center justify-center gap-1 bg-[#F4F6F8] px-2 py-1.5 rounded-full min-w-0">
+            <Gem className="w-3.5 h-3.5 text-[#5A6A85] shrink-0" />
+            <span className="text-[12px] font-semibold text-[#5A6A85] tracking-tight truncate">{cut}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition">
-            <span className="text-base sm:text-lg shrink-0"><IoMdGlobe /></span>
-            <span className="text-xs sm:text-sm font-medium truncate">{origin}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition">
-            <span className="text-base sm:text-lg shrink-0"><GrCertificate /></span>
-            <span className="text-xs sm:text-sm font-medium truncate">{certification}</span>
+          <div className="flex flex-1 items-center justify-center gap-1 bg-[#F4F6F8] px-2 py-1.5 rounded-full min-w-0">
+            <Globe className="w-3.5 h-3.5 text-[#5A6A85] shrink-0" />
+            <span className="text-[12px] font-semibold text-[#5A6A85] tracking-tight truncate">{origin}</span>
           </div>
         </div>
 
         {/* Add to Cart Button */}
-        <div className="flex gap-2 mt-auto">
+        <div className="flex gap-2.5 mt-auto">
           <button 
             onClick={handleAddToCart}
-            className="flex-1 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl transition-all duration-300 text-sm sm:text-base shadow-sm hover:shadow-md"
+            className="flex-1 bg-[#CE0024] hover:bg-[#A8001D] text-white font-bold tracking-wide py-3 px-4 rounded-[12px] transition-colors text-[15px]"
           >
             {buttonText}
           </button>
-          <button className="bg-gray-100 hover:bg-linear-to-br hover:from-amber-100 hover:to-amber-200 border border-gray-200 rounded-lg sm:rounded-xl p-2.5 sm:p-3 transition-all duration-300 shrink-0">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 hover:text-amber-600" />
+          <button className="bg-[#F4F6F8] hover:bg-[#E5E9ED] rounded-[12px] p-3 transition-colors shrink-0 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-[#5A6A85]" />
           </button>
         </div>
       </div>
