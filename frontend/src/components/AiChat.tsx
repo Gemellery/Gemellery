@@ -1,8 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { Sparkles, X, Send, Loader2 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 
+// Pages where the chatbot should NOT appear
+const HIDDEN_ROUTES = ["/signin", "/forgot-password", "/reset-password"];
+
 export default function AiChat() {
+  const location = useLocation();
+  const isHidden = HIDDEN_ROUTES.some(route => location.pathname.startsWith(route));
+
+  if (isHidden) return null;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "ai", text: string }[]>([
     { role: "ai", text: "Hi! How can I help you with Gemellery today?" }
