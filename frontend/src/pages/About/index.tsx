@@ -1,4 +1,5 @@
 import { ArrowRight, Shield, Award, Sparkles, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import AdvancedFooter from '../../components/AdvancedFooter';
 
@@ -41,12 +42,12 @@ function About() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+              <Link to="/marketplace" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors text-center">
                 Explore Marketplace
-              </button>
-              <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors">
+              </Link>
+              <Link to="/blog" className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors text-center">
                 Watch Our Story
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -112,7 +113,7 @@ function About() {
                 For centuries, the gemstone industry has been shrouded in mystery. Buyers couldn't trace their stones, and miners didn't receive fair value.
               </p>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                GemeJewry exists to eliminate this opacity. We've built a digital ecosystem that connects certified Sri Lankan sellers directly with global buyers, ensuring every sapphire, ruby, and spinel comes with a digital passport of authenticity.
+                Gemellery exists to eliminate this opacity. We've built a digital ecosystem that connects certified Sri Lankan sellers directly with global buyers, ensuring every sapphire, ruby, and spinel comes with a digital passport of authenticity.
               </p>
 
               <div className="grid grid-cols-2 gap-6">
@@ -209,7 +210,7 @@ function About() {
                 <span className="italic text-teal-700">Perfected by AI.</span>
               </h2>
               <p className="text-gray-700 mb-8 leading-relaxed">
-                Don't just buy a gemstone. Create a legacy. Our proprietary AI design studio allows you to collaborate with your gems' craftsmen in GaleJs and Colombo to bring it to life, exactly as you wish (with realistic renderings).
+                Don't just buy a gemstone. Create a legacy. Our proprietary AI design studio allows you to collaborate with your gems' craftsmen in Galle and Colombo to bring it to life, exactly as you wish (with realistic renderings).
               </p>
 
               <div className="space-y-4 mb-8">
@@ -227,10 +228,10 @@ function About() {
                 </div>
               </div>
 
-              <button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full inline-flex items-center gap-2 transition-colors">
+              <Link to="/jewelry-designer" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full inline-flex items-center gap-2 transition-colors text-center">
                 Try the Design Studio
                 <ArrowRight size={18} />
-              </button>
+              </Link>
             </div>
 
             <div className="relative">
@@ -384,16 +385,16 @@ function About() {
             
             <h2 className="text-4xl font-bold mb-4">Ready to find your treasure?</h2>
             <p className="text-gray-600 mb-8">
-              Join thousands of collectors and creators who trust GemeJewry for their most precious acquisitions.
+              Join thousands of collectors and creators who trust Gemellery for their most precious acquisitions.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors">
+              <Link to="/marketplace" className="bg-teal-700 hover:bg-teal-800 text-white font-semibold px-8 py-3 rounded-full transition-colors text-center">
                 Browse Collection
-              </button>
-              <button className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors">
+              </Link>
+              <Link to="/contact" className="bg-white hover:bg-gray-50 text-gray-800 font-semibold px-8 py-3 rounded-full border border-gray-300 transition-colors text-center">
                 Contact Support
-              </button>
+              </Link>
             </div>
           </div>
         </section>

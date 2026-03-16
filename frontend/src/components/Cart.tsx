@@ -5,6 +5,7 @@ import { Trash2, Plus, Minus, Lock, Sparkles, CheckCircle, Truck, Shield } from 
 import Navbar from './Navbar';
 import AdvancedFooter from '../components/AdvancedFooter';
 import { useCart } from '@/context/CartContext';
+import { formatPrice } from '@/lib/gems/utils';
 
 interface RecommendedProduct {
   id: string;
@@ -49,11 +50,11 @@ function Cart() {
   // Handle quantity updates
   const handleUpdateQuantity = async (cartItemId: number, newQuantity: number) => {
     if (newQuantity < 1) return;
-    
+
     setUpdatingId(cartItemId);
     const success = await updateCartItem(cartItemId, newQuantity);
     setUpdatingId(null);
-    
+
     if (!success) {
       console.error('Failed to update quantity');
     }
@@ -80,7 +81,7 @@ function Cart() {
       navigate('/signin', { state: { from: '/checkout', message: 'Please sign in to proceed with checkout' } });
       return;
     }
-    
+
     // Navigate to checkout page
     navigate('/checkout');
   };
@@ -103,7 +104,7 @@ function Cart() {
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
       <Navbar />
-      
+
       <main className="flex-1 overflow-y-auto bg-[#faf9f7]">
         {/* Breadcrumb */}
         <div className="px-4 py-4 text-sm text-gray-600 md:px-16">
@@ -141,9 +142,12 @@ function Cart() {
                   {cartItems.map(item => (
                     <div key={item.cart_item_id} className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl shadow-sm">
                       <div className="relative w-full md:w-36 h-64 md:h-36 flex-shrink-0">
-                        <img 
-                          src={'/sample_gems/default.jpg'} 
+                        <img
+                          src={item.image ? item.image : "/sample_gems/default.jpg"}
                           alt={item.gem_name}
+                          onError={(e) => {
+                            e.currentTarget.src = "/sample_gems/default.jpg";
+                          }}
                           className="w-full h-full object-cover rounded-lg bg-gradient-to-br from-gray-900 to-gray-700"
                         />
                         {item.certification && (
@@ -156,7 +160,7 @@ function Cart() {
                       <div className="flex-1 flex flex-col">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-lg font-semibold leading-snug pr-4">{item.gem_name}</h3>
-                          <button 
+                          <button
                             onClick={() => handleRemoveItem(item.cart_item_id)}
                             className="text-gray-400 hover:text-red-700 transition-colors p-1"
                             aria-label="Remove item"
@@ -182,7 +186,7 @@ function Cart() {
 
                         <div className="flex justify-between items-center mt-auto">
                           <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
-                            <button 
+                            <button
                               onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity - 1)}
                               disabled={updatingId === item.cart_item_id}
                               className="px-3 py-2 hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -190,14 +194,14 @@ function Cart() {
                             >
                               <Minus size={16} className="text-gray-600" />
                             </button>
-                            <input 
-                              type="number" 
-                              value={item.quantity} 
-                              readOnly 
+                            <input
+                              type="number"
+                              value={item.quantity}
+                              readOnly
                               className="w-12 text-center border-x border-gray-200 py-2 text-base"
                               min="1"
                             />
-                            <button 
+                            <button
                               onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity + 1)}
                               disabled={updatingId === item.cart_item_id}
                               className="px-3 py-2 hover:bg-gray-50 transition-colors disabled:opacity-50"
@@ -208,7 +212,7 @@ function Cart() {
                           </div>
 
                           <div className="text-2xl font-semibold">
-                            ${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {formatPrice(item.price * item.quantity)}
                           </div>
                         </div>
                       </div>
@@ -224,18 +228,18 @@ function Cart() {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {recommendedProducts.map(product => (
-                      <div 
-                        key={product.id} 
+                      <div
+                        key={product.id}
                         className="bg-white rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg"
                       >
-                        <img 
-                          src={product.image} 
+                        <img
+                          src={product.image}
                           alt={product.name}
                           className="w-full h-52 object-cover bg-gradient-to-br from-gray-900 to-gray-700"
                         />
                         <h4 className="px-4 pt-4 text-base font-semibold">{product.name}</h4>
                         <p className="px-4 pb-4 font-semibold">
-                          ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          {formatPrice(product.price)}
                         </p>
                       </div>
                     ))}
@@ -251,7 +255,7 @@ function Cart() {
 
             <div className="flex justify-between mb-4 text-[15px]">
               <span>Subtotal</span>
-              <span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
 
             <div className="flex justify-between mb-4 text-[15px]">
@@ -264,20 +268,20 @@ function Cart() {
 
             <div className="flex justify-between mb-4 text-[15px]">
               <span>Estimated Tax</span>
-              <span>${estimatedTax.toFixed(2)}</span>
+              <span>{formatPrice(estimatedTax)}</span>
             </div>
 
             <div className="flex justify-between pt-4 mt-4 border-t-2 border-gray-300 font-semibold mb-6">
               <span>Total</span>
               <div className="text-right">
                 <div className="text-3xl">
-                  ${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  {formatPrice(total)}
                 </div>
-                <div className="text-xs text-gray-600 -mt-1">USD</div>
+                <div className="text-xs text-gray-600 -mt-1">LKR</div>
               </div>
             </div>
 
-            <button 
+            <button
               onClick={handleCheckout}
               disabled={isEmpty}
               className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-4 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors mb-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -307,7 +311,7 @@ function Cart() {
                   onChange={(e) => setPromoCode(e.target.value)}
                   className="flex-1 px-3 py-2.5 border border-gray-300 rounded-md text-[15px] focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 />
-                <button 
+                <button
                   onClick={handleApplyPromo}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-md transition-colors"
                 >

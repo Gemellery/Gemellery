@@ -62,6 +62,7 @@ export interface CreateGemParams {
   clarity?: string;
   color?: string;
   origin?: string;
+  mining_region?: string;
   price?: number;
   description?: string;
   ngja_certificate_no: string;
@@ -256,22 +257,36 @@ export const gemModel = {
           g.ngja_certificate_url as certificateUrl,
           JSON_ARRAYAGG(gi.image_url) as images,
           g.seller_id,
+          g.token_id as tokenId,
+          g.blockchain_status as blockchainStatus,
+          g.tx_hash as txHash,
           u.full_name as seller_name,
+          s.business_name,
+          s.verification_status as seller_verification_status,
           g.verification_status as verificationStatus,
           CASE 
             WHEN LOWER(g.verification_status) = 'approved' THEN 1
             ELSE 0
           END as verified,
+          CASE 
+            WHEN LOWER(s.verification_status) = 'approved' THEN 1
+            ELSE 0
+          END as seller_verified,
           g.status,
-          g.created_at as createdAt
+          g.created_at as createdAt,
+          u.joined_date as seller_joined_date,
+          ngja.regional_branch as seller_regional_branch
         FROM gem g
         LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
         LEFT JOIN user u ON g.seller_id = u.user_id
+        LEFT JOIN seller s ON g.seller_id = s.seller_id
+        LEFT JOIN ngja_registered_sellers ngja ON s.ngja_registration_no = ngja.ngja_registration_no
         WHERE ${whereClause}
         GROUP BY g.gem_id, g.gem_name, g.gem_type, g.price, g.carat, g.cut,
                  g.clarity, g.color, g.origin, g.mining_region, g.description,
                  g.ngja_certificate_no, g.ngja_certificate_url, g.seller_id,
-                 u.full_name, g.verification_status, g.status, g.created_at
+                 u.full_name, s.business_name, s.verification_status, u.joined_date, ngja.regional_branch, g.verification_status, 
+                 g.status, g.created_at, g.token_id, g.blockchain_status, g.tx_hash  
         ORDER BY g.created_at DESC
         LIMIT ? OFFSET ?
       `;
@@ -327,17 +342,31 @@ export const gemModel = {
           g.description,
           g.ngja_certificate_no,
           g.ngja_certificate_url,
+          g.token_id,
+          g.tx_hash,
+          g.blockchain_status,
+          g.minted_at,
           g.verification_status,
           CASE 
             WHEN LOWER(g.verification_status) = 'approved' THEN 1
             ELSE 0
           END as verified,
+          CASE 
+            WHEN LOWER(s.verification_status) = 'approved' THEN 1
+            ELSE 0
+          END as seller_verified,
           g.status,
           g.created_at,
           u.full_name as seller_name,
-          g.seller_id
+          s.business_name,
+          s.verification_status as seller_verification_status,
+          u.joined_date as seller_joined_date,
+          g.seller_id,
+          ngja.regional_branch as seller_regional_branch
         FROM gem g
         LEFT JOIN user u ON g.seller_id = u.user_id
+        LEFT JOIN seller s ON g.seller_id = s.seller_id
+        LEFT JOIN ngja_registered_sellers ngja ON s.ngja_registration_no = ngja.ngja_registration_no
         WHERE g.gem_id = ? AND g.status = 'Available'
       `;
 
@@ -379,25 +408,32 @@ export const gemModel = {
 
   /** New gem creation */
   createGem: async (params: CreateGemParams): Promise<number> => {
+
     const conn = await pool.getConnection();
 
     try {
       await conn.beginTransaction();
 
-      // Check for duplicate certificate
-      const exists = await gemModel.certificateExists(params.ngja_certificate_no, conn);
+      const exists = await gemModel.certificateExists(
+        params.ngja_certificate_no,
+        conn
+      );
+
       if (exists) {
         await conn.rollback();
-        throw { code: 'DUPLICATE_CERTIFICATE', message: 'This NGJA certificate number is already registered.' };
+        throw {
+          code: "DUPLICATE_CERTIFICATE",
+          message: "This NGJA certificate number is already registered.",
+        };
       }
 
-      // Insert the gem
-      const [gemResult]: any = await conn.query(
+      const [result]: any = await conn.query(
         `INSERT INTO gem
-          (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
-           price, description, ngja_certificate_no, ngja_certificate_url,
-           updated_date, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
+      (seller_id, gem_name, gem_type, carat, cut, clarity, color, origin,
+       mining_region, price, description,
+       ngja_certificate_no, ngja_certificate_url,
+       updated_date, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), 'Available')`,
         [
           params.seller_id,
           params.gem_name,
@@ -407,6 +443,7 @@ export const gemModel = {
           params.clarity || null,
           params.color || null,
           params.origin || null,
+          params.mining_region || null,
           params.price || null,
           params.description || null,
           params.ngja_certificate_no,
@@ -414,32 +451,35 @@ export const gemModel = {
         ]
       );
 
-      const gem_id = gemResult.insertId;
+      const gem_id = result.insertId;
 
-      // Insert images if any
       if (params.images && params.images.length > 0) {
-        const imageValues = params.images.map((filename: string) => [gem_id, filename]);
+        const values = params.images.map((img) => [gem_id, img]);
+
         await conn.query(
           `INSERT INTO gem_images (gem_id, image_url) VALUES ?`,
-          [imageValues]
+          [values]
         );
       }
 
       await conn.commit();
       return gem_id;
 
-    } catch (error: any) {
+    } catch (err: any) {
+
       await conn.rollback();
 
-      // Re-throw with proper error code for duplicate entry
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw { code: 'DUPLICATE_CERTIFICATE', message: 'This NGJA certificate number is already used for another gem.' };
+      if (err.code === "ER_DUP_ENTRY") {
+        throw {
+          code: "DUPLICATE_CERTIFICATE",
+          message: "This NGJA certificate number already exists.",
+        };
       }
 
-      throw error;
+      throw err;
 
     } finally {
       conn.release();
     }
-  },
+  }
 };

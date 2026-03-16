@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { ChevronUp, ChevronDown } from 'lucide-react'
+import { ChevronUp, ChevronDown, X } from 'lucide-react'
 import type { GemFilters } from '@/lib/gems/types'
 
 /* === Props — what the parent (Marketplace) passes in === */
 
 interface FilterSectionProps {
   onFilterChange: (filters: GemFilters) => void;
+  resetTrigger?: number; 
+  isOpen: boolean;
+  onClose: () => void;
+  totalResults: number;
 }
 /* === Internal filter state shape === */
 interface FiltersType {
@@ -273,7 +277,7 @@ const CutShapeButton: React.FC<{
 ))
 
 /* === FilterSection Component === */
-const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
+const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange, resetTrigger, isOpen, onClose, totalResults }) => {
   const [expandedSections, setExpandedSections] = useState<ExpandedSectionsType>({
     gemName: true,
     caratWeight: true,
@@ -355,35 +359,58 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
     })
   }, [])
 
-  const handleResetAll = useCallback(() => {
-    setFilters({
-      gemName: [],
-      caratWeight: [0.5, 50],
-      priceRange: [],
-      customPriceMin: '',
-      customPriceMax: '',
-      color: [],
-      cutShape: [],
-      clarity: [],
-      miningRegion: [],
-      treatment: [],
-      certification: [],
-    })
-  }, [])
+  // Listen for external reset triggers
+  useEffect(() => {
+    if (resetTrigger && resetTrigger > 0) {
+      setFilters({
+        gemName: [],
+        caratWeight: [0.5, 50],
+        priceRange: [],
+        customPriceMin: '',
+        customPriceMax: '',
+        color: [],
+        cutShape: [],
+        clarity: [],
+        miningRegion: [],
+        treatment: [],
+        certification: [],
+      })
+    }
+  }, [resetTrigger])
 
   return (
-    <div className="w-full max-w-sm bg-white rounded-lg shadow-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between py-4 px-4 border-b border-gray-200">
-        <h2 className="text-lg font-bold text-gray-900">Filters</h2>
-        <button
-          onClick={handleResetAll}
-          className="text-red-500 hover:text-red-600 text-sm font-medium transition"
-        >
-          Reset All
-        </button>
-      </div>
+    <>
+      {/* Slide-in Filters Drawer overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/40 z-50 transition-opacity"
+          onClick={onClose}
+        />
+      )}
 
+      {/* Slide-in Filters Drawer panel */}
+      <div 
+        className={`fixed top-0 left-0 h-full w-[360px] max-w-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between p-6 pb-4 shrink-0">
+          <h2 className="text-xl font-semibold text-gray-900">All Filters</h2>
+          <div className="flex items-center gap-4">
+            
+            <button 
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Drawer Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-2 border-t border-gray-100/50">
+          <div className="pb-20 pt-2">
       {/* Gem Name */}
       <CollapsibleSection title="Gem Type" isExpanded={expandedSections.gemName} onToggle={() => toggleSection('gemName')}>
         <div className="space-y-1">
@@ -576,10 +603,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
       <CollapsibleSection title="Price Range" isExpanded={expandedSections.priceRange} onToggle={() => toggleSection('priceRange')}>
         <div className="space-y-1">
           {[
-            { label: 'Under USD. 100,000', value: 'under100k' },
-            { label: 'USD. 100,000 - 250,000', value: '100kto250k' },
-            { label: 'USD. 250,000 - 500,000', value: '250kto500k' },
-            { label: 'Over USD. 500,000', value: 'above500k' },
+            { label: 'Under Rs. 100,000', value: 'under100k' },
+            { label: 'Rs. 100,000 - 250,000', value: '100kto250k' },
+            { label: 'Rs. 250,000 - 500,000', value: '250kto500k' },
+            { label: 'Over Rs. 500,000', value: 'above500k' },
           ].map(item => (
             <FilterCheckbox
               key={item.value}
@@ -728,7 +755,20 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onFilterChange }) => {
           <FilterCheckbox label="Uncertified" checked={filters.certification.includes('uncertified')} onChange={() => handleCheckboxChange('certification', 'uncertified')} />
         </div>
       </CollapsibleSection>
-    </div>
+          </div>
+        </div>
+
+        {/* Sticky Drawer Footer */}
+        <div className="p-4 bg-white border-t border-gray-100 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <button
+            onClick={onClose}
+            className="w-full bg-[#222222] hover:bg-black text-white font-medium py-3.5 px-6 rounded transition-colors flex items-center justify-center gap-2 text-sm"
+          >
+            Show {totalResults > 10000 ? '10000+' : totalResults} Results
+          </button>
+        </div>
+      </div>
+    </>
   )
 }
 

@@ -347,11 +347,10 @@ function VerifyGems() {
                                                         className="px-3 py-1 text-xs bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center gap-1"
                                                     >
                                                         <RefreshCw
-                                                            className={`h-3 w-3 ${
-                                                                retryingId === g.gem_id
+                                                            className={`h-3 w-3 ${retryingId === g.gem_id
                                                                     ? "animate-spin"
                                                                     : ""
-                                                            }`}
+                                                                }`}
                                                         />
                                                         {retryingId === g.gem_id
                                                             ? "Retrying..."
@@ -537,11 +536,10 @@ function VerifyGems() {
                                                 className="px-5 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2"
                                             >
                                                 <RefreshCw
-                                                    className={`h-4 w-4 ${
-                                                        retryingId === reviewGem.gem_id
+                                                    className={`h-4 w-4 ${retryingId === reviewGem.gem_id
                                                             ? "animate-spin"
                                                             : ""
-                                                    }`}
+                                                        }`}
                                                 />
                                                 {retryingId === reviewGem.gem_id
                                                     ? "Retrying..."
@@ -570,7 +568,7 @@ function VerifyGems() {
                                 <div className="flex-1 border rounded bg-white overflow-hidden">
                                     {reviewGem.ngja_certificate_url ? (
                                         <iframe
-                                            src={`http://localhost:5001/uploads/gem_certificates/${reviewGem.ngja_certificate_url}`}
+                                            src={reviewGem.ngja_certificate_url}
                                             className="w-full h-full"
                                         />
                                     ) : (

@@ -291,11 +291,11 @@ function ManageBlogPosts() {
                                         <td className="p-4">
                                             {p.blog_image_url ? (
                                                 <img
-                                                    src={`http://localhost:5001${p.blog_image_url}`}
+                                                    src={p.blog_image_url || "/placeholder-blog.png"}
                                                     alt={p.blog_title}
                                                     className="w-16 h-16 object-cover rounded-md border shadow-sm"
                                                     onError={(e) => {
-                                                        (e.target as HTMLImageElement).style.display = "none";
+                                                        (e.target as HTMLImageElement).src = "/placeholder-blog.png";
                                                     }}
                                                 />
                                             ) : (

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import fs from "fs";
-import path from "path";
 import * as BlogModel from "../models/Blog.model";
 
-// Get all posts
+// ============================================================
+// Get All Posts
+// ============================================================
 
 export const getAllPosts = async (req: Request, res: Response) => {
     try {
@@ -31,8 +31,9 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-
-// Create posts
+// ============================================================
+// Create Post
+// ============================================================
 
 export const createPost = async (req: Request, res: Response) => {
     try {
@@ -44,8 +45,9 @@ export const createPost = async (req: Request, res: Response) => {
             });
         }
 
-        const imagePath = req.file
-            ? `/uploads/blog_images/${req.file.filename}`
+        // S3 file location
+        const imageUrl = req.file
+            ? (req.file as any).location
             : null;
 
         const userId = (req as any).user?.id;
@@ -60,7 +62,7 @@ export const createPost = async (req: Request, res: Response) => {
             user_id: userId,
             blog_title,
             blog_content,
-            blog_image_url: imagePath,
+            blog_image_url: imageUrl,
         });
 
         return res.status(201).json({
@@ -76,8 +78,9 @@ export const createPost = async (req: Request, res: Response) => {
     }
 };
 
-
-// Edit post
+// ============================================================
+// Edit Post
+// ============================================================
 
 export const editPost = async (req: Request, res: Response) => {
     try {
@@ -104,29 +107,18 @@ export const editPost = async (req: Request, res: Response) => {
             });
         }
 
-        let imagePath: string | null = existingPost.blog_image_url;
+        let imageUrl: string | null = existingPost.blog_image_url;
 
+        // If a new image is uploaded, replace with S3 URL
         if (req.file) {
-            imagePath = `/uploads/blog_images/${req.file.filename}`;
-
-            // Delete old image
-            if (existingPost.blog_image_url) {
-                const oldImagePath = path.join(
-                    process.cwd(),
-                    existingPost.blog_image_url
-                );
-
-                if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                }
-            }
+            imageUrl = (req.file as any).location;
         }
 
         await BlogModel.updatePost(id, {
             user_id: existingPost.user_id,
             blog_title,
             blog_content,
-            blog_image_url: imagePath,
+            blog_image_url: imageUrl,
         });
 
         return res.json({
@@ -141,8 +133,9 @@ export const editPost = async (req: Request, res: Response) => {
     }
 };
 
-
-// Delete posts
+// ============================================================
+// Delete Post
+// ============================================================
 
 export const deletePost = async (req: Request, res: Response) => {
     try {
@@ -162,17 +155,8 @@ export const deletePost = async (req: Request, res: Response) => {
             });
         }
 
-        // Delete image file if exists
-        if (existingPost.blog_image_url) {
-            const imagePath = path.join(
-                process.cwd(),
-                existingPost.blog_image_url
-            );
-
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-            }
-        }
+        // Note: S3 object deletion not implemented here
+        // (optional improvement later)
 
         await BlogModel.deletePost(id);
 
@@ -188,8 +172,9 @@ export const deletePost = async (req: Request, res: Response) => {
     }
 };
 
-
-// Publish Unpublish
+// ============================================================
+// Publish / Unpublish
+// ============================================================
 
 export const togglePublish = async (req: Request, res: Response) => {
     try {

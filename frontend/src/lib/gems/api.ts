@@ -1,12 +1,18 @@
 import { API_CONFIG } from '@/lib/api.config';
-import type { GemListItem, GemFilters, GemApiResponse } from '@/lib/gems/types';
+import type { GemListItem, GemFilters, GemApiResponse, GemData, GemResponse } from '@/lib/gems/types';
 
 /* === Image URL builder === */
-export function getGemImageUrl(filename: string): string {
-  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${filename}`;
+export function getGemImageUrl(path: string): string {
+  if (!path) return '';
+  // If already a full URL (S3 / CDN)
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  // Otherwise use backend upload path
+  return `${import.meta.env.VITE_API_URL}/${path}`;
 }
 
-/* === parseImages — safely parse the images field === */
+/* === Parse image === */
 function parseImages(images: any): string[] {
   if (!images) return [];
 
@@ -32,7 +38,7 @@ function parseImages(images: any): string[] {
   return [];
 }
 
-/* === normalizeGem — convert raw API row → GemListItem === */
+/* === GemListItem === */
 function normalizeGem(raw: any): GemListItem {
   return {
     id: raw.id,
@@ -50,6 +56,14 @@ function normalizeGem(raw: any): GemListItem {
     images: parseImages(raw.images),
     seller_id: raw.seller_id || 0,
     seller_name: raw.seller_name || 'Unknown Seller',
+    business_name: raw.business_name,
+    seller_verification_status: raw.seller_verification_status || 'pending',
+    seller_verified: raw.seller_verified === 1 || raw.seller_verified === true,
+    seller_joined_date: raw.seller_joined_date || '',
+    txHash: raw.txHash || '',
+    blockchainStatus: raw.blockchainStatus || '',
+    tokenId: raw.tokenId || '',
+    seller_regional_branch: raw.seller_regional_branch || '',
     verificationStatus: raw.verificationStatus || 'pending',
     verified: raw.verified === 1 || raw.verified === true,
     status: raw.status || 'Available',
@@ -57,7 +71,7 @@ function normalizeGem(raw: any): GemListItem {
   };
 }
 
-/* === fetchGems — fetch gems from GET /api/gems === */
+/* === fetchGems === */
 export async function fetchGems(
   filters: GemFilters = {}
 ): Promise<GemApiResponse> {
@@ -109,4 +123,26 @@ export async function fetchGems(
       total: json.pagination?.total || 0,
     },
   };
+}
+
+/* === fetchGemById === */
+export async function fetchGemById(id: string): Promise<GemData> {
+  const url = `${API_CONFIG.BASE_URL}${API_CONFIG.GEMS_ENDPOINT}/${id}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Gem not found");
+    }
+    throw new Error(`Failed to fetch gem details: ${response.statusText}`);
+  }
+
+  const result: GemResponse = await response.json();
+
+  if (!result.success || !result.data) {
+    throw new Error("Failed to fetch gem details: Invalid API response");
+  }
+
+  return result.data;
 }

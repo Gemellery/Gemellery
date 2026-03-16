@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import { useEffect, useState } from "react";
 import "./index.css";
 
@@ -28,6 +29,7 @@ import AdminDashboardLayout from "./pages/Dashboards/admin.dashboard";
 import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
 import OrderHistory from "./pages/OrderHistory/index";
+import WishlistPage from "./pages/buyer/BuyerWishlist";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -44,6 +46,11 @@ import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import AdminReports from "./pages/Admin/ReportsPage";
 import Maintenance from "./pages/MaintenancePage";
+import NotFound from "./pages/NotFound";
+import ServerError from "./pages/ServerError";
+import AccessDenied from "./pages/AccessDenied";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
+import AiChat from "./components/AiChat";
 
 
 function MaintenancePage() {
@@ -112,13 +119,18 @@ function AppRoutes() {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
-      <Route path="/jewelry-designer" element={<JewelryDesigner />} />
-      <Route path="/jewelry_designer" element={<JewelryDesigner />} />
-      <Route path="/jewelry-designer/results" element={<JewelryResults />} />
-      <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
-      <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+      <Route element={<DesignHistoryLayout />}>
+        <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+        <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+        <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+        <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+        <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+      </Route>
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/500" element={<ServerError />} />
+          <Route path="/403" element={<AccessDenied />} />
+          <Route path="*" element={<NotFound />} />
 
       <Route path="/seller/:id" element={<SellerProfile />} />
 
@@ -202,6 +214,15 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+          <Route
+            path="/buyer/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
 
       <Route
         path="/admin/dashboard"
@@ -293,6 +314,7 @@ function App() {
   return (
     <CartProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<SignIn />} />
@@ -306,11 +328,13 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/jewelry-designer" element={<JewelryDesigner />} />
-          <Route path="/jewelry_designer" element={<JewelryDesigner />} />
-          <Route path="/jewelry-designer/results" element={<JewelryResults />} />
-          <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
-          <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          <Route element={<DesignHistoryLayout />}>
+            <Route path="/jewelry-designer" element={<JewelryDesigner />} />
+            <Route path="/jewelry_designer" element={<JewelryDesigner />} />
+            <Route path="/jewelry-designer/results" element={<JewelryResults />} />
+            <Route path="/jewelry-designer/refine/:id" element={<JewelryRefine />} />
+            <Route path="/jewelry-designer/design/:id" element={<DesignDetail />} />
+          </Route>
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
 
@@ -393,6 +417,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerDashboardLayout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <WishlistPage />
               </ProtectedRoute>
             }
           />
@@ -482,6 +515,7 @@ function App() {
 
         </Routes>
       </BrowserRouter>
+      <AiChat />
     </CartProvider>
   );
 }
