@@ -24,6 +24,48 @@ router.get("/dashboard-summary", authGuard, authorizeRole("seller"), getSellerDa
 router.get("/inventory", authGuard, authorizeRole("seller"), getSellerInventory);
 router.patch("/gems/:id/status", authGuard, authorizeRole("seller"), updateGemStatus);
 
+// Submit a review for a seller (buyer only)
+router.post("/:id/reviews", authGuard, async (req: Request, res: Response) => {
+  const sellerId = req.params.id;
+  const buyerId = (req as any).user?.id;
+  const { rating, comment } = req.body;
+
+  if (!buyerId) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
+  }
+
+  try {
+    // Insert the review
+    const [insertResult]: any = await pool.query(
+      `INSERT INTO seller_reviews (seller_id, buyer_id, rating, review, review_date)
+       VALUES (?, ?, ?, ?, NOW())`,
+      [sellerId, buyerId, rating, comment || ""]
+    );
+
+    // Fetch buyer name to return with the response
+    const [buyerRows]: any = await pool.query(
+      `SELECT full_name FROM user WHERE user_id = ?`,
+      [buyerId]
+    );
+
+    return res.status(201).json({
+      review: {
+        id: insertResult.insertId,
+        buyerName: buyerRows[0]?.full_name || "Anonymous",
+        rating,
+        comment: comment || "",
+        date: new Date().toISOString(),
+      },
+    });
+  } catch (error: any) {
+    console.error("Submit review error:", error);
+    return res.status(500).json({ message: "Internal server error", detail: error?.message, sqlMessage: error?.sqlMessage });
+  }
+});
+
 // NEW: Public seller profile - no login required
 router.get("/:id", async (req: Request, res: Response) => {
   const sellerId = req.params.id;

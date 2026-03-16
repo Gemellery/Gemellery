@@ -5,6 +5,7 @@ import { Trash2, Plus, Minus, Lock, Sparkles, CheckCircle, Truck, Shield } from 
 import Navbar from './Navbar';
 import AdvancedFooter from '../components/AdvancedFooter';
 import { useCart } from '@/context/CartContext';
+import { formatPrice } from '@/lib/gems/utils';
 
 interface RecommendedProduct {
   id: string;
@@ -211,7 +212,7 @@ function Cart() {
                           </div>
 
                           <div className="text-2xl font-semibold">
-                            ${(item.price * item.quantity).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                            {formatPrice(item.price * item.quantity)}
                           </div>
                         </div>
                       </div>
@@ -238,7 +239,7 @@ function Cart() {
                         />
                         <h4 className="px-4 pt-4 text-base font-semibold">{product.name}</h4>
                         <p className="px-4 pb-4 font-semibold">
-                          ${product.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          {formatPrice(product.price)}
                         </p>
                       </div>
                     ))}
@@ -254,7 +255,7 @@ function Cart() {
 
             <div className="flex justify-between mb-4 text-[15px]">
               <span>Subtotal</span>
-              <span>${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
 
             <div className="flex justify-between mb-4 text-[15px]">
@@ -267,16 +268,16 @@ function Cart() {
 
             <div className="flex justify-between mb-4 text-[15px]">
               <span>Estimated Tax</span>
-              <span>${estimatedTax.toFixed(2)}</span>
+              <span>{formatPrice(estimatedTax)}</span>
             </div>
 
             <div className="flex justify-between pt-4 mt-4 border-t-2 border-gray-300 font-semibold mb-6">
               <span>Total</span>
               <div className="text-right">
                 <div className="text-3xl">
-                  ${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  {formatPrice(total)}
                 </div>
-                <div className="text-xs text-gray-600 -mt-1">USD</div>
+                <div className="text-xs text-gray-600 -mt-1">LKR</div>
               </div>
             </div>
 

@@ -228,8 +228,11 @@ function BuyerDashboardLayout() {
         </div>
 
         {/* Wishlist */}
-        <h3 className="flex items-center text-lg font-bold underline mt-10">
-          Wish List <ArrowRight className="ml-2" />
+        <h3
+          className="flex items-center text-lg font-bold underline mt-10 cursor-pointer text-black hover:text-gray-700 w-fit"
+          onClick={() => navigate("/buyer/wishlist")}
+        >
+          Wishlist <ArrowRight className="ml-2 w-5 h-5" />
         </h3>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6 mt-6">
           {wishlist.length === 0 && (
@@ -238,7 +241,7 @@ function BuyerDashboardLayout() {
             </p>
           )}
 
-          {wishlist.map((item) => (
+          {wishlist.slice(0, 4).map((item) => (
             <div
               key={item.wishlist_id}
               className="rounded-2xl border border-[#e9dfc8] bg-white p-3"
@@ -276,6 +279,15 @@ function BuyerDashboardLayout() {
               </div>
             </div>
           ))}
+
+          {wishlist.length > 4 && (
+            <button
+              className="col-span-full mt-4 px-6 py-2 bg-red-700 text-white rounded-full font-semibold hover:bg-red-900 transition shadow"
+              onClick={() => navigate("/buyer/wishlist")}
+            >
+              View All Wishlist Items
+            </button>
+          )}
         </div>
 
         {/* AI Designs (still static) */}

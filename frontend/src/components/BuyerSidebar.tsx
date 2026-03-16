@@ -75,12 +75,6 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
               <Rows3 className="w-4 h-4" /> Wishlist
             </button>
 
-            <button
-              onClick={() => navigate("/buyer/payments")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/payments' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <BadgeDollarSign className="w-4 h-4" /> Payment Methods
-            </button>
 
           </nav>
         </div>
