@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
 import type { BlogPost } from "../../types/blog.types";
 import { fetchBlogs } from "../../services/blogService";
-import { Search, BookOpen } from "lucide-react";
+import { Search, BookOpen, Gem } from "lucide-react";
 
 const getImageSrc = (url: string | null): string => {
   if (!url) return '';
@@ -125,7 +125,7 @@ const BlogList: React.FC = () => {
 
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-24">
-            <p className="text-5xl mb-4">💎</p>
+            <Gem className="w-12 h-12 text-amber-400 mx-auto mb-4 opacity-60" />
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               No articles found
             </h3>
@@ -172,7 +172,7 @@ const BlogList: React.FC = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-5xl opacity-20">💎</span>
+                        <Gem className="w-12 h-12 text-amber-300 opacity-30" />
                       </div>
                     )}
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xs px-3 py-1 rounded-full text-amber-700 font-medium shadow">

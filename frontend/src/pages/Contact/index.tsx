@@ -332,9 +332,9 @@ const ConciergeContactPage: React.FC = () => {
             ))}
           </div>
           <div className="text-center mt-8">
-            <button className="text-teal-700 font-medium hover:text-teal-800">
+            <a href="/faq" className="text-teal-700 font-medium hover:text-teal-800">
               View Help Center →
-            </button>
+            </a>
           </div>
         </div>
       </div>

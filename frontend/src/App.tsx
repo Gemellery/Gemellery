@@ -14,8 +14,8 @@ import ProductSpecifications from "./components/ProductSpecifications";
 import Cart from "./components/Cart";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/Signin/ForgotPassword";
+import ResetPassword from "./pages/Signin/ResetPassword";
 import AddNewGem from "./pages/Gem/AddNewGem";
 import EditGem from "./pages/Gem/EditGem";
 import JewelryDesigner from "./pages/JewelryDesigner/Designer";
@@ -51,7 +51,7 @@ import ServerError from "./pages/ServerError";
 import AccessDenied from "./pages/AccessDenied";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import AiChat from "./components/AiChat";
-
+import FAQ from "./pages/FAQ";
 
 function MaintenancePage() {
   return (
@@ -337,7 +337,10 @@ function App() {
           </Route>
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:id" element={<BlogDetail />} />
-
+          <Route path="/500" element={<ServerError />} />
+          <Route path="/403" element={<AccessDenied />} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
 
           <Route

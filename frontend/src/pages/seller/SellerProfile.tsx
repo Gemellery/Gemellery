@@ -111,11 +111,7 @@ const SellerProfile: React.FC = () => {
 
             <div className="px-5 sm:px-8 pb-6 -mt-14 relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-card overflow-hidden shadow-md bg-accent/20">
-                    <img src={PLACEHOLDER_AVATAR} alt={seller.fullName} className="w-full h-full object-cover" />
-                  </div>
-                </div>
+               
 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">

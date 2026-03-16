@@ -3,7 +3,9 @@ import nodemailer from "nodemailer";
 export const sendEmail = async (
   to: string,
   subject: string,
-  text: string
+  text: string,
+  html?: string,
+  attachments?: any[]
 ) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -17,6 +19,8 @@ export const sendEmail = async (
     from: `"Gemellery" <${process.env.EMAIL_USER}>`,
     to,
     subject,
-    text
+    text,
+    html,
+    attachments
   });
 };
