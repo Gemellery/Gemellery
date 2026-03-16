@@ -125,7 +125,7 @@ const BlogList: React.FC = () => {
 
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-24">
-            <p className="text-5xl mb-4">💎</p>
+            <Gem className="w-12 h-12 text-amber-400 mx-auto mb-4 opacity-60" />
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               No articles found
             </h3>
