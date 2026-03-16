@@ -245,7 +245,7 @@ function SignIn() {
                 <button
                   type="button"
                   onClick={() => navigate("/forgot-password")}
-                  className="text-xs text-[#1a6fc4] hover:text-teal-800 hover:underline font-medium transition-colors"
+                  className="text-xs text-[#1a6fc4] hover:text-[#1a6fc4] hover:underline font-medium transition-colors"
                 >
                   Forgot password?
                 </button>

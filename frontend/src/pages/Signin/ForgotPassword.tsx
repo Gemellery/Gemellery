@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LockKeyhole } from 'lucide-react';
+import { LockKeyhole, MoveLeft } from 'lucide-react';
 import BasicFooter from '../../components/BasicFooter';
 
 function ForgotPassword() {
@@ -96,9 +96,9 @@ function ForgotPassword() {
                         <div className="flex justify-center mt-6">
                             <button
                                 onClick={() => navigate("/signin")}
-                                className="text-xs text-[#1F7A73] hover:text-teal-800 hover:underline font-semibold transition-colors"
+                                className="text-xs text-[#1a6fc4] hover:text-[#1a6fc4] hover:underline font-semibold transition-colors flex items-center gap-1.5"
                             >
-                                ← Back to Sign In
+                                <MoveLeft size={14} /> Back to Sign In
                             </button>
                         </div>
                     </div>
