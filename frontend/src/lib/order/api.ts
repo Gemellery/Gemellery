@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@/lib/api.config';
-import type { CheckoutRequest, CheckoutResponse } from './types';
+import type { CheckoutRequest, CheckoutResponse, PaymentIntentResponse } from './types';
 
 /**
  * Helper: Get auth headers
@@ -42,4 +42,21 @@ export async function checkoutOrder(
     order_id: data.order_id,
     total_amount: data.total_amount,
   };
+}
+
+/**
+ * Initialize Stripe payment for current cart
+ */
+export async function createPaymentIntent(): Promise<PaymentIntentResponse> {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/api/orders/payment-intent`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || `Failed to initialize payment (${response.status})`);
+  }
+
+  return response.json();
 }
