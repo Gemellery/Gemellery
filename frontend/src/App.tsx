@@ -67,7 +67,7 @@ function AppRoutes() {
 
   useEffect(() => {
 
-    fetch("http://localhost:5001/api/system-settings")
+    fetch("/api/system-settings")
       .then(res => res.json())
       .then(data => {
 
@@ -97,21 +97,21 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/marketplace" element={<Marketplace />} />
-      <Route 
-        path="/shipping-form" 
+      <Route
+        path="/shipping-form"
         element={
           <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
             <ShippingForm />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/checkout" 
+      <Route
+        path="/checkout"
         element={
           <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
             <ShippingForm />
           </ProtectedRoute>
-        } 
+        }
       />
       <Route path="/product-detail/:id" element={<ProductDetail />} />
       <Route path="/product-gallery" element={<ProductSpecifications />} />
@@ -128,9 +128,9 @@ function AppRoutes() {
       </Route>
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
-          <Route path="/500" element={<ServerError />} />
-          <Route path="/403" element={<AccessDenied />} />
-          <Route path="*" element={<NotFound />} />
+      <Route path="/500" element={<ServerError />} />
+      <Route path="/403" element={<AccessDenied />} />
+      <Route path="*" element={<NotFound />} />
 
       <Route path="/seller/:id" element={<SellerProfile />} />
 
@@ -215,14 +215,14 @@ function AppRoutes() {
         }
       />
 
-          <Route
-            path="/buyer/wishlist"
-            element={
-              <ProtectedRoute allowedRoles={["buyer"]}>
-                <WishlistPage />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/buyer/wishlist"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <WishlistPage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/admin/dashboard"

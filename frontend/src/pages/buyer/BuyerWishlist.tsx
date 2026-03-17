@@ -17,7 +17,7 @@ function WishlistPage() {
     if (!token) return;
     const fetchWishlist = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/wishlist`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/wishlist`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
