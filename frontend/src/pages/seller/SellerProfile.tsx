@@ -129,12 +129,12 @@ const SellerProfile: React.FC = () => {
                         </span>
                         {seller.verificationStatus === "approved" && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                            ✓ Verified Seller
+                            Verified Seller
                           </span>
                         )}
                         {seller.verificationStatus === "pending" && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
-                            ⏳ Pending Verification
+                             Pending Verification
                           </span>
                         )}
                       </div>
