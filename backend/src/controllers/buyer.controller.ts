@@ -135,15 +135,16 @@ export const getRecentOrders = async (req: Request, res: Response) => {
           o.order_status,
           o.total_amount,
           o.created_at,
+          g.gem_name,
           MIN(gi.image_url) AS image_url
         FROM orders o
         LEFT JOIN order_items oi ON oi.order_id = o.order_id
         LEFT JOIN gem g ON g.gem_id = oi.gem_id
         LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
         WHERE o.buyer_id = ?
-        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at
+        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, g.gem_name
         ORDER BY o.created_at DESC
-        LIMIT 5
+        LIMIT 10
       `,
       [buyerId]
     );
@@ -186,6 +187,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
         NULL AS state,
         NULL AS zip,
         MIN(gi.image_url) AS image_url,
+        GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
         COUNT(DISTINCT oi.order_item_id) AS item_count
       FROM orders o
       LEFT JOIN order_items oi ON oi.order_id = o.order_id
