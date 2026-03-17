@@ -203,7 +203,7 @@ function SellerDashboardLayout() {
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-500">Total Revenue</span>
                             <span className="text-2xl font-bold text-gray-900">
-                                ${dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString()}` : "Loading..."}
+                                {dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString('en-US')}` : "Loading..."}
                             </span>
                             <span className={`text-xs mt-1 ${dashboardStats?.revenueTrend >= 0 ? "text-green-600" : "text-red-600"}`}>
                                 {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% from last month` : ""}
@@ -317,7 +317,7 @@ function SellerDashboardLayout() {
                                     {gem.carat} ct • {gem.cut}
                                 </p>
                                 <p className="font-bold text-red-500">
-                                    ${Number(gem.price).toLocaleString()}
+                                    LKR {Number(gem.price).toLocaleString('en-US')}
                                 </p>
                             </div>
                         </div>

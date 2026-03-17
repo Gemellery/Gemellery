@@ -290,7 +290,7 @@ export default function SellerInventory() {
                               {gem.color && <span> · {gem.color}</span>}
                             </td>
                             <td className="p-4 font-semibold text-gray-900">
-                              ${Number(gem.price).toLocaleString()}
+                              LKR {Number(gem.price).toLocaleString('en-US')}
                             </td>
                             <td className="p-4">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${sBadge.style}`}>
