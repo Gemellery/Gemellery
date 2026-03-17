@@ -49,7 +49,7 @@ function SellerSettings() {
     const [isEditing, setIsEditing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+    const API_URL = import.meta.env.VITE_API_URL || "";
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
 

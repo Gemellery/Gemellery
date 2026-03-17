@@ -16,7 +16,7 @@ function ReportModal({ reportType, onClose }: Props) {
     const [summary, setSummary] = useState<any>(null);
     const [rows, setRows] = useState<any[]>([]);
 
-    const BASE_URL = "http://localhost:5001/api/admin/reports";
+    const BASE_URL = "/api/admin/reports";
 
     const ENDPOINTS: Record<ReportType, string> = {
         sales: "sales",

@@ -46,7 +46,7 @@ function AddNewGem() {
 
             try {
 
-                const res = await fetch("http://localhost:5001/api/gems/enums");
+                const res = await fetch("/api/gems/enums");
 
                 const data = await res.json();
 
@@ -95,7 +95,7 @@ function AddNewGem() {
 
         try {
 
-            const res = await fetch("http://localhost:5001/api/gems", {
+            const res = await fetch("/api/gems", {
                 method: "POST",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData
