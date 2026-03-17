@@ -4,7 +4,7 @@ import BuyerSidebar from "../../components/BuyerSidebar";
 import Footer from "../../components/BasicFooter";
 import { Heart } from "lucide-react";
 import type { WishlistItem } from "../../lib/wishlist/types";
-import { API_CONFIG } from "../../lib/api.config";
+import { getGemImageUrl } from "../../lib/gems/api";
 
 
 
@@ -25,6 +25,10 @@ function WishlistPage() {
         });
         if (!res.ok) return;
         const data = await res.json();
+        // Debug: log image URLs for each item
+        (data.items || data).forEach((item: any) => {
+          console.log('Wishlist image_url:', item.image_url, 'gem_id:', item.gem_id, 'gem_name:', item.gem_name);
+        });
         setWishlist(data.items || data); // support both array and {items: array}
       } catch (err) {
         console.error("wishlist error", err);
@@ -69,7 +73,9 @@ function WishlistPage() {
                       <img
                         src={
                           item.image_url
-                            ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`
+                            ? (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')
+                                ? item.image_url
+                                : getGemImageUrl(`uploads/gem_images/${item.image_url}`))
                             : "/placeholder-gem.png"
                         }
                         alt={item.gem_name}

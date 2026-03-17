@@ -251,7 +251,9 @@ function BuyerDashboardLayout() {
                   <img
                     src={
                       item.image_url
-                        ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`
+                        ? (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')
+                            ? item.image_url
+                            : `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`)
                         : "/placeholder-gem.png"
                     }
                     alt={item.gem_name}
