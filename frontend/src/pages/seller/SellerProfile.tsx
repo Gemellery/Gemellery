@@ -147,18 +147,7 @@ const SellerProfile: React.FC = () => {
               </div>
 
               {/* Stats */}
-              <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  { label: "Total Gems", value: gems.length.toString() },
-                  { label: "Total Reviews", value: totalReviews.toString() },
-                  { label: "Average Rating", value: averageRating > 0 ? `${averageRating} / 5` : "No ratings yet" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="bg-background rounded-[var(--radius-lg)] px-4 py-3 border border-border">
-                    <p className="text-xs text-foreground/50 uppercase tracking-wide font-medium">{label}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">{value}</p>
-                  </div>
-                ))}
-              </div>
+             
             </div>
           </div>
 
