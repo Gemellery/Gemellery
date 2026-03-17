@@ -42,7 +42,7 @@ function EditGem() {
     useEffect(() => {
         const fetchGem = async () => {
             try {
-                const res = await fetch(`http://localhost:5001/api/gems/seller/${id}`, {
+                const res = await fetch(`/api/gems/seller/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -118,7 +118,7 @@ function EditGem() {
         newImages.forEach((img) => formData.append("images", img));
 
         try {
-            const response = await fetch(`http://localhost:5001/api/gems/${id}`, {
+            const response = await fetch(`/api/gems/${id}`, {
                 method: "PUT",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,
@@ -253,7 +253,7 @@ function EditGem() {
                                         {existingImages.map((img) => (
                                             <div key={img.image_id} className="relative group">
                                                 <img
-                                                    src={`http://localhost:5001/uploads/gem_images/${img.image_url}`}
+                                                    src={`/uploads/gem_images/${img.image_url}`}
                                                     alt="Gem"
                                                     className="w-full h-24 object-cover rounded-lg border"
                                                     onError={(e) => {

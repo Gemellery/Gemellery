@@ -99,7 +99,7 @@ function VerifyGems() {
     }, []);
 
     const loadGems = async () => {
-        const res = await fetch("http://localhost:5001/api/admin/gems", {
+        const res = await fetch("/api/admin/gems", {
             headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -115,7 +115,7 @@ function VerifyGems() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/gem/${gemId}/retry-mint`,
+                `/api/admin/gem/${gemId}/retry-mint`,
                 {
                     method: "POST",
                     headers: { Authorization: `Bearer ${token}` },
@@ -193,7 +193,7 @@ function VerifyGems() {
         setLoadingId(id);
 
         const res = await fetch(
-            `http://localhost:5001/api/admin/gem/${id}/status`,
+            `/api/admin/gem/${id}/status`,
             {
                 method: "PUT",
                 headers: {
@@ -348,8 +348,8 @@ function VerifyGems() {
                                                     >
                                                         <RefreshCw
                                                             className={`h-3 w-3 ${retryingId === g.gem_id
-                                                                    ? "animate-spin"
-                                                                    : ""
+                                                                ? "animate-spin"
+                                                                : ""
                                                                 }`}
                                                         />
                                                         {retryingId === g.gem_id
@@ -537,8 +537,8 @@ function VerifyGems() {
                                             >
                                                 <RefreshCw
                                                     className={`h-4 w-4 ${retryingId === reviewGem.gem_id
-                                                            ? "animate-spin"
-                                                            : ""
+                                                        ? "animate-spin"
+                                                        : ""
                                                         }`}
                                                 />
                                                 {retryingId === reviewGem.gem_id

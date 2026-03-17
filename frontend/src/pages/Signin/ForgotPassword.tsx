@@ -14,7 +14,7 @@ function ForgotPassword() {
         setMessage("");
 
         try {
-            const res = await fetch("http://localhost:5001/api/auth/forgot-password", {
+            const res = await fetch("/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
@@ -37,7 +37,7 @@ function ForgotPassword() {
 
     return (
         <div className="min-h-screen bg-[#fcfbf8] flex flex-col">
-            
+
             {/* === Top Navigation Bar === */}
             <nav className="w-full px-6 sm:px-12 md:px-48 py-4 flex justify-between items-center border-b border-gray-100 bg-white">
                 <img src="/src/assets/logos/Elegance Jewelry.png" alt="Gemellery Logo" className="h-10 w-auto" />
@@ -48,7 +48,7 @@ function ForgotPassword() {
 
             {/* === Page Body === */}
             <div className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-                
+
                 <h1 className="text-3xl sm:text-4xl font-bold text-center font-serif text-gray-900">
                     Reset Password
                 </h1>
@@ -84,11 +84,10 @@ function ForgotPassword() {
                         </button>
 
                         {message && (
-                            <p className={`text-xs text-center mb-4 rounded-lg py-2 px-3 ${
-                                message.toLowerCase().includes("error") 
-                                ? "text-red-500 bg-red-50" 
-                                : "text-green-600 bg-green-50"
-                            }`}>
+                            <p className={`text-xs text-center mb-4 rounded-lg py-2 px-3 ${message.toLowerCase().includes("error")
+                                    ? "text-red-500 bg-red-50"
+                                    : "text-green-600 bg-green-50"
+                                }`}>
                                 {message}
                             </p>
                         )}

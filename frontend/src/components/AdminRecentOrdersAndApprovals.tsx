@@ -17,11 +17,11 @@ function AdminRecentOrdersAndApprovals() {
 
     useEffect(() => {
 
-        fetch("http://localhost:5001/api/admin/recent-orders")
+        fetch("/api/admin/recent-orders")
             .then(res => res.json())
             .then(data => setOrders(data));
 
-        fetch("http://localhost:5001/api/admin/pending-approvals")
+        fetch("/api/admin/pending-approvals")
             .then(res => res.json())
             .then(data => {
                 setPendingSellers(data.pendingSellers);

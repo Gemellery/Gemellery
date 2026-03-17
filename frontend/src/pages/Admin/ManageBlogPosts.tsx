@@ -41,7 +41,7 @@ function ManageBlogPosts() {
     const loadPosts = async () => {
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs?status=${statusFilter}`,
+                `/api/admin/blogs?status=${statusFilter}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -81,8 +81,8 @@ function ManageBlogPosts() {
         }
 
         const url = editingPost
-            ? `http://localhost:5001/api/admin/blogs/${editingPost.blog_id}`
-            : `http://localhost:5001/api/admin/blogs`;
+            ? `/api/admin/blogs/${editingPost.blog_id}`
+            : `/api/admin/blogs`;
 
         const method = editingPost ? "PUT" : "POST";
 
@@ -126,7 +126,7 @@ function ManageBlogPosts() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs/${post.blog_id}`,
+                `/api/admin/blogs/${post.blog_id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -166,7 +166,7 @@ function ManageBlogPosts() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs/${post.blog_id}/status`,
+                `/api/admin/blogs/${post.blog_id}/status`,
                 {
                     method: "PATCH",
                     headers: {
