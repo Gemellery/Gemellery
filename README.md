@@ -1,5 +1,12 @@
 # 💎 Gemellery: Premium Blockchain-Powered Gemstone Marketplace
 
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Ethereum](https://img.shields.io/badge/Ethereum-Hardhat-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white)](https://hardhat.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+
 **Gemellery** is a sophisticated, end-to-end digital marketplace designed for high-value gemstone trading. By integrating **Blockchain technology**, Gemellery ensures absolute transparency, trust, and authenticity for every transaction. Featuring a multi-layered ecosystem for buyers, sellers, and administrators, it leverages AI-driven tools and decentralized verification to redefine the gemstone industry.
 
 ---
