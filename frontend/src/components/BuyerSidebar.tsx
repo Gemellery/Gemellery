@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, Flower, Rows3, BadgeDollarSign, X, History, Home } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck } from "lucide-react";
 
 interface BuyerSidebarProps {
   buyerName: string;
@@ -59,6 +59,13 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
               className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/orders/history' ? ' underline decoration-black decoration-2' : ''}`}
             >
               <History className="w-4 h-4" /> Order History
+            </button>
+
+            <button
+              onClick={() => navigate("/buyer/order-status")}
+              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/order-status' ? ' underline decoration-black decoration-2' : ''}`}
+            >
+              <Truck className="w-4 h-4" /> Order Status
             </button>
 
             <button
