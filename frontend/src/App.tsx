@@ -31,6 +31,7 @@ import SellerProfile from "./pages/seller/SellerProfile";
 import OrderHistory from "./pages/OrderHistory/index";
 import WishlistPage from "./pages/buyer/BuyerWishlist";
 import BuyerSettings from "./pages/buyer/BuyerSettings";
+import BuyerOrderStatus from "./pages/buyer/BuyerOrderStatus";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -439,6 +440,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/order-status"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerOrderStatus />
               </ProtectedRoute>
             }
           />
