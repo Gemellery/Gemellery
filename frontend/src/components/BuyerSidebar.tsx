@@ -80,7 +80,7 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
         </div>
 
         <div className="p-6 border-t space-y-3">
-          <button onClick={() => navigate("/buyer/settings")} className="flex items-center gap-3 w-full text-left hover:underline">
+          <button onClick={() => navigate("/buyer/settings")} className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/settings' ? ' underline decoration-black decoration-2' : ''}`}>
             <Settings className="w-4 h-4" /> Settings
           </button>
 
