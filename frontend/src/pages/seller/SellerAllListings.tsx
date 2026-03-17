@@ -24,7 +24,7 @@ function SellerAllListings() {
 
                 setLoading(true);
 
-                const res = await fetch("http://localhost:5001/api/seller/gems", {
+                const res = await fetch("/api/seller/gems", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

@@ -1,7 +1,7 @@
 // Manage all the API
 
 // Get base URL from environment or default to localhost
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export const API_CONFIG = {
   BASE_URL: API_BASE_URL,

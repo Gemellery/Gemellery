@@ -28,7 +28,7 @@ export default function AiChat() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5001/api/chat", {
+      const response = await axios.post("/api/chat", {
         message: userMessage,
         context: window.location.pathname
       });
@@ -66,11 +66,11 @@ export default function AiChat() {
       <div className="fixed bottom-6 right-6 z-50">
         {!isOpen && (
           <button
-             onClick={() => setIsOpen(true)}
-             className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/30 transition-transform hover:scale-110 active:scale-95"
-             aria-label="Open AI Chat"
+            onClick={() => setIsOpen(true)}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg shadow-amber-500/30 transition-transform hover:scale-110 active:scale-95"
+            aria-label="Open AI Chat"
           >
-             <Sparkles className="h-6 w-6 text-white" />
+            <Sparkles className="h-6 w-6 text-white" />
           </button>
         )}
       </div>
@@ -97,11 +97,10 @@ export default function AiChat() {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2 shadow-sm backdrop-blur-md ${
-                    msg.role === "user"
+                  className={`max-w-[85%] rounded-2xl px-4 py-2 shadow-sm backdrop-blur-md ${msg.role === "user"
                       ? "bg-gradient-to-r from-[#D4AF37]/90 to-[#F5D061]/90 text-[#0A1128] rounded-br-none border border-white/30"
                       : "bg-white/60 text-gray-800 border border-white/50 rounded-bl-none"
-                  }`}
+                    }`}
                 >
                   <p className="text-sm break-words whitespace-pre-wrap leading-relaxed">
                     {formatText(msg.text)}

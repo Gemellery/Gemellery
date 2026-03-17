@@ -80,7 +80,7 @@ function AdminOrderManagement() {
 
     const loadOrders = async () => {
         try {
-            const res = await fetch("http://localhost:5001/api/admin/orders", {
+            const res = await fetch("/api/admin/orders", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -98,14 +98,14 @@ function AdminOrderManagement() {
 
     const loadOrderDetails = async (id: number) => {
         const res = await fetch(
-            `http://localhost:5001/api/admin/orders/${id}`,
+            `/api/admin/orders/${id}`,
             { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await res.json();
         setOrderItems(data.items || []);
 
         const historyRes = await fetch(
-            `http://localhost:5001/api/admin/orders/${id}/history`,
+            `/api/admin/orders/${id}/history`,
             { headers: { Authorization: `Bearer ${token}` } }
         );
         const historyData = await historyRes.json();
@@ -114,7 +114,7 @@ function AdminOrderManagement() {
 
     const updateStatus = async (orderId: number, status: OrderStatus) => {
         await fetch(
-            `http://localhost:5001/api/admin/orders/${orderId}/status`,
+            `/api/admin/orders/${orderId}/status`,
             {
                 method: "PUT",
                 headers: {
@@ -309,7 +309,7 @@ function AdminOrderManagement() {
                                             {item.images.map((img, idx) => (
                                                 <img
                                                     key={idx}
-                                                    src={`http://localhost:5001/uploads/gem_images/${img}`}
+                                                    src={`/uploads/gem_images/${img}`}
                                                     className="w-20 h-20 object-cover rounded border"
                                                 />
                                             ))}

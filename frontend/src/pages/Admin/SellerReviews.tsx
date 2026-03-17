@@ -42,7 +42,7 @@ function ManageSellerReviews() {
                 ratingFilter !== "all" ? `?rating=${ratingFilter}` : "";
 
             const res = await fetch(
-                `http://localhost:5001/api/admin/reviews${query}`,
+                `/api/admin/reviews${query}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -60,7 +60,7 @@ function ManageSellerReviews() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/review/${review_id}`,
+                `/api/admin/review/${review_id}`,
                 {
                     method: "DELETE",
                     headers: { Authorization: `Bearer ${token}` },

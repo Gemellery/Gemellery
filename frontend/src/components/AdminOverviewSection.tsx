@@ -23,17 +23,17 @@ function AdminOverviewSection() {
 
     useEffect(() => {
 
-        fetch("http://localhost:5001/api/admin/monthly-orders")
+        fetch("/api/admin/monthly-orders")
             .then(res => res.json())
             .then(data => setChartData(data))
             .catch(err => console.error("Chart error:", err));
 
-        fetch("http://localhost:5001/api/admin/total-revenue")
+        fetch("/api/admin/total-revenue")
             .then(res => res.json())
             .then(data => setRevenue(data.revenue))
             .catch(err => console.error("Revenue error:", err));
 
-        fetch("http://localhost:5001/api/admin/orders-today")
+        fetch("/api/admin/orders-today")
             .then(res => res.json())
             .then(data => setOrdersToday(data.todayOrders))
             .catch(err => console.error("Orders today error:", err));
