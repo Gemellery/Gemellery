@@ -179,7 +179,7 @@ function CheckoutContent() {
 
       // Success! Redirect to order confirmation or history page
       if (response.order_id) {
-        navigate(`/order-history`);
+        navigate(`/buyer/orders/history`);
       }
     } catch (err) {
       const error = err instanceof Error ? err.message : "Failed to complete checkout";
