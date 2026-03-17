@@ -2,6 +2,21 @@ import { Request, Response } from "express";
 import pool from "../database";
 import { stripe } from "../config/stripe";
 
+const STRIPE_MAX_USD_CENTS = 99_999_999;
+
+function toStripeAmountInCents(rawTotal: number): number {
+  if (!Number.isFinite(rawTotal) || rawTotal <= 0) {
+    return 0;
+  }
+
+  // Some datasets may already store monetary values in cents.
+  if (rawTotal * 100 > STRIPE_MAX_USD_CENTS && rawTotal <= STRIPE_MAX_USD_CENTS) {
+    return Math.round(rawTotal);
+  }
+
+  return Math.round(rawTotal * 100);
+}
+
 export const createPaymentIntent = async (req: any, res: Response) => {
   const user_id = req.user.id;
 
@@ -39,10 +54,16 @@ export const createPaymentIntent = async (req: any, res: Response) => {
       0
     );
 
-    const amountInCents = Math.round(totalAmount * 100);
+    const amountInCents = toStripeAmountInCents(totalAmount);
 
     if (amountInCents < 50) {
       return res.status(400).json({ message: "Minimum payment amount is $0.50" });
+    }
+
+    if (amountInCents > STRIPE_MAX_USD_CENTS) {
+      return res.status(400).json({
+        message: "Order total exceeds Stripe limit. Please reduce cart total or split into multiple orders.",
+      });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -60,9 +81,11 @@ export const createPaymentIntent = async (req: any, res: Response) => {
       paymentIntentId: paymentIntent.id,
       amount: totalAmount,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
-    return res.status(500).json({ message: "Failed to initialize payment" });
+    return res.status(500).json({
+      message: err?.raw?.message || err?.message || "Failed to initialize payment",
+    });
   } finally {
     conn.release();
   }
@@ -121,9 +144,9 @@ export const checkoutOrder = async (req: any, res: Response) => {
 
     const cart_id = cartRows[0].cart_id;
 
-    // Get cart items
+    // Get cart items with seller info
     const [items]: any = await conn.query(
-      `SELECT ci.gem_id, ci.quantity, g.price
+      `SELECT ci.gem_id, ci.quantity, g.price, g.seller_id
        FROM cart_items ci
        JOIN gem g ON ci.gem_id = g.gem_id
        WHERE ci.cart_id = ?`,
@@ -134,13 +157,20 @@ export const checkoutOrder = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
+    // Get seller_id from first item (for single seller orders)
+    const seller_id = items[0].seller_id;
+    
+    if (!seller_id) {
+      return res.status(400).json({ message: "Item seller information missing" });
+    }
+
     // Calculate total
     const total_amount = items.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,
       0
     );
 
-    const expectedAmountInCents = Math.round(total_amount * 100);
+    const expectedAmountInCents = toStripeAmountInCents(total_amount);
 
     if (paymentIntent.currency !== "usd" || paymentIntent.amount_received < expectedAmountInCents) {
       return res.status(400).json({ message: "Paid amount does not match order total" });
@@ -148,9 +178,9 @@ export const checkoutOrder = async (req: any, res: Response) => {
 
     // Create order
     const [orderResult]: any = await conn.query(
-      `INSERT INTO orders (buyer_id, total_amount, payment_method, payment_status, shipping_address_id)
-       VALUES (?, ?, ?, ?, ?)`,
-      [user_id, total_amount, payment_method, "Paid", shipping_address_id]
+      `INSERT INTO orders (buyer_id, seller_id, total_amount, payment_method, payment_status, address_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [user_id, seller_id, total_amount, payment_method, "Paid", shipping_address_id]
     );
 
     const order_id = orderResult.insertId;
