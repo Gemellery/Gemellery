@@ -16,6 +16,8 @@ import * as shippingAPI from "@/lib/shipping/api.ts";
 import * as orderAPI from "@/lib/order/api.ts";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
 import { useCart } from "@/context/CartContext";
+import { getGemImageUrl } from "@/lib/gems/api";
+import { formatPrice } from "@/lib/gems/utils";
 
 
 function Checkout() {
@@ -548,7 +550,7 @@ function Checkout() {
                       <div key={item.cart_item_id} className="flex gap-3">
                         <div className="w-16 h-16 rounded-lg border overflow-hidden flex-shrink-0">
                           <img
-                            src={item.image || "/sample_gems/default.jpg"}
+                            src={item.image ? getGemImageUrl(item.image) : "/sample_gems/default.jpg"}
                             alt={item.gem_name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -567,7 +569,7 @@ function Checkout() {
                             <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                           )}
                           <p className="text-emerald-600 font-semibold mt-1">
-                            ${(item.price * item.quantity).toLocaleString()}
+                            {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -580,7 +582,7 @@ function Checkout() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${SUBTOTAL.toLocaleString()}</span>
+                  <span>{formatPrice(SUBTOTAL)}</span>
                 </div>
                 <div className="flex justify-between text-emerald-600">
                   <span>Insured Shipping</span>
@@ -588,7 +590,7 @@ function Checkout() {
                 </div>
                 <div className="flex justify-between">
                   <span>Export Documentation</span>
-                  <span>${EXPORT_FEE.toLocaleString()}</span>
+                  <span>{formatPrice(EXPORT_FEE)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Sales Tax (Est.)</span>
@@ -600,7 +602,7 @@ function Checkout() {
 
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total Due</span>
-                <span>${TOTAL.toLocaleString()}</span>
+                <span>{formatPrice(TOTAL)}</span>
               </div>
 
               {/* Checkout Error Message */}
@@ -622,7 +624,7 @@ function Checkout() {
                     Processing...
                   </>
                 ) : (
-                  <>Pay ${TOTAL.toLocaleString()}</>
+                  <>Pay {formatPrice(TOTAL)}</>
                 )}
               </button>
 
