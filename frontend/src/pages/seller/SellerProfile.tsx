@@ -121,7 +121,7 @@ const SellerProfile: React.FC = () => {
                         {seller.businessName}
                       </h1>
                       {/* From user table */}
-                      <p className="text-sm text-foreground/50 mt-0.5">Managed by {seller.fullName}</p>
+                     <p className="text-sm text-foreground/50 mt-0.5 font-[Source_Sans_3]">Managed by {seller.fullName}</p>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         <SellerStarRating rating={averageRating} size="sm" showValue />
                         <span className="text-sm text-foreground/60">
