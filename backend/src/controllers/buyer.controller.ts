@@ -187,6 +187,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
         NULL AS state,
         NULL AS zip,
         MIN(gi.image_url) AS image_url,
+        GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
         COUNT(DISTINCT oi.order_item_id) AS item_count
       FROM orders o
       LEFT JOIN order_items oi ON oi.order_id = o.order_id
