@@ -59,7 +59,7 @@ function ManageAdmins() {
     const loadAdmins = async () => {
         try {
             const res = await fetch(
-                `http://localhost:5001/api/super-admin/admins?status=${statusFilter}`,
+                `/api/super-admin/admins?status=${statusFilter}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const data = await res.json();
@@ -71,7 +71,7 @@ function ManageAdmins() {
 
     const loadCountries = async () => {
         try {
-            const res = await fetch("http://localhost:5001/api/countries");
+            const res = await fetch("/api/countries");
             const data = await res.json();
             setCountries(Array.isArray(data) ? data : []);
         } catch {
@@ -82,7 +82,7 @@ function ManageAdmins() {
     // load maintenace
     const loadMaintenance = async () => {
         try {
-            const res = await fetch("http://localhost:5001/api/system-settings");
+            const res = await fetch("/api/system-settings");
             const data = await res.json();
             if (data.success) {
                 setMaintenance(data.data.maintenance_mode === 1);
@@ -97,7 +97,7 @@ function ManageAdmins() {
     const toggleMaintenance = async () => {
         try {
             const res = await fetch(
-                "http://localhost:5001/api/system-settings/maintenance",
+                "/api/system-settings/maintenance",
                 {
                     method: "PATCH",
                     headers: {
@@ -162,8 +162,8 @@ function ManageAdmins() {
         }
 
         const url = editingAdmin
-            ? `http://localhost:5001/api/super-admin/admins/${editingAdmin.user_id}`
-            : `http://localhost:5001/api/super-admin/admins`;
+            ? `/api/super-admin/admins/${editingAdmin.user_id}`
+            : `/api/super-admin/admins`;
 
         const method = editingAdmin ? "PUT" : "POST";
 
@@ -200,7 +200,7 @@ function ManageAdmins() {
     ) => {
         try {
             const res = await fetch(
-                `http://localhost:5001/api/super-admin/admins/${admin.user_id}/status`,
+                `/api/super-admin/admins/${admin.user_id}/status`,
                 {
                     method: "PATCH",
                     headers: {

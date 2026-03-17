@@ -28,7 +28,7 @@ function SellerDashboardLayout() {
     useEffect(() => {
         const fetchSellerProfile = async () => {
             try {
-                const res = await fetch("http://localhost:5001/api/seller/profile", {
+                const res = await fetch("/api/seller/profile", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -51,7 +51,7 @@ function SellerDashboardLayout() {
             try {
                 setGemsLoading(true);
 
-                const res = await fetch("http://localhost:5001/api/seller/gems/recent", {
+                const res = await fetch("/api/seller/gems/recent", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -81,7 +81,7 @@ function SellerDashboardLayout() {
     useEffect(() => {
         const fetchDashboardSummary = async () => {
             try {
-                const res = await fetch("http://localhost:5001/api/seller/dashboard-summary", {
+                const res = await fetch("/api/seller/dashboard-summary", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!res.ok) throw new Error("Failed to fetch dashboard summary");
@@ -132,20 +132,20 @@ function SellerDashboardLayout() {
                 {/* Verification Status Banner */}
                 {seller && (
                     <div className={`rounded-2xl p-4 mb-6 flex items-center gap-4 border ${seller.verification_status === "approved"
-                            ? "bg-green-50 border-green-200"
-                            : seller.verification_status === "pending"
-                                ? "bg-yellow-50 border-yellow-200"
-                                : seller.verification_status === "rejected"
-                                    ? "bg-red-50 border-red-200"
-                                    : "bg-orange-50 border-orange-200"
+                        ? "bg-green-50 border-green-200"
+                        : seller.verification_status === "pending"
+                            ? "bg-yellow-50 border-yellow-200"
+                            : seller.verification_status === "rejected"
+                                ? "bg-red-50 border-red-200"
+                                : "bg-orange-50 border-orange-200"
                         }`}>
                         <div className={`p-3 rounded-xl ${seller.verification_status === "approved"
-                                ? "bg-green-100"
-                                : seller.verification_status === "pending"
-                                    ? "bg-yellow-100"
-                                    : seller.verification_status === "rejected"
-                                        ? "bg-red-100"
-                                        : "bg-orange-100"
+                            ? "bg-green-100"
+                            : seller.verification_status === "pending"
+                                ? "bg-yellow-100"
+                                : seller.verification_status === "rejected"
+                                    ? "bg-red-100"
+                                    : "bg-orange-100"
                             }`}>
                             {seller.verification_status === "approved" && <ShieldCheck className="text-green-600 size-6" />}
                             {seller.verification_status === "pending" && <Clock className="text-yellow-600 size-6" />}
@@ -154,12 +154,12 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex-1">
                             <h4 className={`font-semibold text-sm ${seller.verification_status === "approved"
-                                    ? "text-green-800"
-                                    : seller.verification_status === "pending"
-                                        ? "text-yellow-800"
-                                        : seller.verification_status === "rejected"
-                                            ? "text-red-800"
-                                            : "text-orange-800"
+                                ? "text-green-800"
+                                : seller.verification_status === "pending"
+                                    ? "text-yellow-800"
+                                    : seller.verification_status === "rejected"
+                                        ? "text-red-800"
+                                        : "text-orange-800"
                                 }`}>
                                 {seller.verification_status === "approved" && "Verified Seller"}
                                 {seller.verification_status === "pending" && "Verification Pending"}
@@ -167,12 +167,12 @@ function SellerDashboardLayout() {
                                 {seller.verification_status === "suspended" && "Account Suspended"}
                             </h4>
                             <p className={`text-xs mt-0.5 ${seller.verification_status === "approved"
-                                    ? "text-green-600"
-                                    : seller.verification_status === "pending"
-                                        ? "text-yellow-600"
-                                        : seller.verification_status === "rejected"
-                                            ? "text-red-600"
-                                            : "text-orange-600"
+                                ? "text-green-600"
+                                : seller.verification_status === "pending"
+                                    ? "text-yellow-600"
+                                    : seller.verification_status === "rejected"
+                                        ? "text-red-600"
+                                        : "text-orange-600"
                                 }`}>
                                 {seller.verification_status === "approved" && "Your seller account has been verified. You can list and sell gems."}
                                 {seller.verification_status === "pending" && "Your account is under review. You'll be notified once verified by an admin."}
@@ -181,12 +181,12 @@ function SellerDashboardLayout() {
                             </p>
                         </div>
                         <span className={`text-xs font-medium px-3 py-1 rounded-full ${seller.verification_status === "approved"
-                                ? "bg-green-200 text-green-800"
-                                : seller.verification_status === "pending"
-                                    ? "bg-yellow-200 text-yellow-800"
-                                    : seller.verification_status === "rejected"
-                                        ? "bg-red-200 text-red-800"
-                                        : "bg-orange-200 text-orange-800"
+                            ? "bg-green-200 text-green-800"
+                            : seller.verification_status === "pending"
+                                ? "bg-yellow-200 text-yellow-800"
+                                : seller.verification_status === "rejected"
+                                    ? "bg-red-200 text-red-800"
+                                    : "bg-orange-200 text-orange-800"
                             }`}>
                             {seller.verification_status.charAt(0).toUpperCase() + seller.verification_status.slice(1)}
                         </span>

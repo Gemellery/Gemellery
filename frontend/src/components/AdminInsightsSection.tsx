@@ -28,12 +28,12 @@ function AdminInsightsSection() {
 
     useEffect(() => {
 
-        fetch("http://localhost:5001/api/admin/top-gem-categories")
+        fetch("/api/admin/top-gem-categories")
             .then(res => res.json())
             .then(data => setGemCategoryData(data))
             .catch(err => console.error("Gem categories error:", err));
 
-        fetch("http://localhost:5001/api/admin/seller-growth")
+        fetch("/api/admin/seller-growth")
             .then(res => res.json())
             .then(data => setSellerGrowthData(data))
             .catch(err => console.error("Seller growth error:", err));

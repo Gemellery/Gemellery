@@ -14,7 +14,7 @@ function AdminTopSellers() {
 
     useEffect(() => {
 
-        fetch("http://localhost:5001/api/admin/top-sellers")
+        fetch("/api/admin/top-sellers")
             .then(res => res.json())
             .then(data => setSellers(data))
             .catch(err => console.error(err));

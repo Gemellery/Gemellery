@@ -70,7 +70,7 @@ function VerifySellers() {
   }, []);
 
   const loadSellers = async () => {
-    const res = await fetch("http://localhost:5001/api/admin/pending-sellers", {
+    const res = await fetch("/api/admin/pending-sellers", {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
@@ -103,7 +103,7 @@ function VerifySellers() {
   const updateStatus = async (id: number, status: Status) => {
 
 
-    await fetch(`http://localhost:5001/api/admin/seller/${id}/status`, {
+    await fetch(`/api/admin/seller/${id}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
