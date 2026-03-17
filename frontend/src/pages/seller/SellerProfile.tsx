@@ -239,7 +239,7 @@ const SellerProfile: React.FC = () => {
                         </p>
                         <div className="flex items-center justify-between mt-1.5">
                           <span className="text-base font-bold text-foreground tabular-nums">
-                            ${Number(gem.price).toLocaleString()}
+                            LKR {Number(gem.price).toLocaleString('en-US')}
                           </span>
                           <button
                             disabled={!gem.inStock}
