@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import {
   Edit,
   ShieldCheck,
-  CreditCard,
   Lock,
   MessageCircle,
   Loader,
   AlertCircle,
-  Trash2
+  Trash2,
+  Sparkles,
+  CreditCard
 } from "lucide-react";
 import Navbar from "./Navbar";
 import AdvancedFooter from "./AdvancedFooter";
@@ -17,8 +20,13 @@ import * as orderAPI from "@/lib/order/api.ts";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
 import { useCart } from "@/context/CartContext";
 
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
-function Checkout() {
+function CheckoutContent() {
+  const stripe = useStripe();
+  const elements = useElements();
+
   /* ---------------- Cart Items ---------------- */
   const { items: cartItems, totalAmount, isLoading: isCartLoading } = useCart();
 
@@ -52,7 +60,8 @@ function Checkout() {
   const [luxuryBox, setLuxuryBox] = useState(true);
 
   /* ---------------- Payment ---------------- */
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const paymentMethod = "card";
+  const [cardholderName, setCardholderName] = useState("");
 
   /* ---------------- Pricing (Dynamic from Cart) ---------------- */
   const SUBTOTAL = totalAmount || 0;
@@ -133,9 +142,39 @@ function Checkout() {
     setCheckoutError(null);
 
     try {
+      if (!stripe || !elements) {
+        throw new Error("Stripe is not ready yet. Please wait a few seconds and try again.");
+      }
+
+      const cardElement = elements.getElement(CardElement);
+
+      if (!cardElement) {
+        throw new Error("Card input is not ready. Please check your card details.");
+      }
+
+      const paymentIntentData = await orderAPI.createPaymentIntent();
+
+      const paymentResult = await stripe.confirmCardPayment(paymentIntentData.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: cardholderName || `${shipping.firstName} ${shipping.lastName}`.trim() || "Gemellery Customer",
+          },
+        },
+      });
+
+      if (paymentResult.error) {
+        throw new Error(paymentResult.error.message || "Payment confirmation failed");
+      }
+
+      if (!paymentResult.paymentIntent || paymentResult.paymentIntent.status !== "succeeded") {
+        throw new Error("Payment was not completed. Please try again.");
+      }
+
       const response = await orderAPI.checkoutOrder({
         payment_method: paymentMethod,
         shipping_address_id: selectedAddressId,
+        payment_intent_id: paymentResult.paymentIntent.id,
       });
 
       // Success! Redirect to order confirmation or history page
@@ -488,31 +527,59 @@ function Checkout() {
             {/* -------- Payment Method -------- */}
             <section className="bg-[#fcfbf8] border rounded-xl p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-sm font-semibold">Payment Method</h3>
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-emerald-700" />
+                  Credit Card
+                </h3>
                 <span className="flex items-center gap-1 text-xs text-gray-500">
                   <Lock className="w-3 h-3" /> Encrypted
                 </span>
               </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setPaymentMethod("card")}
-                  className={`payment-btn ${paymentMethod === "card" && "active"}`}
-                >
-                  <CreditCard className="w-4 h-4" /> Credit Card
-                </button>
-                <button className="payment-btn">Wire Transfer</button>
-                <button className="payment-btn">Crypto</button>
-              </div>
-
               {paymentMethod === "card" && (
-                <div className="bg-[#f4efe6] p-4 rounded-lg space-y-3">
-                  <input placeholder="Card Number" className="input" />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input placeholder="MM / YY" className="input" />
-                    <input placeholder="CVC" className="input" />
+                <div className="rounded-2xl border border-[#e6ddcf] bg-gradient-to-b from-[#f8f3ea] to-[#efe5d5] p-5 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Card Details</p>
+                    <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                      <span className="rounded bg-white/80 px-2 py-1 border border-[#ded3c3]">VISA</span>
+                      <span className="rounded bg-white/80 px-2 py-1 border border-[#ded3c3]">MC</span>
+                      <span className="rounded bg-white/80 px-2 py-1 border border-[#ded3c3]">AMEX</span>
+                    </div>
                   </div>
-                  <input placeholder="Name on card" className="input" />
+
+                  <input
+                    placeholder="Cardholder name"
+                    className="input bg-white/90"
+                    value={cardholderName}
+                    onChange={(e) => setCardholderName(e.target.value)}
+                  />
+
+                  <div className="rounded-xl border border-[#d6c7b2] bg-white px-3 py-3 shadow-inner">
+                    <CardElement
+                      options={{
+                        hidePostalCode: true,
+                        style: {
+                          base: {
+                            fontSize: "16px",
+                            color: "#111827",
+                            iconColor: "#7a5d2f",
+                            fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif",
+                            "::placeholder": {
+                              color: "#9ca3af",
+                            },
+                          },
+                          invalid: {
+                            color: "#b91c1c",
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                    Your card details are tokenized and never stored on Gemellery.
+                  </div>
                 </div>
               )}
 
@@ -613,7 +680,7 @@ function Checkout() {
 
               <button
                 onClick={handleCheckout}
-                disabled={isCheckingOut || !selectedAddressId || cartItems.length === 0 || isCartLoading}
+                disabled={isCheckingOut || !selectedAddressId || cartItems.length === 0 || isCartLoading || !stripe || !elements}
                 className="w-full bg-[#a33a42] hover:bg-[#8f3238] disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-3 rounded-full text-sm font-medium flex items-center justify-center gap-2"
               >
                 {isCheckingOut ? (
@@ -648,6 +715,28 @@ function Checkout() {
       {/* Footer */}
       <AdvancedFooter />
     </div>
+  );
+}
+
+function Checkout() {
+  if (!stripePromise) {
+    return (
+      <div className="min-h-screen bg-[#fcfbf8] p-6">
+        <Navbar />
+        <main className="max-w-3xl mx-auto py-10">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700">
+            Stripe is not configured. Set VITE_STRIPE_PUBLISHABLE_KEY in your frontend environment.
+          </div>
+        </main>
+        <AdvancedFooter />
+      </div>
+    );
+  }
+
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutContent />
+    </Elements>
   );
 }
 
