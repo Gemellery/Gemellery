@@ -3,6 +3,10 @@ import { Sparkles, X, Send, Loader2 } from "lucide-react";
 import axios from "axios";
 
 export default function AiChat() {
+  const HIDDEN_ROUTES = ["/signin", "/forgot-password", "/reset-password"];
+  const isHidden = HIDDEN_ROUTES.some(route => window.location.pathname.startsWith(route));
+
+  if (isHidden) return null;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "ai", text: string }[]>([
     { role: "ai", text: "Hi! How can I help you with Gemellery today?" }
