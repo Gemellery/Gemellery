@@ -257,17 +257,17 @@ export default function SellerInventory() {
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto max-w-full">
+                  <table className="w-full text-xs sm:text-sm whitespace-nowrap">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left p-4 font-medium text-gray-600">Gem</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Type</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Details</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Price</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Verification</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Actions</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Gem</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Type</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Details</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Price</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Status</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Verification</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -277,8 +277,8 @@ export default function SellerInventory() {
                         const VIcon = vBadge.icon;
                         return (
                           <tr key={gem.gem_id} className="hover:bg-gray-50">
-                            <td className="p-4">
-                              <div className="flex items-center gap-3">
+                            <td className="p-2 sm:p-4 align-top">
+                              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                                  <img
                                    src={getGemImageSrc(gem.image_url)}
                                    alt={gem.gem_name}
@@ -288,32 +288,32 @@ export default function SellerInventory() {
                                    }}
                                  />
                                 <div>
-                                  <p className="font-medium text-gray-900">{gem.gem_name}</p>
-                                  <p className="text-xs text-gray-500 md:hidden">{gem.gem_type}</p>
+                                  <p className="font-medium text-gray-900 break-words max-w-[100px] sm:max-w-[160px]">{gem.gem_name}</p>
+                                  <p className="text-xs text-gray-500 md:hidden break-words max-w-[80px]">{gem.gem_type}</p>
                                 </div>
                               </div>
                             </td>
-                            <td className="p-4 text-gray-600 hidden md:table-cell">{gem.gem_type}</td>
-                            <td className="p-4 text-gray-500 hidden md:table-cell">
+                            <td className="p-2 sm:p-4 text-gray-600 hidden md:table-cell break-words">{gem.gem_type}</td>
+                            <td className="p-2 sm:p-4 text-gray-500 hidden md:table-cell break-words">
                               <span>{gem.carat} ct</span>
                               {gem.cut && <span> · {gem.cut}</span>}
                               {gem.color && <span> · {gem.color}</span>}
                             </td>
-                            <td className="p-4 font-semibold text-gray-900">
+                            <td className="p-2 sm:p-4 font-semibold text-gray-900 break-words">
                               LKR {Number(gem.price).toLocaleString('en-US')}
                             </td>
-                            <td className="p-4">
+                            <td className="p-2 sm:p-4 break-words">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${sBadge.style}`}>
                                 {sBadge.label}
                               </span>
                             </td>
-                            <td className="p-4 hidden md:table-cell">
+                            <td className="p-2 sm:p-4 hidden md:table-cell break-words">
                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${vBadge.style}`}>
                                 <VIcon className="w-3 h-3" /> {vBadge.label}
                               </span>
                             </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
+                            <td className="p-2 sm:p-4 break-words">
+                              <div className="flex items-center gap-1 sm:gap-2">
                                 <button
                                   onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
                                   disabled={gem.status === "Sold"}
