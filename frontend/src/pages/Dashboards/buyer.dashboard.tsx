@@ -377,7 +377,7 @@ function BuyerDashboardLayout() {
                 Your Designs
               </h3>
               <button
-                onClick={() => navigate("/jewelry-designer")}
+                onClick={() => navigate("/buyer/ai-designs")}
                 className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all shadow-sm">
                 {designs.length > 4 && (
                   <span className="bg-gray-100 text-gray-600 text-xs font-bold px-1.5 py-0.5 rounded-md">
