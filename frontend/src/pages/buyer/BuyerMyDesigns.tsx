@@ -64,10 +64,10 @@ function BuyerMyDesigns() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
 
         {/* Sticky Header */}
-        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
