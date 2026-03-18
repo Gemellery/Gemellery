@@ -20,8 +20,7 @@ const TERMS = {
   effectiveDate: "1st January 2025",
   lastUpdated:   "24th November 2025",
   version:       "1.0",
-  contactEmail:  "hello@gemellery.lk",
-  legalEmail:    "legal@gemellery.lk",
+  officialEmail:  "gemellery.official@gmail.com",
   address:       "Colombo, Sri Lanka",
 };
 
@@ -517,21 +516,14 @@ export default function TermsAndConditions() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 <ContactCard label="General Inquiries">
                   <a
-                    href={`mailto:${TERMS.contactEmail}`}
+                    href={`mailto:${TERMS.officialEmail}`}
                     className="text-sm font-semibold text-[#D4AF37] hover:underline break-all"
                   >
-                    {TERMS.contactEmail}
+                    {TERMS.officialEmail}
                   </a>
                 </ContactCard>
 
-                <ContactCard label="Legal & Compliance">
-                  <a
-                    href={`mailto:${TERMS.legalEmail}`}
-                    className="text-sm font-semibold text-[#D4AF37] hover:underline break-all"
-                  >
-                    {TERMS.legalEmail}
-                  </a>
-                </ContactCard>
+               
 
                 <ContactCard label="Support">
                   <button
