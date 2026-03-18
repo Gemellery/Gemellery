@@ -1,6 +1,6 @@
 import logo from '../assets/logos/Elegance Jewelry.png';
 import { Instagram, Linkedin, X, Facebook } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+
 
 function AdvancedFooter() {
         
