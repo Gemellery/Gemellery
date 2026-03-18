@@ -125,8 +125,8 @@ function Cart() {
         )}
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 py-8 md:px-16 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
-          <div>
+        <div className="max-w-7xl mx-auto px-4 py-8 md:px-16 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+          <div className="min-w-0">
             <h1 className="text-4xl font-semibold mb-2">Your Selection</h1>
             <p className="text-gray-600 mb-8 leading-relaxed">
               Review your high-value gemstone selections before securing your order. Each item
@@ -202,8 +202,6 @@ function Cart() {
               ))}
             </div>
 
-            {/* Recommendations Slider */}
-            <RecommendedGemsSlider />
           </div>
 
           {/* Order Summary Sidebar */}
@@ -280,6 +278,11 @@ function Cart() {
               Need help? <a href="/contact" className="text-red-700 font-semibold hover:underline">Contact Concierge</a>
             </div>
           </aside>
+        </div>
+
+        {/* Recommendations Slider */}
+        <div className="max-w-7xl mx-auto px-4 pb-16 md:px-16">
+          <RecommendedGemsSlider />
         </div>
       </main>
       {/* Footer */}
