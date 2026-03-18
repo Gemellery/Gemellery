@@ -219,8 +219,17 @@ function BuyerDashboardLayout() {
               </h3>
               <button 
                 onClick={() => navigate("/buyer/orders/history")}
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
-                >
+                className={`group text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
+                  orders.length > 4 
+                    ? "text-gray-900 bg-white border border-gray-900 hover:bg-gray-900 hover:text-white px-3 py-1.5 rounded-lg shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
+              >
+                {orders.length > 4 && (
+                  <span className="bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors duration-300">
+                    {orders.length}
+                  </span>
+                )}
                 View all <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -282,16 +291,7 @@ function BuyerDashboardLayout() {
               )}
             </div>
 
-            {orders.length > 4 && (
-              <div className="mt-8 flex justify-center">
-                <button
-                  onClick={() => navigate("/buyer/orders/history")}
-                  className="px-8 py-2.5 bg-white border-2 border-gray-800 text-gray-800 text-sm font-bold rounded-full hover:bg-gray-800 hover:text-white transition-all shadow-sm"
-                >
-                  View All Orders
-                </button>
-              </div>
-            )}
+
           </section>
 
           {/* Wishlist */}
@@ -302,9 +302,18 @@ function BuyerDashboardLayout() {
               </h3>
               <button 
                 onClick={() => navigate("/buyer/wishlist")}
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
-               >
-                 View all <ArrowRight className="w-4 h-4" />
+                className={`group text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
+                  wishlist.length > 4 
+                    ? "text-gray-900 bg-white border border-gray-900 hover:bg-gray-900 hover:text-white px-3 py-1.5 rounded-lg shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
+              >
+                {wishlist.length > 4 && (
+                  <span className="bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors duration-300">
+                    {wishlist.length}
+                  </span>
+                )}
+                View all <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
@@ -358,16 +367,7 @@ function BuyerDashboardLayout() {
               ))}
             </div>
 
-            {wishlist.length > 4 && (
-              <div className="mt-8 flex justify-center">
-                <button
-                  onClick={() => navigate("/buyer/wishlist")}
-                  className="px-8 py-2.5 bg-white border-2 border-gray-800 text-gray-800 text-sm font-bold rounded-full hover:bg-gray-800 hover:text-white transition-all shadow-sm"
-                >
-                  View All Wishlist Items
-                </button>
-              </div>
-            )}
+
           </section>
 
           {/* AI Designs */}
@@ -378,9 +378,14 @@ function BuyerDashboardLayout() {
               </h3>
               <button
                 onClick={() => navigate("/buyer/ai-designs")}
-                className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all shadow-sm">
+                className={`group text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
+                  designs.length > 4 
+                    ? "text-gray-900 bg-white border border-gray-900 hover:bg-gray-900 hover:text-white px-3 py-1.5 rounded-lg shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                }`}
+              >
                 {designs.length > 4 && (
-                  <span className="bg-gray-100 text-gray-600 text-xs font-bold px-1.5 py-0.5 rounded-md">
+                  <span className="bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors duration-300">
                     {designs.length}
                   </span>
                 )}
