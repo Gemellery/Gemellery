@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   RefreshCw,
   Mail,
-  Printer,
   ArrowUp,
 } from "lucide-react";
 
@@ -87,9 +86,7 @@ export default function TermsAndConditions() {
     }
   };
 
-  // Browser print / Save as PDF
-  const handlePrint = () => window.print();
-
+  
   // Back to top
   const handleBackToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
@@ -153,14 +150,7 @@ export default function TermsAndConditions() {
             accessing our services, you agree to be bound by this agreement.
           </p>
 
-          {/* Print / Save as PDF — hero */}
-          <button
-            onClick={handlePrint}
-            className="inline-flex items-center gap-2 border border-white/20 text-white/70 text-sm px-5 py-2 rounded-full hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all duration-200 print:hidden"
-          >
-            <Printer className="w-4 h-4" />
-            Save / Print PDF
-          </button>
+         
         </div>
       </div>
 
@@ -216,17 +206,6 @@ export default function TermsAndConditions() {
                   })}
                 </nav>
 
-                {/* Save / Print PDF — sidebar */}
-                <div className="mx-3 mb-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                  <p className="text-xs text-gray-500 mb-2">Need a copy for your records?</p>
-                  <button
-                    onClick={handlePrint}
-                    className="w-full flex items-center justify-center gap-2 text-xs font-semibold text-[#0A1128] bg-white border border-gray-200 rounded-lg py-2 hover:bg-gray-50 hover:border-[#D4AF37] transition-all duration-200"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    Save / Print PDF
-                  </button>
-                </div>
               </div>
             </div>
           </aside>
