@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import SellerSidebar from "../../components/SellerSidebar";
+import BuyerSidebar from "../../components/BuyerSidebar";
 import Footer from "../../components/BasicFooter";
 import { Edit, Save, Menu } from "lucide-react";
 
@@ -15,34 +15,24 @@ const Input = (props: any) => (
 );
 
 
-interface SellerProfile {
+interface BuyerProfile {
     full_name: string;
     mobile: string;
     email: string;
     role: string;
     joined_date: string;
     country_name: string;
-
-    business_name: string;
-    business_reg_no: string;
-    ngja_registration_no: string;
-    seller_license_url: string;
-
     address: string;
 }
 
-function SellerSettings() {
-    const [form, setForm] = useState<SellerProfile>({
+function BuyerSettings() {
+    const [form, setForm] = useState<BuyerProfile>({
         full_name: "",
         mobile: "",
         email: "",
         role: "",
         joined_date: "",
         country_name: "",
-        business_name: "",
-        business_reg_no: "",
-        ngja_registration_no: "",
-        seller_license_url: "",
         address: "",
     });
 
@@ -53,11 +43,11 @@ function SellerSettings() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = localStorage.getItem("token");
 
-    // Load seller profile
+    // Load buyer profile
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/seller/profile`, {
+                const res = await fetch(`${API_URL}/api/buyer/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -65,7 +55,7 @@ function SellerSettings() {
 
                 if (!res.ok) throw new Error("Failed to load profile");
 
-                const data: SellerProfile = await res.json();
+                const data: BuyerProfile = await res.json();
                 setForm(data);
             } catch (error) {
                 console.error(error);
@@ -85,7 +75,7 @@ function SellerSettings() {
     // Save changes
     const handleSave = async () => {
         try {
-            const res = await fetch(`${API_URL}/api/seller/profile`, {
+            const res = await fetch(`${API_URL}/api/buyer/profile`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -100,7 +90,7 @@ function SellerSettings() {
 
             if (!res.ok) throw new Error("Failed to update profile");
 
-            const updatedRes = await fetch(`${API_URL}/api/seller/profile`, {
+            const updatedRes = await fetch(`${API_URL}/api/buyer/profile`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -130,8 +120,8 @@ function SellerSettings() {
     return (
         <div className="flex h-screen overflow-hidden">
             {/* LEFT SIDEBAR */}
-            <SellerSidebar
-                sellerName={user.full_name || user.email}
+            <BuyerSidebar
+                buyerName={user.full_name || user.email}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
             />
@@ -147,7 +137,7 @@ function SellerSettings() {
                         <Menu className="w-5 h-5" />
                     </button>
 
-                    <h1 className="text-2xl font-semibold">Seller Settings</h1>
+                    <h1 className="text-2xl font-semibold">Buyer Settings</h1>
                 </div>
 
                 {/* CONTENT */}
@@ -224,34 +214,6 @@ function SellerSettings() {
                         <Label text="Account Type" />
                         <Input value={form.role} disabled />
                     </section>
-
-                    {/* Business Verification */}
-                    <section className="bg-[#fcfbf8] border rounded-xl p-6 space-y-4">
-                        <h2 className="font-bold text-sm">Business Verification</h2>
-
-                        <Label text="Business Name" />
-                        <Input value={form.business_name} disabled />
-
-                        <Label text="Business Registration No" />
-                        <Input value={form.business_reg_no} disabled />
-
-                        <Label text="NGJA Registration No" />
-                        <Input value={form.ngja_registration_no} disabled />
-
-                        <Label text="NGJA Seller License" />
-                        <a
-                            href={`${API_URL}${form.seller_license_url}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-emerald-600 underline"
-                        >
-                            View Seller License
-                        </a>
-                    </section>
-
-                    <p className="text-xs text-gray-500">
-                        Business and verification details cannot be edited.
-                    </p>
                 </div>
 
                 <Footer />
@@ -260,6 +222,4 @@ function SellerSettings() {
     );
 }
 
-export default SellerSettings;
-
-
+export default BuyerSettings;

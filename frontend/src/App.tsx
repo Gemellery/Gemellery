@@ -30,6 +30,8 @@ import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
 import OrderHistory from "./pages/OrderHistory/index";
 import WishlistPage from "./pages/buyer/BuyerWishlist";
+import BuyerSettings from "./pages/buyer/BuyerSettings";
+import BuyerOrderStatus from "./pages/buyer/BuyerOrderStatus";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -67,7 +69,7 @@ function AppRoutes() {
 
   useEffect(() => {
 
-    fetch("http://localhost:5001/api/system-settings")
+    fetch("/api/system-settings")
       .then(res => res.json())
       .then(data => {
 
@@ -97,21 +99,21 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/marketplace" element={<Marketplace />} />
-      <Route 
-        path="/shipping-form" 
+      <Route
+        path="/shipping-form"
         element={
           <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
             <ShippingForm />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/checkout" 
+      <Route
+        path="/checkout"
         element={
           <ProtectedRoute allowedRoles={["buyer", "seller", "admin"]}>
             <ShippingForm />
           </ProtectedRoute>
-        } 
+        }
       />
       <Route path="/product-detail/:id" element={<ProductDetail />} />
       <Route path="/product-gallery" element={<ProductSpecifications />} />
@@ -128,9 +130,9 @@ function AppRoutes() {
       </Route>
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
-          <Route path="/500" element={<ServerError />} />
-          <Route path="/403" element={<AccessDenied />} />
-          <Route path="*" element={<NotFound />} />
+      <Route path="/500" element={<ServerError />} />
+      <Route path="/403" element={<AccessDenied />} />
+      <Route path="*" element={<NotFound />} />
 
       <Route path="/seller/:id" element={<SellerProfile />} />
 
@@ -215,14 +217,23 @@ function AppRoutes() {
         }
       />
 
-          <Route
-            path="/buyer/wishlist"
-            element={
-              <ProtectedRoute allowedRoles={["buyer"]}>
-                <WishlistPage />
-              </ProtectedRoute>
-            }
-          />
+      <Route
+        path="/buyer/wishlist"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <WishlistPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/buyer/settings"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <BuyerSettings />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/admin/dashboard"
@@ -429,6 +440,24 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/order-status"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerOrderStatus />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/settings"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerSettings />
               </ProtectedRoute>
             }
           />

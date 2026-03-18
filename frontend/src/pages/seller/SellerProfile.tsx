@@ -111,7 +111,7 @@ const SellerProfile: React.FC = () => {
 
             <div className="px-5 sm:px-8 pb-6 -mt-14 relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-               
+
 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
@@ -168,18 +168,16 @@ const SellerProfile: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150 ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150 ${activeTab === tab.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-foreground/60 hover:text-foreground hover:bg-background"
-                }`}
+                  }`}
               >
                 {tab.label}
-                <span className={`text-xs px-1.5 py-0.5 rounded-[var(--radius-sm)] ${
-                  activeTab === tab.id
+                <span className={`text-xs px-1.5 py-0.5 rounded-[var(--radius-sm)] ${activeTab === tab.id
                     ? "bg-primary-foreground/20 text-primary-foreground"
                     : "bg-border text-foreground/50"
-                }`}>
+                  }`}>
                   {tab.count}
                 </span>
               </button>
@@ -208,7 +206,7 @@ const SellerProfile: React.FC = () => {
                     <div key={gem.id} className="group flex flex-col rounded-[var(--radius-lg)] overflow-hidden border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200 max-w-[260px] w-full mx-auto">
                       <div className="relative overflow-hidden bg-background" style={{ height: "180px" }}>
                         <img
-                         src={gem.imageUrl ? `http://localhost:5001/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : PLACEHOLDER_IMAGE}
+                          src={gem.imageUrl ? `/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : PLACEHOLDER_IMAGE}
                           alt={gem.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
@@ -241,15 +239,14 @@ const SellerProfile: React.FC = () => {
                         </p>
                         <div className="flex items-center justify-between mt-1.5">
                           <span className="text-base font-bold text-foreground tabular-nums">
-                            ${Number(gem.price).toLocaleString()}
+                            LKR {Number(gem.price).toLocaleString('en-US')}
                           </span>
                           <button
                             disabled={!gem.inStock}
-                            className={`text-xs font-semibold px-3 py-1 rounded-[var(--radius-md)] transition-opacity duration-150 ${
-                              gem.inStock
+                            className={`text-xs font-semibold px-3 py-1 rounded-[var(--radius-md)] transition-opacity duration-150 ${gem.inStock
                                 ? "payment-btn active cursor-pointer"
                                 : "bg-border text-foreground/40 cursor-not-allowed"
-                            }`}
+                              }`}
                           >
                             {gem.inStock ? "View Gem" : "Unavailable"}
                           </button>

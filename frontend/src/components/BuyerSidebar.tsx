@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, Flower, Rows3, BadgeDollarSign, X, History, Home } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck } from "lucide-react";
 
 interface BuyerSidebarProps {
   buyerName: string;
@@ -62,6 +62,13 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
             </button>
 
             <button
+              onClick={() => navigate("/buyer/order-status")}
+              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/order-status' ? ' underline decoration-black decoration-2' : ''}`}
+            >
+              <Truck className="w-4 h-4" /> Order Status
+            </button>
+
+            <button
               onClick={() => navigate("/buyer/ai-designs")}
               className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/ai-designs' ? ' underline decoration-black decoration-2' : ''}`}
             >
@@ -80,7 +87,7 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
         </div>
 
         <div className="p-6 border-t space-y-3">
-          <button onClick={() => navigate("/buyer/settings")} className="flex items-center gap-3 w-full text-left hover:underline">
+          <button onClick={() => navigate("/buyer/settings")} className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/settings' ? ' underline decoration-black decoration-2' : ''}`}>
             <Settings className="w-4 h-4" /> Settings
           </button>
 

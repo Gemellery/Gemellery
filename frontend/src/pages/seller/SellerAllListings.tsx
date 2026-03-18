@@ -24,7 +24,7 @@ function SellerAllListings() {
 
                 setLoading(true);
 
-                const res = await fetch("http://localhost:5001/api/seller/gems", {
+                const res = await fetch("/api/seller/gems", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -120,7 +120,7 @@ function SellerAllListings() {
                                 </p>
                                 <div className="flex items-center justify-between">
                                     <p className="font-bold text-red-500">
-                                        ${Number(gem.price).toLocaleString()}
+                                        LKR {Number(gem.price).toLocaleString('en-US')}
                                     </p>
                                     <button
                                         onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}

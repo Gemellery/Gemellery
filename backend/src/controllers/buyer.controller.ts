@@ -1,6 +1,89 @@
 import { Request, Response } from "express";
 import db from "../database";
 
+// GET /api/buyer/profile
+export const getBuyerProfile = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+        u.full_name,
+        u.mobile,
+        u.email,
+        u.role,
+        u.joined_date,
+
+        c.country_name,
+
+        a.address
+        FROM user u
+        LEFT JOIN address a ON a.user_id = u.user_id
+        LEFT JOIN country c ON c.country_id = u.country_id
+        WHERE u.user_id = ? AND u.role = 'Buyer'
+        `,
+      [buyerId]
+    );
+
+    if (!rows.length) {
+      return res.status(403).json({ error: "Not a buyer" });
+    }
+
+    return res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load buyer profile" });
+  }
+};
+
+// PATCH /api/buyer/profile
+export const updateBuyerProfile = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { full_name, mobile, address } = req.body;
+
+    await db.query(
+      `
+        UPDATE user
+        SET full_name = ?, mobile = ?
+        WHERE user_id = ? AND role = 'Buyer'
+        `,
+      [full_name, mobile, buyerId]
+    );
+
+    // Update or insert address
+    const [existingAddressResult]: any = await db.query(
+      `SELECT address_id FROM address WHERE user_id = ?`,
+      [buyerId]
+    );
+
+    if (existingAddressResult.length > 0) {
+      await db.query(
+        `
+          UPDATE address
+          SET address = ?
+          WHERE user_id = ?
+          `,
+        [address, buyerId]
+      );
+    } else {
+      await db.query(
+        `
+          INSERT INTO address (user_id, address)
+          VALUES (?, ?)
+          `,
+        [buyerId, address]
+      );
+    }
+
+    return res.json({ message: "Profile updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to update buyer profile" });
+  }
+};
+
 // GET /api/buyer/dashboard-summary
 export const getBuyerDashboardSummary = async (req: Request, res: Response) => {
   try {
@@ -52,15 +135,16 @@ export const getRecentOrders = async (req: Request, res: Response) => {
           o.order_status,
           o.total_amount,
           o.created_at,
+          g.gem_name,
           MIN(gi.image_url) AS image_url
         FROM orders o
         LEFT JOIN order_items oi ON oi.order_id = o.order_id
         LEFT JOIN gem g ON g.gem_id = oi.gem_id
         LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
         WHERE o.buyer_id = ?
-        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at
+        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, g.gem_name
         ORDER BY o.created_at DESC
-        LIMIT 5
+        LIMIT 10
       `,
       [buyerId]
     );
@@ -98,17 +182,17 @@ export const getAllOrders = async (req: Request, res: Response) => {
         o.total_amount,
         o.created_at,
         o.payment_method,
-        sa.address_line1,
-        sa.city,
-        sa.state,
-        sa.zip,
+        NULL AS address_line1,
+        NULL AS city,
+        NULL AS state,
+        NULL AS zip,
         MIN(gi.image_url) AS image_url,
+        GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
         COUNT(DISTINCT oi.order_item_id) AS item_count
       FROM orders o
       LEFT JOIN order_items oi ON oi.order_id = o.order_id
       LEFT JOIN gem g ON g.gem_id = oi.gem_id
       LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
-      LEFT JOIN shipping_addresses sa ON sa.address_id = o.shipping_address_id
       WHERE o.buyer_id = ?
     `;
 
@@ -122,8 +206,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     }
 
     dataQuery += `
-      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method,
-               sa.address_line1, sa.city, sa.state, sa.zip
+      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method
       ORDER BY o.${sort} ${order}
       LIMIT ? OFFSET ?
     `;
@@ -168,17 +251,16 @@ export const getOrderDetails = async (req: Request, res: Response) => {
           o.total_amount,
           o.created_at,
           o.payment_method,
-          sa.address_line1,
-          sa.address_line2,
-          sa.city,
-          sa.state,
-          sa.zip,
-          sa.country,
-          sa.phone_number,
+          NULL AS address_line1,
+          NULL AS address_line2,
+          NULL AS city,
+          NULL AS state,
+          NULL AS zip,
+          NULL AS country,
+          NULL AS phone_number,
           u.full_name,
           u.email
         FROM orders o
-        LEFT JOIN shipping_addresses sa ON sa.address_id = o.shipping_address_id
         LEFT JOIN user u ON u.user_id = o.buyer_id
         WHERE o.order_id = ? AND o.buyer_id = ?
       `,

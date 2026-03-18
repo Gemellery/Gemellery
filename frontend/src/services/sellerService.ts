@@ -1,6 +1,6 @@
 import type { SellerProfileResponse } from "../types/seller.types";
 
-const API_BASE_URL = "http://localhost:5001/api";
+const API_BASE_URL = "/api";
 
 export const fetchSellerProfile = async (
   sellerId: string
