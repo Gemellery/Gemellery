@@ -17,8 +17,8 @@ import {
 
 // ─── Terms metadata — only edit here when Terms change ───────────────────────
 const TERMS = {
-  effectiveDate: "1st January 2025",
-  lastUpdated:   "24th November 2025",
+  effectiveDate: "18th March 2026",
+  lastUpdated:   "18th March 2026",
   version:       "1.0",
   officialEmail:  "gemellery.official@gmail.com",
   address:       "Colombo, Sri Lanka",
