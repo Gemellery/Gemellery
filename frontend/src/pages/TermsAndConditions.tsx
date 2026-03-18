@@ -575,26 +575,14 @@ export default function TermsAndConditions() {
                 Policy. Last updated:{" "}
                 <span className="text-gray-300">{TERMS.lastUpdated}</span>.
               </p>
-              <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex flex-wrap gap-3 justify-center">
                 <button
-                  onClick={() => navigate("/")}
-                  className="px-6 py-2.5 bg-[#D4AF37] text-[#0A1128] text-sm font-semibold rounded-full hover:bg-[#F5D061] transition-colors duration-200"
+                    onClick={() => navigate("/")}
+                    className="px-6 py-2.5 bg-[#D4AF37] text-[#0A1128] text-sm font-semibold rounded-full hover:bg-[#F5D061] transition-colors duration-200"
                 >
-                  Return to Home
+                    Return to Home
                 </button>
-                <button
-                  onClick={() => navigate("/contact")}
-                  className="px-6 py-2.5 border border-white/20 text-white text-sm font-medium rounded-full hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors duration-200"
-                >
-                  Contact Support
-                </button>
-                <button
-                  onClick={() => navigate("/privacy-policy")}
-                  className="px-6 py-2.5 border border-white/20 text-white text-sm font-medium rounded-full hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors duration-200"
-                >
-                  Privacy Policy
-                </button>
-              </div>
+                </div>
             </div>
 
           </main>
