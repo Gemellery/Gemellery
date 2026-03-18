@@ -147,9 +147,9 @@ function BuyerDashboardLayout() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
         {/* Header container */}
-        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -242,7 +242,7 @@ function BuyerDashboardLayout() {
                   {orders.slice(0, 4).map((order) => (
                     <div
                       key={order.order_id}
-                      className="p-4 md:px-6 md:py-5 flex items-center justify-between"
+                      className="p-4 md:px-6 md:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center p-1">
@@ -270,7 +270,7 @@ function BuyerDashboardLayout() {
                         </div>
                       </div>
                       
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex w-full sm:w-auto items-center sm:flex-col justify-between sm:items-end gap-2">
                         <span className="font-bold text-gray-900">
                           LKR {Number(order.total_amount).toLocaleString()}
                         </span>
@@ -317,7 +317,7 @@ function BuyerDashboardLayout() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {wishlist.length === 0 && (
                 <div className="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-100 rounded-2xl shadow-sm">
                   Your wishlist is empty.
@@ -393,7 +393,7 @@ function BuyerDashboardLayout() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {designsLoading ? (
                 /* Skeleton Loaders */
                 [1, 2, 3, 4].map((i) => (

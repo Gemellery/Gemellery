@@ -15,6 +15,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/BasicFooter";
 import API_CONFIG from "../../lib/api.config";
 
 interface GemItem {
@@ -57,6 +58,17 @@ const statusBadge: Record<string, { label: string; style: string }> = {
 };
 
 type FilterTab = "all" | "Available" | "Reserved" | "Sold" | "pending" | "rejected";
+
+/** Handles both full S3 URLs (from createGem) and bare filenames (from updateGem) */
+function getGemImageSrc(image_url: string | null): string {
+  if (!image_url) return "/placeholder-gem.png";
+  // Already a full URL (http/https) — use as-is
+  if (image_url.startsWith("http://") || image_url.startsWith("https://")) {
+    return image_url;
+  }
+  // Bare filename — build the path via the backend uploads folder
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${image_url}`;
+}
 
 export default function SellerInventory() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -267,18 +279,14 @@ export default function SellerInventory() {
                           <tr key={gem.gem_id} className="hover:bg-gray-50">
                             <td className="p-4">
                               <div className="flex items-center gap-3">
-                                <img
-                                  src={
-                                    gem.image_url
-                                      ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${gem.image_url}`
-                                      : "/placeholder-gem.png"
-                                  }
-                                  alt={gem.gem_name}
-                                  className="w-12 h-12 rounded-lg object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "/placeholder-gem.png";
-                                  }}
-                                />
+                                 <img
+                                   src={getGemImageSrc(gem.image_url)}
+                                   alt={gem.gem_name}
+                                   className="w-12 h-12 rounded-lg object-cover"
+                                   onError={(e) => {
+                                     (e.target as HTMLImageElement).src = "/placeholder-gem.png";
+                                   }}
+                                 />
                                 <div>
                                   <p className="font-medium text-gray-900">{gem.gem_name}</p>
                                   <p className="text-xs text-gray-500 md:hidden">{gem.gem_type}</p>
@@ -364,6 +372,7 @@ export default function SellerInventory() {
             )}
           </div>
         </div>
+        <Footer />
       </main>
     </div>
   );
