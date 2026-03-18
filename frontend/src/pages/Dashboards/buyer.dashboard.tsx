@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import image from "../../assets/logos/example_ring.png";
 import API_CONFIG from "../../lib/api.config";
+import { getUserDesigns } from "../../lib/jewelry-designer/api";
+import type { JewelryDesign } from "../../lib/jewelry-designer/types";
 
 interface Summary {
   activeOrders: number;
@@ -52,6 +54,8 @@ function BuyerDashboardLayout() {
   });
   const [orders, setOrders] = useState<RecentOrder[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [designs, setDesigns] = useState<JewelryDesign[]>([]);
+  const [designsLoading, setDesignsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -127,6 +131,12 @@ function BuyerDashboardLayout() {
     fetchSummary();
     fetchOrders();
     fetchWishlist();
+
+    // Fetch saved designs
+    getUserDesigns()
+      .then((data) => setDesigns(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())))
+      .catch(() => setDesigns([]))
+      .finally(() => setDesignsLoading(false));
   }, []);
 
   return (
@@ -366,27 +376,64 @@ function BuyerDashboardLayout() {
               <h3 className="text-lg font-bold text-gray-900">
                 Your Designs
               </h3>
-              <button className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors">
+              <button
+                onClick={() => navigate("/jewelry-designer")}
+                className="text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 hover:border-gray-300 px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all shadow-sm">
+                {designs.length > 4 && (
+                  <span className="bg-gray-100 text-gray-600 text-xs font-bold px-1.5 py-0.5 rounded-md">
+                    {designs.length}
+                  </span>
+                )}
                 View all <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                 <div key={i} className="bg-white rounded-2xl border border-gray-100 p-2 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow cursor-pointer group">
-                    <div className="aspect-square bg-gray-50 rounded-xl overflow-hidden relative">
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors z-10"></div>
-                        <img
-                            src="/sample_gems/almandine_18.jpg"
-                            alt="AI Design"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        />
-                         <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase text-gray-600 shadow-sm z-20">
-                            Concept {i}
-                        </div>
-                    </div>
+              {designsLoading ? (
+                /* Skeleton Loaders */
+                [1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white rounded-2xl border border-gray-100 p-2 shadow-sm animate-pulse">
+                    <div className="aspect-square bg-gray-100 rounded-xl mb-3" />
+                    <div className="h-3 bg-gray-100 rounded w-3/4 mx-1" />
+                    <div className="h-3 bg-gray-100 rounded w-1/2 mx-1 mt-2" />
+                  </div>
+                ))
+              ) : designs.length === 0 ? (
+                <div className="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-100 rounded-2xl shadow-sm">
+                  No saved designs yet. <button onClick={() => navigate("/jewelry-designer")} className="text-[#cc000b] font-semibold hover:underline">Create your first design</button>
                 </div>
-              ))}
+              ) : (
+                designs.slice(0, 4).map((design) => {
+                const thumb = design.generatedImages?.[0]?.thumbnailUrl || design.generatedImages?.[0]?.url || null;
+                return (
+                  <div
+                    key={design.id}
+                    onClick={() => navigate(`/jewelry-designer/design/${design.id}`)}
+                    className="bg-white rounded-2xl border border-gray-100 p-2 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-shadow cursor-pointer group"
+                  >
+                    <div className="aspect-square bg-gray-50 rounded-xl overflow-hidden relative">
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors z-10" />
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt={`${design.gemType} ${design.gemCut}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <span className="text-gray-400 text-xs">No preview</span>
+                        </div>
+                      )}
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase text-gray-600 shadow-sm z-20">
+                        {design.gemType || "Design"}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2 px-1 pb-1 truncate">
+                      {design.designPrompt?.slice(0, 40) || design.gemCut}
+                    </p>
+                  </div>
+                );
+              }))}
             </div>
           </section>
         </div>
