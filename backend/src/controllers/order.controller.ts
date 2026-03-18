@@ -178,9 +178,9 @@ export const checkoutOrder = async (req: any, res: Response) => {
 
     // Create order
     const [orderResult]: any = await conn.query(
-      `INSERT INTO orders (buyer_id, seller_id, total_amount, payment_method, payment_status, address_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [user_id, seller_id, total_amount, payment_method, "Paid", shipping_address_id]
+      `INSERT INTO orders (buyer_id, seller_id, total_amount, payment_method, payment_status, order_status, address_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, seller_id, total_amount, payment_method, "Paid", "Processing", shipping_address_id]
     );
 
     const order_id = orderResult.insertId;
@@ -191,6 +191,12 @@ export const checkoutOrder = async (req: any, res: Response) => {
         `INSERT INTO order_items (order_id, gem_id, price, quantity)
          VALUES (?, ?, ?, ?)`,
         [order_id, item.gem_id, item.price, item.quantity]
+      );
+
+      // Update gem status to Sold
+      await conn.query(
+        `UPDATE gem SET status = 'Sold' WHERE gem_id = ?`,
+        [item.gem_id]
       );
     }
 
