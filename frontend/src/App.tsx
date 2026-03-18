@@ -342,6 +342,7 @@ function App() {
           <Route path="/403" element={<AccessDenied />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
 
           <Route
