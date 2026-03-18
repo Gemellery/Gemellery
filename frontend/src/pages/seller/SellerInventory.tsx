@@ -37,6 +37,7 @@ interface Summary {
   total: number;
   available: number;
   unavailable: number;
+  sold: number;
   pending: number;
   approved: number;
   rejected: number;
@@ -55,7 +56,7 @@ const statusBadge: Record<string, { label: string; style: string }> = {
   Sold: { label: "Sold", style: "bg-purple-100 text-purple-800" },
 };
 
-type FilterTab = "all" | "Available" | "Reserved" | "pending" | "rejected";
+type FilterTab = "all" | "Available" | "Reserved" | "Sold" | "pending" | "rejected";
 
 export default function SellerInventory() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -64,7 +65,7 @@ export default function SellerInventory() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [gems, setGems] = useState<GemItem[]>([]);
-  const [summary, setSummary] = useState<Summary>({ total: 0, available: 0, unavailable: 0, pending: 0, approved: 0, rejected: 0 });
+  const [summary, setSummary] = useState<Summary>({ total: 0, available: 0, unavailable: 0, sold: 0, pending: 0, approved: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,7 +81,7 @@ export default function SellerInventory() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (filter === "Available" || filter === "Reserved") {
+      if (filter === "Available" || filter === "Reserved" || filter === "Sold") {
         params.set("status", filter);
       }
       if (filter === "pending" || filter === "rejected") {
@@ -138,6 +139,7 @@ export default function SellerInventory() {
     { key: "all", label: "All Gems", count: summary.total },
     { key: "Available", label: "Available", count: summary.available },
     { key: "Reserved", label: "Reserved", count: summary.unavailable },
+    { key: "Sold", label: "Sold", count: summary.sold },
     { key: "pending", label: "Pending", count: summary.pending },
     { key: "rejected", label: "Rejected", count: summary.rejected },
   ];
@@ -306,16 +308,17 @@ export default function SellerInventory() {
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
-                                  title="Edit"
+                                  disabled={gem.status === "Sold"}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title={gem.status === "Sold" ? "Cannot edit a sold gem" : "Edit"}
                                 >
                                   <Pencil className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => toggleStatus(gem)}
-                                  disabled={togglingId === gem.gem_id}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50"
-                                  title={gem.status === "Available" ? "Mark Unavailable" : "Mark Available"}
+                                  disabled={togglingId === gem.gem_id || gem.status === "Sold"}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title={gem.status === "Sold" ? "Cannot toggle a sold gem" : (gem.status === "Available" ? "Mark Unavailable" : "Mark Available")}
                                 >
                                   {gem.status === "Available" ? (
                                     <EyeOff className="w-4 h-4" />
