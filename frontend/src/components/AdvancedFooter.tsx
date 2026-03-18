@@ -3,7 +3,7 @@ import { Instagram, Linkedin, X, Facebook } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function AdvancedFooter() {
-        const navigate = useNavigate();
+        
     return (
         <>
             <footer className="w-full bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-t border-white/30 shadow-2xl flex flex-col items-center justify-center">
