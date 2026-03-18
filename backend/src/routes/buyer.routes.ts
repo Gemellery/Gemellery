@@ -7,10 +7,26 @@ import {
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  getBuyerProfile,
+  updateBuyerProfile,
 } from "../controllers/buyer.controller";
 import { authGuard, authorizeRole } from "../middleware/auth.middleware";
 
 const router = Router();
+
+router.get(
+  "/profile",
+  authGuard,
+  authorizeRole("buyer"),
+  getBuyerProfile
+);
+
+router.patch(
+  "/profile",
+  authGuard,
+  authorizeRole("buyer"),
+  updateBuyerProfile
+);
 
 router.get(
   "/dashboard-summary",

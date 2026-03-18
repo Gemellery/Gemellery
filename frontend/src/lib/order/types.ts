@@ -1,6 +1,7 @@
 export interface CheckoutRequest {
   payment_method: string;
   shipping_address_id: number;
+  payment_intent_id: string;
 }
 
 export interface CheckoutResponse {
@@ -8,6 +9,12 @@ export interface CheckoutResponse {
   message: string;
   order_id?: number;
   total_amount?: number;
+}
+
+export interface PaymentIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
 }
 
 export interface OrderItem {

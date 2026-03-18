@@ -48,6 +48,7 @@ interface Order {
   zip: string;
   item_count: number;
   image_url?: string;
+  gem_name?: string;
 }
 
 interface OrderDetails extends Order {
@@ -283,8 +284,8 @@ function OrderHistory() {
 
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-lg">
-                              Order #{order.order_id}
+                            <h3 className="font-bold text-lg line-clamp-1">
+                              {order.gem_name || `Order #${order.order_id}`}
                             </h3>
                             <span
                               className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
@@ -298,6 +299,11 @@ function OrderHistory() {
                           </div>
 
                           <div className="flex flex-col gap-1 text-sm text-gray-600">
+                            {order.gem_name && (
+                              <div className="font-semibold text-gray-500 mb-1">
+                                Order #{order.order_id}
+                              </div>
+                            )}
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
                               {new Date(order.created_at).toLocaleDateString()}
@@ -316,7 +322,7 @@ function OrderHistory() {
                           {order.item_count} item(s)
                         </div>
                         <div className="text-lg font-bold text-[#cc000b]">
-                          PKR {order.total_amount.toLocaleString()}
+                          LKR {Number(order.total_amount).toLocaleString('en-US')}
                         </div>
                       </div>
 
@@ -438,7 +444,7 @@ function OrderHistory() {
                           <div className="flex items-center justify-between mt-2">
                             <span className="text-sm">Qty: {item.quantity}</span>
                             <span className="font-bold">
-                              PKR {(item.price * item.quantity).toLocaleString()}
+                              LKR {Number(item.price * item.quantity).toLocaleString('en-US')}
                             </span>
                           </div>
                         </div>
@@ -467,8 +473,7 @@ function OrderHistory() {
                 {/* Order Summary */}
                 <div className="border-t pt-4">
                   <div className="flex justify-between mb-2">
-                    <span>Subtotal:</span>
-                    <span>PKR {selectedOrder.total_amount.toLocaleString()}</span>
+                    <span>LKR {Number(selectedOrder.total_amount).toLocaleString('en-US')}</span>
                   </div>
                   <div className="flex justify-between mb-4">
                     <span>Payment Method:</span>
@@ -477,7 +482,7 @@ function OrderHistory() {
                   <div className="flex justify-between text-lg font-bold bg-gray-50 p-3 rounded">
                     <span>Total:</span>
                     <span className="text-[#cc000b]">
-                      PKR {selectedOrder.total_amount.toLocaleString()}
+                      LKR {Number(selectedOrder.total_amount).toLocaleString('en-US')}
                     </span>
                   </div>
                 </div>

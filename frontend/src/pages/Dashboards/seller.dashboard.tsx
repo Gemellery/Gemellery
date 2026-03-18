@@ -95,44 +95,49 @@ function SellerDashboardLayout() {
     }, []);
 
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-800">
             <SellerSidebar sellerName={user?.full_name || user?.email}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
-                <div className="flex items-center justify-between mb-5">
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="md:hidden p-2 rounded-lg hover:bg-gray-200">
-                        <Menu className="w-5 h-5" />
-                    </button>
-
-                    <div className="ml-4 md:ml-0">
-                        <h3 className="font-bold text-2xl">
-                            Welcome back, {user?.full_name}
-                        </h3>
-                        <p className="flex items-center text-sm text-gray-500 gap-2">
-                            {seller?.verification_status === "approved" ? (
-                                <BadgeCheck className="text-[#1F7A73] size-5" />
-                            ) : (
-                                <ShieldAlert className="text-yellow-500 size-5" />
-                            )}
-                            {seller?.business_name || "Loading business..."}
-                        </p>
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
+                <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="md:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100/80 text-gray-600 transition-colors">
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <div>
+                            <h3 className="font-bold text-2xl tracking-tight text-gray-900">
+                                Welcome back, {user?.full_name}
+                            </h3>
+                            <p className="text-gray-500 mt-1 flex items-center gap-2">
+                                {seller?.verification_status === "approved" ? (
+                                    <BadgeCheck className="w-4 h-4 text-emerald-500" />
+                                ) : (
+                                    <ShieldAlert className="w-4 h-4 text-amber-500" />
+                                )}
+                                {seller?.business_name || "Loading business..."}
+                            </p>
+                        </div>
                     </div>
 
                     <button
                         onClick={() => navigate("/add-new-gem")}
-                        className="hidden md:flex items-center gap-2 px-6 py-3 bg-[#1F7A73] text-white font-semibold rounded-full shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
-                        <Plus size={18} /> List New Gem
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-[#1F7A73] text-white font-medium rounded-xl shadow-lg shadow-teal-500/20 hover:bg-[#186660] hover:-translate-y-0.5 transition-all duration-300 w-full md:w-auto">
+                        <Plus size={18} />
+                        <span className="hidden md:inline">List New Gem</span>
+                        <span className="md:hidden">List Gem</span>
                     </button>
                 </div>
+
+                <div className="px-6 pt-4 pb-6 md:px-10 md:pt-5 md:pb-10 max-w-7xl mx-auto">
 
                 {/* Verification Status Banner */}
                 {seller && (
                     <div className={`rounded-2xl p-4 mb-6 flex items-center gap-4 border ${seller.verification_status === "approved"
-                        ? "bg-green-50 border-green-200"
+                        ? "bg-green-100 border-green-300"
                         : seller.verification_status === "pending"
                             ? "bg-yellow-50 border-yellow-200"
                             : seller.verification_status === "rejected"
@@ -140,7 +145,7 @@ function SellerDashboardLayout() {
                                 : "bg-orange-50 border-orange-200"
                         }`}>
                         <div className={`p-3 rounded-xl ${seller.verification_status === "approved"
-                            ? "bg-green-100"
+                            ? "bg-green-200"
                             : seller.verification_status === "pending"
                                 ? "bg-yellow-100"
                                 : seller.verification_status === "rejected"
@@ -154,7 +159,7 @@ function SellerDashboardLayout() {
                         </div>
                         <div className="flex-1">
                             <h4 className={`font-semibold text-sm ${seller.verification_status === "approved"
-                                ? "text-green-800"
+                                ? "text-green-900"
                                 : seller.verification_status === "pending"
                                     ? "text-yellow-800"
                                     : seller.verification_status === "rejected"
@@ -167,7 +172,7 @@ function SellerDashboardLayout() {
                                 {seller.verification_status === "suspended" && "Account Suspended"}
                             </h4>
                             <p className={`text-xs mt-0.5 ${seller.verification_status === "approved"
-                                ? "text-green-600"
+                                ? "text-green-700"
                                 : seller.verification_status === "pending"
                                     ? "text-yellow-600"
                                     : seller.verification_status === "rejected"
@@ -181,7 +186,7 @@ function SellerDashboardLayout() {
                             </p>
                         </div>
                         <span className={`text-xs font-medium px-3 py-1 rounded-full ${seller.verification_status === "approved"
-                            ? "bg-green-200 text-green-800"
+                            ? "bg-green-300 text-green-900"
                             : seller.verification_status === "pending"
                                 ? "bg-yellow-200 text-yellow-800"
                                 : seller.verification_status === "rejected"
@@ -193,131 +198,133 @@ function SellerDashboardLayout() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
 
                     {/* Total Revenue */}
-                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <div className="p-4 rounded-xl bg-white">
-                            <BanknoteArrowDown className="text-[#1F7A73] size-7" />
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
+                        <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                            <BanknoteArrowDown className="w-5 h-5" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Total Revenue</span>
-                            <span className="text-2xl font-bold text-gray-900">
-                                ${dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString()}` : "Loading..."}
-                            </span>
-                            <span className={`text-xs mt-1 ${dashboardStats?.revenueTrend >= 0 ? "text-green-600" : "text-red-600"}`}>
-                                {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% from last month` : ""}
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">Total Revenue</p>
+                            <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+                                {dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString('en-US')}` : "—"}
+                            </h3>
+                            <span className={`text-xs font-medium ${dashboardStats?.revenueTrend >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                                {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% this month` : ""}
                             </span>
                         </div>
                     </div>
 
                     {/* Total Listings */}
-                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <div className="p-4 rounded-xl bg-white">
-                            <Package className="text-[#1F7A73] size-7" />
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
+                        <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                            <Package className="w-5 h-5" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Active Listings</span>
-                            <span className="text-2xl font-bold text-gray-900">
-                                {dashboardStats?.totalListings ?? "Loading..."}
-                            </span>
-                            <span className="text-xs text-gray-500 mt-1">
-                                Available gems
-                            </span>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">Active Listings</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.totalListings ?? "—"}</h3>
+                            <p className="text-xs text-gray-400">Available gems</p>
                         </div>
                     </div>
 
                     {/* Total Orders */}
-                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <div className="p-4 rounded-xl bg-white">
-                            <BadgeCheck className="text-[#1F7A73] size-7" />
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
+                        <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                            <BadgeCheck className="w-5 h-5" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Total Orders</span>
-                            <span className="text-2xl font-bold text-gray-900">
-                                {dashboardStats?.totalOrders ?? "Loading..."}
-                            </span>
-                            <span className="text-xs text-gray-500 mt-1">
-                                All time
-                            </span>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">Total Orders</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.totalOrders ?? "—"}</h3>
+                            <p className="text-xs text-gray-400">All time</p>
                         </div>
                     </div>
 
                     {/* Wishlist Count */}
-                    <div className="group bg-[#f8f0d9] rounded-2xl p-6 flex items-center gap-5 shadow-sm hover:shadow-lg transition-all duration-300">
-                        <div className="p-4 rounded-xl bg-white">
-                            <Heart className="text-[#1F7A73] size-7" />
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
+                        <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+                            <Heart className="w-5 h-5" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">Wishlisted Gems</span>
-                            <span className="text-2xl font-bold text-gray-900">
-                                {dashboardStats?.wishlistCount ?? "Loading..."}
-                            </span>
-                            <span className="text-xs text-gray-500 mt-1">
-                                Across all listings
-                            </span>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">Wishlisted Gems</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.wishlistCount ?? "—"}</h3>
+                            <p className="text-xs text-gray-400">Across all listings</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Active Listings */}
-                <h3
-                    onClick={() => navigate("/seller/listings")}
-                    className="flex items-center text-lg font-bold underline mt-10 cursor-pointer hover:text-[#1F7A73]"
-                >
-                    Active Listings <ArrowRight className="ml-2" />
-                </h3>
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-gray-900">Active Listings</h3>
+                    <button
+                        onClick={() => navigate("/seller/listings")}
+                        className={`group text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
+                            gems.length > 4 
+                            ? "text-gray-900 bg-white border border-gray-900 hover:bg-gray-900 hover:text-white px-3 py-1.5 rounded-lg shadow-sm"
+                            : "text-gray-500 hover:text-gray-900"
+                        }`}
+                    >
+                        {gems.length > 4 && (
+                            <span className="bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors duration-300">
+                                {gems.length}
+                            </span>
+                        )}
+                        View all <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
 
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mb-6 mt-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
 
                     {gemsLoading && (
-                        <p className="col-span-full text-sm text-gray-500">
-                            Loading active listings...
-                        </p>
+                        [1,2,3,4].map((i) => (
+                            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-3 animate-pulse">
+                                <div className="w-full aspect-square bg-gray-100 rounded-xl mb-3" />
+                                <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
+                                <div className="h-3 bg-gray-100 rounded w-1/2 mb-2" />
+                                <div className="h-4 bg-gray-100 rounded w-2/3" />
+                            </div>
+                        ))
                     )}
 
                     {!gemsLoading && gems.length === 0 && (
-                        <EmptyState
-                            title="No active listings yet"
-                            description="Start selling by listing your first gemstone on Gemellery."
-                            ctaLabel="List your first gem"
-                            ctaLink="/add-new-gem"
-                        />
+                        <div className="col-span-full bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+                            <EmptyState
+                                title="No active listings yet"
+                                description="Start selling by listing your first gemstone on Gemellery."
+                                ctaLabel="List your first gem"
+                                ctaLink="/add-new-gem"
+                            />
+                        </div>
                     )}
 
-
-                    {!gemsLoading && gems.map((gem) => (
+                    {!gemsLoading && gems.slice(0, 4).map((gem) => (
                         <div
                             key={gem.gem_id}
-                            className="rounded-2xl border border-[#e9dfc8] bg-white p-3"
+                            onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
+                            className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
                         >
-                            <div className="relative">
-                                <div className="rounded-2xl p-2">
-                                    <img
-                                        src={gem.image_url || "/placeholder-gem.png"}
-                                        alt={gem.gem_name}
-                                        className="w-full h-48 object-contain rounded-xl"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = "/placeholder-gem.png";
-                                        }}
-                                    />
-
+                            <div className="relative aspect-square bg-gray-50/50 p-4 flex-shrink-0">
+                                <img
+                                    src={gem.image_url || "/placeholder-gem.png"}
+                                    alt={gem.gem_name}
+                                    className="w-full h-full object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = "/placeholder-gem.png";
+                                    }}
+                                />
+                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-2 py-1 rounded-full border border-gray-100 shadow-sm">
+                                    {gem.carat} ct
                                 </div>
-
-                                <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white flex items-center justify-center shadow">
-                                    <BadgeCheck className="h-4 w-4 text-[#1F7A73]" />
-                                </button>
                             </div>
-
-                            <div className="mt-3 space-y-1">
-                                <h3 className="font-semibold text-sm text-gray-900">
-                                    {gem.gem_name}
-                                </h3>
-                                <p className="text-xs text-gray-500">
-                                    {gem.carat} ct • {gem.cut}
-                                </p>
-                                <p className="font-bold text-red-500">
-                                    ${Number(gem.price).toLocaleString()}
+                            <div className="p-4 flex-1 flex flex-col justify-between border-t border-gray-50">
+                                <div>
+                                    <h3 className="font-bold text-gray-900 group-hover:text-[#1F7A73] transition-colors line-clamp-1 mb-1">
+                                        {gem.gem_name}
+                                    </h3>
+                                    <p className="text-xs font-medium text-gray-400 mb-3">{gem.cut}</p>
+                                </div>
+                                <p className="font-bold text-[#cc000b] text-base">
+                                    LKR {Number(gem.price).toLocaleString('en-US')}
                                 </p>
                             </div>
                         </div>
@@ -325,23 +332,40 @@ function SellerDashboardLayout() {
                 </div>
 
 
-                <h3 className="flex items-center text-lg font-bold underline mt-10 mb-6">
-                    Performance Status <ArrowRight className="ml-2" />
-                </h3>
-                <div className="flex flex-col md:flex-row gap-5 md:gap-4 mb-6 border-[#f5e2aa]">
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
-                        <div className="flex flex-col">
-                            <h2 className="font-bold">Verification Rate</h2>
-                            <h2 className="text-sm text-gray-500">{dashboardStats ? `${dashboardStats.verificationRate}%` : "Loading..."}</h2>
+
+
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-gray-900">Performance</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-sm font-medium text-gray-500">Verification Rate</p>
+                            <span className="text-sm font-bold text-[#1F7A73]">
+                                {dashboardStats ? `${dashboardStats.verificationRate}%` : "—"}
+                            </span>
                         </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#1F7A73] rounded-full transition-all duration-700"
+                                style={{ width: `${dashboardStats?.verificationRate || 0}%` }}
+                            />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2">Gems approved vs. submitted</p>
                     </div>
 
-                    <div className="w-full md:flex-1 h-42 bg-[#f8f0d9] rounded-xl flex items-center justify-between p-4">
-                        <div className="flex flex-col">
-                            <h2 className="font-bold">Active Shipments</h2>
-                            <h2 className="text-sm text-gray-500">{dashboardStats?.activeShipments ?? "Loading..."}</h2>
+                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5">
+                        <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                            <Package className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500 mb-1">Active Shipments</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.activeShipments ?? "—"}</h3>
+                            <p className="text-xs text-gray-400 mt-1">Currently in transit</p>
                         </div>
                     </div>
+                </div>
+
                 </div>
                 <Footer />
             </main>
