@@ -530,7 +530,7 @@ export default function TermsAndConditions() {
                     onClick={() => navigate("/contact")}
                     className="text-sm font-semibold text-[#D4AF37] hover:underline text-left"
                   >
-                    Visit Help Centre →
+                    Visit Contact us →
                   </button>
                 </ContactCard>
 
