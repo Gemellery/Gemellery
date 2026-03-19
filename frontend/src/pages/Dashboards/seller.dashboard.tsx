@@ -100,8 +100,8 @@ function SellerDashboardLayout() {
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
-                <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
+                <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setSidebarOpen(true)}
@@ -136,7 +136,7 @@ function SellerDashboardLayout() {
 
                 {/* Verification Status Banner */}
                 {seller && (
-                    <div className={`rounded-2xl p-4 mb-6 flex items-center gap-4 border ${seller.verification_status === "approved"
+                    <div className={`rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 border ${seller.verification_status === "approved"
                         ? "bg-green-100 border-green-300"
                         : seller.verification_status === "pending"
                             ? "bg-yellow-50 border-yellow-200"
@@ -144,7 +144,7 @@ function SellerDashboardLayout() {
                                 ? "bg-red-50 border-red-200"
                                 : "bg-orange-50 border-orange-200"
                         }`}>
-                        <div className={`p-3 rounded-xl ${seller.verification_status === "approved"
+                        <div className={`p-3 rounded-xl shrink-0 ${seller.verification_status === "approved"
                             ? "bg-green-200"
                             : seller.verification_status === "pending"
                                 ? "bg-yellow-100"
@@ -198,7 +198,7 @@ function SellerDashboardLayout() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
 
                     {/* Total Revenue */}
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
@@ -258,13 +258,22 @@ function SellerDashboardLayout() {
                     <h3 className="text-lg font-bold text-gray-900">Active Listings</h3>
                     <button
                         onClick={() => navigate("/seller/listings")}
-                        className="text-sm font-medium text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                        className={`group text-sm font-medium flex items-center gap-1.5 transition-all duration-300 ${
+                            gems.length > 4 
+                            ? "text-gray-900 bg-white border border-gray-900 hover:bg-gray-900 hover:text-white px-3 py-1.5 rounded-lg shadow-sm"
+                            : "text-gray-500 hover:text-gray-900"
+                        }`}
                     >
+                        {gems.length > 4 && (
+                            <span className="bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white text-xs font-bold px-1.5 py-0.5 rounded-md transition-colors duration-300">
+                                {gems.length}
+                            </span>
+                        )}
                         View all <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
 
                     {gemsLoading && (
                         [1,2,3,4].map((i) => (
@@ -322,16 +331,7 @@ function SellerDashboardLayout() {
                     ))}
                 </div>
 
-                {gems.length > 4 && (
-                    <div className="mt-8 flex justify-center">
-                        <button
-                            onClick={() => navigate("/seller/listings")}
-                            className="px-8 py-2.5 bg-white border-2 border-gray-800 text-gray-800 text-sm font-bold rounded-full hover:bg-gray-800 hover:text-white transition-all shadow-sm"
-                        >
-                            View All Listings
-                        </button>
-                    </div>
-                )}
+
 
 
                 <div className="flex items-center justify-between mb-6">

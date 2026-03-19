@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BuyerSidebar from "../../components/BuyerSidebar";
 import Footer from "../../components/BasicFooter";
-import { Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, Menu } from "lucide-react";
 import API_CONFIG from "../../lib/api.config";
 
 interface Order {
@@ -79,15 +79,23 @@ function BuyerOrderStatus() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
+        <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
           {/* Header */}
-          <div className="bg-white shadow-sm sticky top-0 z-50">
+          <div className="bg-white shadow-sm sticky top-0 z-30">
             <div className="px-6 py-5 md:px-10 md:py-6 flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Order Status</h1>
-                <p className="text-gray-600 text-sm mt-1">
-                  Track the delivery progress of your ongoing purchases
-                </p>
+              <div className="flex items-center">
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="md:hidden p-2 -ml-2 mr-3 rounded-lg hover:bg-gray-100 text-gray-600 focus:outline-none"
+                >
+                  <Menu className="w-6 h-6" />
+                </button>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold">Order Status</h1>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Track the delivery progress of your ongoing purchases
+                  </p>
+                </div>
               </div>
             </div>
           </div>
