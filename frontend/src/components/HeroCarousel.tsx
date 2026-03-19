@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
@@ -26,7 +27,7 @@ const slides = [
     },
 ];
 
-const contentVariants = {
+const contentVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i: number) => ({
         opacity: 1,
@@ -86,13 +87,13 @@ export default function HeroCarousel() {
                     animate="visible"
                     exit="exit"
                 >
-                    <div className="max-w-6xl mx-auto px-8 md:px-14 w-full">
+                    <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-14 w-full pt-10 sm:pt-0">
 
                         {/* Badge */}
                         <motion.div
                             custom={0}
                             variants={contentVariants}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-white text-sm font-medium mb-6"
+                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm text-white text-xs sm:text-sm font-medium mb-4 sm:mb-6"
                         >
                             <span className="w-2 h-2 rounded-full bg-[#C9A24D] animate-pulse" />
                             {slide.badge}
@@ -102,7 +103,7 @@ export default function HeroCarousel() {
                         <motion.h1
                             custom={1}
                             variants={contentVariants}
-                            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.08] mb-5"
+                            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-4 sm:mb-5"
                         >
                             {slide.titleLine1}
                             <br />
@@ -115,23 +116,23 @@ export default function HeroCarousel() {
                         <motion.p
                             custom={2}
                             variants={contentVariants}
-                            className="text-gray-200 text-lg md:text-xl mb-9 max-w-lg leading-relaxed"
+                            className="text-gray-200 text-sm sm:text-base md:text-lg mb-8 sm:mb-9 max-w-lg leading-relaxed"
                         >
                             {slide.description}
                         </motion.p>
 
                         {/* CTAs */}
-                        <motion.div custom={3} variants={contentVariants} className="flex flex-wrap gap-4">
+                        <motion.div custom={3} variants={contentVariants} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 w-full sm:w-auto">
                             <button
                                 onClick={() => navigate(slide.primaryCta.path)}
-                                className="px-8 py-3.5 rounded-xl font-bold text-black text-base transition-all duration-300 hover:shadow-xl hover:shadow-[#C9A24D]/40 hover:-translate-y-0.5 active:scale-95"
+                                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-3.5 rounded-xl font-bold text-black text-sm sm:text-base transition-all duration-300 hover:shadow-xl hover:shadow-[#C9A24D]/40 hover:-translate-y-0.5 active:scale-95"
                                 style={{ background: "linear-gradient(135deg, #C9A24D 0%, #FFE066 100%)" }}
                             >
                                 {slide.primaryCta.label}
                             </button>
                             <button
                                 onClick={() => navigate(slide.secondaryCta.path)}
-                                className="px-8 py-3.5 rounded-xl font-semibold text-white text-base border border-white/25 backdrop-blur-sm hover:bg-white/12 transition-all duration-300"
+                                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-3.5 rounded-xl font-semibold text-white text-sm sm:text-base border border-white/25 backdrop-blur-sm hover:bg-white/12 transition-all duration-300"
                             >
                                 {slide.secondaryCta.label}
                             </button>
@@ -141,7 +142,7 @@ export default function HeroCarousel() {
             </AnimatePresence>
 
             {/* Slide indicators */}
-            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                 {slides.map((_, i) => (
                     <button
                         key={i}

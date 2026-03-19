@@ -54,7 +54,7 @@ export default function HomePageCard() {
     const inView = useInView(ref, { once: true, margin: "-80px" });
 
     return (
-        <div ref={ref} className="w-full py-24 px-6 bg-white">
+        <div ref={ref} className="w-full py-16 md:py-24 px-4 sm:px-6 bg-white">
             <div className="max-w-7xl mx-auto">
                 <motion.p
                     initial={{ opacity: 0, y: 12 }}
@@ -68,7 +68,7 @@ export default function HomePageCard() {
                     initial={{ opacity: 0, y: 18 }}
                     animate={inView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.45, delay: 0.07 }}
-                    className="text-center text-3xl md:text-4xl font-extrabold text-gray-900 mb-3"
+                    className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3"
                 >
                     The Gold Standard of Trust
                 </motion.h2>
@@ -76,13 +76,13 @@ export default function HomePageCard() {
                     initial={{ opacity: 0 }}
                     animate={inView ? { opacity: 1 } : {}}
                     transition={{ duration: 0.45, delay: 0.14 }}
-                    className="text-center text-gray-500 max-w-2xl mx-auto mb-14 text-base"
+                    className="text-center text-gray-500 max-w-2xl mx-auto mb-10 md:mb-14 text-sm md:text-base px-2"
                 >
                     Sri Lanka's most trusted gemstone platform — built on certification,
                     blockchain, and AI from the ground up.
                 </motion.p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
                     {features.map(({ icon: Icon, accentColor, from, to, tag, title, description, highlight }, i) => (
                         <motion.div
                             key={title}
