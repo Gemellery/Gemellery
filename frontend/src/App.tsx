@@ -55,6 +55,8 @@ import AccessDenied from "./pages/AccessDenied";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import AiChat from "./components/AiChat";
 import FAQ from "./pages/FAQ";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 
 function MaintenancePage() {
   return (
@@ -362,7 +364,9 @@ function App() {
           <Route path="/403" element={<AccessDenied />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route
             path="/seller/dashboard"
