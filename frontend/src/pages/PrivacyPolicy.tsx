@@ -163,15 +163,14 @@ export default function PrivacyPolicy() {
               {/* ── 1. Introduction ── */}
               <PolicySection id="introduction" title="1. Introduction" icon={Globe}>
                 <p>
-                  Welcome to <strong>Gemellery</strong> ("we," "our," or "us") — Sri Lanka's
-                  premier AI-powered gemstone marketplace. We are committed to protecting
+                  Welcome to <strong>Gemellery</strong> — Sri Lanka's
+                  premier Blockchain-based AI-powered gemstone marketplace. We are committed to protecting
                   your personal information and your right to privacy.
                 </p>
                 <p>
                   This Privacy Policy applies to all information collected through our
-                  platform at <span className="text-[#B8942E] font-semibold">gemellery.lk</span>,
-                  our mobile applications, and any related services, sales, marketing,
-                  or events (collectively, the <strong>"Platform"</strong>).
+                  platform at <span className="text-[#B8942E] font-semibold">gemellery.lk</span>
+                 
                 </p>
                 <p>
                   By accessing or using the Platform, you agree to the terms of this
