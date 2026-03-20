@@ -534,7 +534,6 @@ export default function PrivacyPolicy() {
                <div className="grid md:grid-cols-2 gap-4 mt-4">
                     {[
                         { label: "General Inquiries", value: "gemellery.official@gmail.com", href: "mailto:gemellery.official@gmail.com" },
-                        { label: "Data Requests", value: "Account Settings → Data Request", href: null },
                         { label: "Contact Form", value: "gemellery.lk/contact", href: "/contact" },
 
                     ].map((item) => (
