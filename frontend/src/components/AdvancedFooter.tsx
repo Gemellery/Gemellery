@@ -74,12 +74,6 @@ function AdvancedFooter() {
                                     Terms of Service
                                 </a>
                             </li>
-
-                            <li>
-                                <a href="/help" className="text-gray-700 hover:text-[#D4AF37] cursor-pointer transition-colors duration-300">
-                                    Need Help ?
-                                </a>
-                            </li>
                         </ul>
                     </div>
 
