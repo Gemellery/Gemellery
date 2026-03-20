@@ -85,9 +85,10 @@ export default function PrivacyPolicy() {
           {/* meta pills */}
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             {[
-              { label: "Effective Date", value: "January 1, 2025" },
-              { label: "Last Updated", value: "November 24, 2025" },
-              { label: "Jurisdiction", value: "Sri Lanka & Global" },
+             // ✅ REPLACE WITH THIS — dynamic date
+                { label: "Effective Date", value: "January 1, 2025" },
+                { label: "Last Updated", value: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) },
+                { label: "Jurisdiction", value: "Sri Lanka & Global" },
             ].map((item) => (
               <div
                 key={item.label}
