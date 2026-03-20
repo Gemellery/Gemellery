@@ -86,7 +86,7 @@ export default function PrivacyPolicy() {
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             {[
              // ✅ REPLACE WITH THIS — dynamic date
-                { label: "Effective Date", value: "January 1, 2025" },
+                { label: "Effective Date", value: "January 1, 2026" },
                 { label: "Last Updated", value: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) },
                 { label: "Jurisdiction", value: "Sri Lanka & Global" },
             ].map((item) => (
