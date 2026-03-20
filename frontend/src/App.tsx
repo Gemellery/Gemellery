@@ -53,6 +53,7 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import AiChat from "./components/AiChat";
 import FAQ from "./pages/FAQ";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 
 function MaintenancePage() {
   return (
