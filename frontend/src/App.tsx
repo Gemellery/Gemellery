@@ -345,6 +345,7 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route
             path="/seller/dashboard"
