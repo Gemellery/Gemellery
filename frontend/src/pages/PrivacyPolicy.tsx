@@ -417,10 +417,10 @@ export default function PrivacyPolicy() {
                   100% impenetrable. We encourage you to use a strong, unique password
                   and to report any suspicious activity to{" "}
                   <a
-                    href="mailto:security@gemellery.lk"
-                    className="text-[#B8942E] font-semibold hover:underline"
-                  >
-                    security@gemellery.lk
+                  
+                        href="mailto:gemellery.official@gmail.com"
+                        >
+                            gemellery.official@gmail.com
                   </a>
                   .
                 </InfoBox>
@@ -531,13 +531,13 @@ export default function PrivacyPolicy() {
                   following channels:
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  {[
-                    { label: "General Privacy", value: "privacy@gemellery.lk", href: "mailto:privacy@gemellery.lk" },
-                    { label: "Security Issues", value: "security@gemellery.lk", href: "mailto:security@gemellery.lk" },
-                    { label: "Data Requests", value: "Account Settings → Data Request", href: null },
-                    { label: "Contact Form", value: "gemellery.lk/contact", href: "/contact" },
-                  ].map((item) => (
+               <div className="grid md:grid-cols-2 gap-4 mt-4">
+                    {[
+                        { label: "General Inquiries", value: "gemellery.official@gmail.com", href: "mailto:gemellery.official@gmail.com" },
+                        { label: "Data Requests", value: "Account Settings → Data Request", href: null },
+                        { label: "Contact Form", value: "gemellery.lk/contact", href: "/contact" },
+
+                    ].map((item) => (
                     <div
                       key={item.label}
                       className="flex items-start gap-3 p-4 bg-white border border-gray-200/70 rounded-xl shadow-sm"
