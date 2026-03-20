@@ -19,6 +19,8 @@ import * as shippingAPI from "@/lib/shipping/api.ts";
 import * as orderAPI from "@/lib/order/api.ts";
 import type { ShippingAddress } from "@/lib/shipping/types.ts";
 import { useCart } from "@/context/CartContext";
+import { getGemImageUrl } from "@/lib/gems/api";
+import { formatPrice } from "@/lib/gems/utils";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
@@ -28,7 +30,7 @@ function CheckoutContent() {
   const elements = useElements();
 
   /* ---------------- Cart Items ---------------- */
-  const { items: cartItems, totalAmount, isLoading: isCartLoading } = useCart();
+  const { items: cartItems, totalAmount, isLoading: isCartLoading, refreshCart } = useCart();
 
   /* ---------------- Shipping ---------------- */
   const [shipping, setShipping] = useState({
@@ -179,6 +181,7 @@ function CheckoutContent() {
 
       // Success! Redirect to order confirmation or history page
       if (response.order_id) {
+        await refreshCart();
         navigate(`/buyer/orders/history`);
       }
     } catch (err) {
@@ -615,7 +618,7 @@ function CheckoutContent() {
                       <div key={item.cart_item_id} className="flex gap-3">
                         <div className="w-16 h-16 rounded-lg border overflow-hidden flex-shrink-0">
                           <img
-                            src={item.image || "/sample_gems/default.jpg"}
+                            src={item.image ? getGemImageUrl(item.image) : "/sample_gems/default.jpg"}
                             alt={item.gem_name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -634,7 +637,7 @@ function CheckoutContent() {
                             <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                           )}
                           <p className="text-emerald-600 font-semibold mt-1">
-                            ${(item.price * item.quantity).toLocaleString()}
+                            {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -647,7 +650,7 @@ function CheckoutContent() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>${SUBTOTAL.toLocaleString()}</span>
+                  <span>{formatPrice(SUBTOTAL)}</span>
                 </div>
                 <div className="flex justify-between text-emerald-600">
                   <span>Insured Shipping</span>
@@ -655,7 +658,7 @@ function CheckoutContent() {
                 </div>
                 <div className="flex justify-between">
                   <span>Export Documentation</span>
-                  <span>${EXPORT_FEE.toLocaleString()}</span>
+                  <span>{formatPrice(EXPORT_FEE)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Sales Tax (Est.)</span>
@@ -667,7 +670,7 @@ function CheckoutContent() {
 
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total Due</span>
-                <span>${TOTAL.toLocaleString()}</span>
+                <span>{formatPrice(TOTAL)}</span>
               </div>
 
               {/* Checkout Error Message */}
@@ -689,7 +692,7 @@ function CheckoutContent() {
                     Processing...
                   </>
                 ) : (
-                  <>Pay ${TOTAL.toLocaleString()}</>
+                  <>Pay {formatPrice(TOTAL)}</>
                 )}
               </button>
 

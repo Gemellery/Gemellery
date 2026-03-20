@@ -15,6 +15,7 @@ import {
   Plus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/BasicFooter";
 import API_CONFIG from "../../lib/api.config";
 
 interface GemItem {
@@ -37,6 +38,7 @@ interface Summary {
   total: number;
   available: number;
   unavailable: number;
+  sold: number;
   pending: number;
   approved: number;
   rejected: number;
@@ -55,7 +57,18 @@ const statusBadge: Record<string, { label: string; style: string }> = {
   Sold: { label: "Sold", style: "bg-purple-100 text-purple-800" },
 };
 
-type FilterTab = "all" | "Available" | "Reserved" | "pending" | "rejected";
+type FilterTab = "all" | "Available" | "Reserved" | "Sold" | "pending" | "rejected";
+
+/** Handles both full S3 URLs (from createGem) and bare filenames (from updateGem) */
+function getGemImageSrc(image_url: string | null): string {
+  if (!image_url) return "/placeholder-gem.png";
+  // Already a full URL (http/https) — use as-is
+  if (image_url.startsWith("http://") || image_url.startsWith("https://")) {
+    return image_url;
+  }
+  // Bare filename — build the path via the backend uploads folder
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${image_url}`;
+}
 
 export default function SellerInventory() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -64,7 +77,7 @@ export default function SellerInventory() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [gems, setGems] = useState<GemItem[]>([]);
-  const [summary, setSummary] = useState<Summary>({ total: 0, available: 0, unavailable: 0, pending: 0, approved: 0, rejected: 0 });
+  const [summary, setSummary] = useState<Summary>({ total: 0, available: 0, unavailable: 0, sold: 0, pending: 0, approved: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,7 +93,7 @@ export default function SellerInventory() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (filter === "Available" || filter === "Reserved") {
+      if (filter === "Available" || filter === "Reserved" || filter === "Sold") {
         params.set("status", filter);
       }
       if (filter === "pending" || filter === "rejected") {
@@ -138,6 +151,7 @@ export default function SellerInventory() {
     { key: "all", label: "All Gems", count: summary.total },
     { key: "Available", label: "Available", count: summary.available },
     { key: "Reserved", label: "Reserved", count: summary.unavailable },
+    { key: "Sold", label: "Sold", count: summary.sold },
     { key: "pending", label: "Pending", count: summary.pending },
     { key: "rejected", label: "Rejected", count: summary.rejected },
   ];
@@ -243,17 +257,17 @@ export default function SellerInventory() {
               </div>
             ) : (
               <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="overflow-x-auto max-w-full">
+                  <table className="w-full text-xs sm:text-sm whitespace-nowrap">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left p-4 font-medium text-gray-600">Gem</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Type</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Details</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Price</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Status</th>
-                        <th className="text-left p-4 font-medium text-gray-600 hidden md:table-cell">Verification</th>
-                        <th className="text-left p-4 font-medium text-gray-600">Actions</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Gem</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Type</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Details</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Price</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Status</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 hidden md:table-cell break-words">Verification</th>
+                        <th className="text-left p-2 sm:p-4 font-medium text-gray-600 break-words">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -263,59 +277,56 @@ export default function SellerInventory() {
                         const VIcon = vBadge.icon;
                         return (
                           <tr key={gem.gem_id} className="hover:bg-gray-50">
-                            <td className="p-4">
-                              <div className="flex items-center gap-3">
-                                <img
-                                  src={
-                                    gem.image_url
-                                      ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${gem.image_url}`
-                                      : "/placeholder-gem.png"
-                                  }
-                                  alt={gem.gem_name}
-                                  className="w-12 h-12 rounded-lg object-cover"
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src = "/placeholder-gem.png";
-                                  }}
-                                />
+                            <td className="p-2 sm:p-4 align-top">
+                              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                 <img
+                                   src={getGemImageSrc(gem.image_url)}
+                                   alt={gem.gem_name}
+                                   className="w-12 h-12 rounded-lg object-cover"
+                                   onError={(e) => {
+                                     (e.target as HTMLImageElement).src = "/placeholder-gem.png";
+                                   }}
+                                 />
                                 <div>
-                                  <p className="font-medium text-gray-900">{gem.gem_name}</p>
-                                  <p className="text-xs text-gray-500 md:hidden">{gem.gem_type}</p>
+                                  <p className="font-medium text-gray-900 break-words max-w-[100px] sm:max-w-[160px]">{gem.gem_name}</p>
+                                  <p className="text-xs text-gray-500 md:hidden break-words max-w-[80px]">{gem.gem_type}</p>
                                 </div>
                               </div>
                             </td>
-                            <td className="p-4 text-gray-600 hidden md:table-cell">{gem.gem_type}</td>
-                            <td className="p-4 text-gray-500 hidden md:table-cell">
+                            <td className="p-2 sm:p-4 text-gray-600 hidden md:table-cell break-words">{gem.gem_type}</td>
+                            <td className="p-2 sm:p-4 text-gray-500 hidden md:table-cell break-words">
                               <span>{gem.carat} ct</span>
                               {gem.cut && <span> · {gem.cut}</span>}
                               {gem.color && <span> · {gem.color}</span>}
                             </td>
-                            <td className="p-4 font-semibold text-gray-900">
-                              ${Number(gem.price).toLocaleString()}
+                            <td className="p-2 sm:p-4 font-semibold text-gray-900 break-words">
+                              LKR {Number(gem.price).toLocaleString('en-US')}
                             </td>
-                            <td className="p-4">
+                            <td className="p-2 sm:p-4 break-words">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${sBadge.style}`}>
                                 {sBadge.label}
                               </span>
                             </td>
-                            <td className="p-4 hidden md:table-cell">
+                            <td className="p-2 sm:p-4 hidden md:table-cell break-words">
                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${vBadge.style}`}>
                                 <VIcon className="w-3 h-3" /> {vBadge.label}
                               </span>
                             </td>
-                            <td className="p-4">
-                              <div className="flex items-center gap-2">
+                            <td className="p-2 sm:p-4 break-words">
+                              <div className="flex items-center gap-1 sm:gap-2">
                                 <button
                                   onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
-                                  title="Edit"
+                                  disabled={gem.status === "Sold"}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title={gem.status === "Sold" ? "Cannot edit a sold gem" : "Edit"}
                                 >
                                   <Pencil className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => toggleStatus(gem)}
-                                  disabled={togglingId === gem.gem_id}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50"
-                                  title={gem.status === "Available" ? "Mark Unavailable" : "Mark Available"}
+                                  disabled={togglingId === gem.gem_id || gem.status === "Sold"}
+                                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title={gem.status === "Sold" ? "Cannot toggle a sold gem" : (gem.status === "Available" ? "Mark Unavailable" : "Mark Available")}
                                 >
                                   {gem.status === "Available" ? (
                                     <EyeOff className="w-4 h-4" />
@@ -361,6 +372,7 @@ export default function SellerInventory() {
             )}
           </div>
         </div>
+        <Footer />
       </main>
     </div>
   );
