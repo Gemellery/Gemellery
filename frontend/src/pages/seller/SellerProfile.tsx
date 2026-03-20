@@ -11,7 +11,7 @@ type ActiveTab = "gems" | "reviews";
 
 const PLACEHOLDER_BANNER =
   "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80";
-const PLACEHOLDER_AVATAR = "";
+// const PLACEHOLDER_AVATAR = "";
 
 const SellerProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -196,7 +196,7 @@ const SellerProfile: React.FC = () => {
                       key={gem.id}
                       id={String(gem.id)}
                       name={gem.name}
-                      price={`$${Number(gem.price).toLocaleString()}`}
+                      price={`LKR ${Number(gem.price).toLocaleString()}`}
                       weight={gem.carat ? `${gem.carat}ct` : "N/A"}
                       cut={gem.type || "N/A"}
                       origin={gem.origin || "N/A"}
