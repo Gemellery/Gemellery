@@ -1,9 +1,4 @@
-import {
-  Users,
-  Gem,
-  Clock,
-  Package,
-} from "lucide-react";
+import { Users, Gem, Clock, Package } from "lucide-react";
 
 interface AdminStatsCardsProps {
   totalUsers: number;
@@ -13,45 +8,46 @@ interface AdminStatsCardsProps {
   totalOrders: number;
 }
 
-function AdminStatsCards({
+const AdminStatsCards: React.FC<AdminStatsCardsProps> = ({
   totalUsers,
   totalGems,
   pendingVerifications,
   pendingGemApprovals,
   totalOrders,
-}: AdminStatsCardsProps) {
+}) => {
+
   const cards = [
     {
       title: "Total Users",
-      value: totalUsers,
+      value: totalUsers ?? 0,
       icon: Users,
       bg: "bg-blue-50",
       iconColor: "text-blue-600",
     },
     {
       title: "Total Gems",
-      value: totalGems,
+      value: totalGems ?? 0,
       icon: Gem,
       bg: "bg-purple-50",
       iconColor: "text-purple-600",
     },
     {
       title: "Pending Seller Verifications",
-      value: pendingVerifications,
+      value: pendingVerifications ?? 0,
       icon: Clock,
       bg: "bg-amber-50",
       iconColor: "text-amber-600",
     },
     {
       title: "Pending Gem Approvals",
-      value: pendingGemApprovals,
+      value: pendingGemApprovals ?? 0,
       icon: Clock,
       bg: "bg-orange-50",
       iconColor: "text-orange-600",
     },
     {
       title: "Total Orders",
-      value: totalOrders,
+      value: totalOrders ?? 0,
       icon: Package,
       bg: "bg-green-50",
       iconColor: "text-green-600",
@@ -68,7 +64,7 @@ function AdminStatsCards({
             key={index}
             className="bg-white p-5 rounded-xl border border-gray-200 
             shadow-sm hover:shadow-md transition-all duration-200
-            flex flex-col justify-between min-h-[120px]"
+            flex flex-col justify-between min-h-30"
           >
             <div className="flex items-start justify-between">
 
@@ -83,8 +79,7 @@ function AdminStatsCards({
               </div>
 
               <div
-                className={`w-12 h-12 rounded-lg ${card.bg} 
-                flex items-center justify-center`}
+                className={`w-12 h-12 rounded-lg ${card.bg} flex items-center justify-center`}
               >
                 <Icon className={`w-5 h-5 ${card.iconColor}`} />
               </div>
@@ -95,6 +90,6 @@ function AdminStatsCards({
       })}
     </div>
   );
-}
+};
 
 export default AdminStatsCards;

@@ -34,10 +34,36 @@ const ConciergeContactPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Message sent successfully!');
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          inquiryType: formData.inquiryType,
+          message: formData.message,
+          subscribe: formData.subscribe,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Message sent successfully! We will get back to you within 24 hours.');
+        setFormData({
+          firstName: '', lastName: '', email: '',
+          inquiryType: 'General Inquiry', message: '', subscribe: false,
+        });
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      alert('Network error. Please check your connection and try again.');
+    }
   };
 
   const toggleFaq = (index: number) => {
@@ -68,9 +94,9 @@ const ConciergeContactPage: React.FC = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-800/20 via-transparent to-transparent"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
-  <Sparkles className="w-4 h-4 text-teal-300" />
-  <span className="tracking-wide uppercase">Concierge Service</span>
-</div>
+            <Sparkles className="w-4 h-4 text-teal-300" />
+            <span className="tracking-wide uppercase">Concierge Service</span>
+          </div>
 
           <h1 className="text-5xl font-serif font-bold mb-6">
             How can we assist you today?
@@ -87,8 +113,8 @@ const ConciergeContactPage: React.FC = () => {
           {/* AI Gemologist */}
           <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
             <div className="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center mb-4">
-  <Gem className="w-7 h-7 text-teal-600" />
-</div>
+              <Gem className="w-7 h-7 text-teal-600" />
+            </div>
 
             <h3 className="text-xl font-semibold mb-2">AI Gemologist</h3>
             <p className="text-gray-600 mb-6 text-sm">
@@ -137,7 +163,7 @@ const ConciergeContactPage: React.FC = () => {
             <p className="text-gray-700 mb-8">
               For specific inquiries regarding orders, customization, or partnerships, please fill out the form. Our consultants (locally sourced) will respond within 24 hours.
             </p>
-            
+
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -158,7 +184,7 @@ const ConciergeContactPage: React.FC = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-3">
-                    
+
                     <span className="text-xs uppercase tracking-wide opacity-90">Headquarters</span>
                   </div>
                   <div className="text-base font-semibold">Colombo, Sri Lanka</div>
@@ -292,9 +318,8 @@ const ConciergeContactPage: React.FC = () => {
                 >
                   <span className="font-medium text-left">{faq.question}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-400 transition-transform ${
-                      expandedFaq === index ? 'rotate-180' : ''
-                    }`}
+                    className={`w-5 h-5 text-gray-400 transition-transform ${expandedFaq === index ? 'rotate-180' : ''
+                      }`}
                   />
                 </button>
                 {expandedFaq === index && (
@@ -306,17 +331,17 @@ const ConciergeContactPage: React.FC = () => {
             ))}
           </div>
           <div className="text-center mt-8">
-            <button className="text-teal-700 font-medium hover:text-teal-800">
+            <a href="/faq" className="text-teal-700 font-medium hover:text-teal-800">
               View Help Center →
-            </button>
+            </a>
           </div>
         </div>
       </div>
-        {/* Footer */}
-        <AdvancedFooter />
+      {/* Footer */}
+      <AdvancedFooter />
     </div>
   );
-  
+
 };
 
 export default ConciergeContactPage;

@@ -24,7 +24,7 @@ function ReAuthModal({ onSuccess, onClose }: Props) {
             setLoading(true);
 
             await axios.post(
-                "http://localhost:5001/api/super-admin/re-authenticate",
+                "/api/super-admin/re-authenticate",
                 { password },
                 {
                     headers: {

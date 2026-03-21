@@ -70,7 +70,7 @@ function VerifySellers() {
   }, []);
 
   const loadSellers = async () => {
-    const res = await fetch("http://localhost:5001/api/admin/pending-sellers", {
+    const res = await fetch("/api/admin/pending-sellers", {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
@@ -101,9 +101,9 @@ function VerifySellers() {
     sellers.filter((s) => s.verification_status === status).length;
 
   const updateStatus = async (id: number, status: Status) => {
-    
 
-    await fetch(`http://localhost:5001/api/admin/seller/${id}/status`, {
+
+    await fetch(`/api/admin/seller/${id}/status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ function VerifySellers() {
     toast.success(`Seller ${status}`);
     setReviewSeller(null);
     setVerifiedCheck(false);
-    
+
     loadSellers();
   };
 
@@ -319,7 +319,7 @@ function VerifySellers() {
                 <div className="flex-1 border rounded bg-white overflow-hidden">
                   {reviewSeller.seller_license_url ? (
                     <iframe
-                      src={`http://localhost:5001${reviewSeller.seller_license_url}`}
+                      src={reviewSeller.seller_license_url}
                       className="w-full h-full"
                     />
                   ) : (

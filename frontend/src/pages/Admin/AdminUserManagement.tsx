@@ -71,7 +71,7 @@ function AdminUserManagement() {
     }, []);
 
     const loadUsers = async () => {
-        const res = await fetch("http://localhost:5001/api/admin/users", {
+        const res = await fetch("/api/admin/users", {
             headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -116,7 +116,7 @@ function AdminUserManagement() {
 
     const updateStatus = async (id: number, newStatus: Status) => {
         const res = await fetch(
-            `http://localhost:5001/api/admin/users/${id}/status`,
+            `/api/admin/users/${id}/status`,
             {
                 method: "PATCH",
                 headers: {
@@ -474,7 +474,7 @@ function AdminUserManagement() {
                                         {reviewUser.seller_license_url && (
                                             <div className="flex-1 border rounded bg-white overflow-hidden">
                                                 <iframe
-                                                    src={`http://localhost:5001${reviewUser.seller_license_url}`}
+                                                    src={`${reviewUser.seller_license_url}`}
                                                     className="w-full h-full"
                                                 />
                                             </div>

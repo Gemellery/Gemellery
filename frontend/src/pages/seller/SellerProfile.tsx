@@ -4,14 +4,14 @@ import Navbar from "../../components/Navbar";
 import AdvancedFooter from "../../components/AdvancedFooter";
 import SellerStarRating from "../../components/seller/SellerStarRating";
 import { fetchSellerProfile } from "../../services/sellerService";
+import GemCard from "../../components/GemCard";
 import type { SellerProfileResponse } from "../../types/seller.types";
 
 type ActiveTab = "gems" | "reviews";
 
 const PLACEHOLDER_BANNER =
   "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1200&q=80";
-const PLACEHOLDER_AVATAR = "";
-const PLACEHOLDER_IMAGE = "/sample_gems/handfulgems.jpg";
+// const PLACEHOLDER_AVATAR = "";
 
 const SellerProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,11 +111,7 @@ const SellerProfile: React.FC = () => {
 
             <div className="px-5 sm:px-8 pb-6 -mt-14 relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-card overflow-hidden shadow-md bg-accent/20">
-                    <img src={PLACEHOLDER_AVATAR} alt={seller.fullName} className="w-full h-full object-cover" />
-                  </div>
-                </div>
+
 
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
@@ -125,7 +121,7 @@ const SellerProfile: React.FC = () => {
                         {seller.businessName}
                       </h1>
                       {/* From user table */}
-                      <p className="text-sm text-foreground/50 mt-0.5">Managed by {seller.fullName}</p>
+                     <p className="text-sm text-foreground/50 mt-0.5 font-[Source_Sans_3]">Managed by {seller.fullName}</p>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         <SellerStarRating rating={averageRating} size="sm" showValue />
                         <span className="text-sm text-foreground/60">
@@ -133,12 +129,12 @@ const SellerProfile: React.FC = () => {
                         </span>
                         {seller.verificationStatus === "approved" && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                            ✓ Verified Seller
+                            Verified Seller
                           </span>
                         )}
                         {seller.verificationStatus === "pending" && (
                           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
-                            ⏳ Pending Verification
+                             Pending Verification
                           </span>
                         )}
                       </div>
@@ -151,18 +147,7 @@ const SellerProfile: React.FC = () => {
               </div>
 
               {/* Stats */}
-              <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {[
-                  { label: "Total Gems", value: gems.length.toString() },
-                  { label: "Total Reviews", value: totalReviews.toString() },
-                  { label: "Average Rating", value: averageRating > 0 ? `${averageRating} / 5` : "No ratings yet" },
-                ].map(({ label, value }) => (
-                  <div key={label} className="bg-background rounded-[var(--radius-lg)] px-4 py-3 border border-border">
-                    <p className="text-xs text-foreground/50 uppercase tracking-wide font-medium">{label}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-foreground">{value}</p>
-                  </div>
-                ))}
-              </div>
+             
             </div>
           </div>
 
@@ -172,18 +157,16 @@ const SellerProfile: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150 ${
-                  activeTab === tab.id
+                className={`flex items-center gap-2 px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150 ${activeTab === tab.id
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-foreground/60 hover:text-foreground hover:bg-background"
-                }`}
+                  }`}
               >
                 {tab.label}
-                <span className={`text-xs px-1.5 py-0.5 rounded-[var(--radius-sm)] ${
-                  activeTab === tab.id
+                <span className={`text-xs px-1.5 py-0.5 rounded-[var(--radius-sm)] ${activeTab === tab.id
                     ? "bg-primary-foreground/20 text-primary-foreground"
                     : "bg-border text-foreground/50"
-                }`}>
+                  }`}>
                   {tab.count}
                 </span>
               </button>
@@ -209,57 +192,17 @@ const SellerProfile: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {gems.map((gem) => (
-                    <div key={gem.id} className="group flex flex-col rounded-[var(--radius-lg)] overflow-hidden border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200 max-w-[260px] w-full mx-auto">
-                      <div className="relative overflow-hidden bg-background" style={{ height: "180px" }}>
-                        <img
-                         src={gem.imageUrl ? `http://localhost:5001/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : PLACEHOLDER_IMAGE}
-                          alt={gem.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE; }}
-                        />
-                        {!gem.inStock && (
-                          <div className="absolute top-2 left-2">
-                            <span className="inline-block text-xs font-semibold px-2 py-0.5 rounded-[var(--radius-sm)] bg-foreground/80 text-background">
-                              Sold Out
-                            </span>
-                          </div>
-                        )}
-                        <div className="absolute top-2 right-2">
-                          <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-[var(--radius-sm)] bg-card/90 border border-border text-foreground/80 backdrop-blur-sm">
-                            {gem.type}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col flex-1 p-3 gap-1.5">
-                        <h3 className="font-semibold text-foreground text-sm leading-snug font-[Playfair_Display] line-clamp-1">
-                          {gem.name}
-                        </h3>
-                        <div className="flex gap-2 flex-wrap">
-                          {gem.carat && <span className="text-xs text-foreground/50">{gem.carat}ct</span>}
-                          {gem.color && <span className="text-xs text-foreground/50">{gem.color}</span>}
-                          {gem.origin && <span className="text-xs text-foreground/50">{gem.origin}</span>}
-                        </div>
-                        <p className="text-xs text-foreground/65 leading-relaxed line-clamp-2 flex-1">
-                          {gem.description}
-                        </p>
-                        <div className="flex items-center justify-between mt-1.5">
-                          <span className="text-base font-bold text-foreground tabular-nums">
-                            ${Number(gem.price).toLocaleString()}
-                          </span>
-                          <button
-                            disabled={!gem.inStock}
-                            className={`text-xs font-semibold px-3 py-1 rounded-[var(--radius-md)] transition-opacity duration-150 ${
-                              gem.inStock
-                                ? "payment-btn active cursor-pointer"
-                                : "bg-border text-foreground/40 cursor-not-allowed"
-                            }`}
-                          >
-                            {gem.inStock ? "View Gem" : "Unavailable"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <GemCard
+                      key={gem.id}
+                      id={String(gem.id)}
+                      name={gem.name}
+                      price={`LKR ${Number(gem.price).toLocaleString()}`}
+                      weight={gem.carat ? `${gem.carat}ct` : "N/A"}
+                      cut={gem.type || "N/A"}
+                      origin={gem.origin || "N/A"}
+                      verified={false}
+                      image={gem.imageUrl ? `/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : "/sample_gems/handfulgems.jpg"}
+                    />
                   ))}
                 </div>
               )}

@@ -1,0 +1,35 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // Environment Settings
+    "module": "nodenext",
+    "target": "ES2020",
+    "moduleDetection": "force",
+    "moduleResolution": "nodenext",
+
+    // Module Resolution
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    // Output Settings
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+
+    // Stricter Typechecking Options
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "isolatedModules": true,
+
+    // Skip type checking for node_modules and generated files
+    "skipLibCheck": true
+  },
+  "include": [
+    "./scripts",
+    "./test",
+    "./ignition",
+    "./typechain-types",
+    "hardhat.config.ts"
+  ]
+}

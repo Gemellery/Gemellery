@@ -12,6 +12,7 @@ import {
   Package,
   X,
   FileCog,
+  Home
 } from "lucide-react";
 import ReAuthModal from "./admin/ReAuthModal";
 
@@ -33,8 +34,12 @@ function AdminSidebar({
   const isSuperAdmin = role?.toLowerCase() === "super_admin";
   const [showReAuthModal, setShowReAuthModal] = useState(false);
 
-  const isActive = (path: string) =>
-    location.pathname.startsWith(path);
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const navItem = (path: string, label: string, Icon: any) => (
     <button
@@ -93,6 +98,7 @@ function AdminSidebar({
 
           {/* Navigation */}
           <nav className="mt-6 space-y-2">
+            {navItem("/", "Back to Website", Home)}
             {navItem("/admin/dashboard", "Dashboard", LayoutDashboard)}
             {navItem("/admin/verify-sellers", "Verify Sellers", ShieldCheck)}
             {navItem("/admin/manage-gems", "Manage Gems", Gem)}
@@ -120,15 +126,9 @@ function AdminSidebar({
                   >
                     <UserCog className="w-4 h-4 shrink-0" />
                     <span className="text-sm font-medium">
-                      Admin Management
+                      Admin Management & System Control
                     </span>
                   </button>
-
-                  {navItem(
-                    "/admin/settings",
-                    "System Settings",
-                    Settings
-                  )}
                 </div>
               </>
             )}

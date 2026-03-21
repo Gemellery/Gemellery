@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
 import Footer from "../../components/BasicFooter";
-import { Menu, BadgeCheck } from "lucide-react";
+import { Menu, BadgeCheck, Pencil } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Gem {
     gem_id: number;
@@ -14,6 +15,8 @@ interface Gem {
 
 function SellerAllListings() {
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchAllGems = async () => {
             try {
@@ -21,7 +24,7 @@ function SellerAllListings() {
 
                 setLoading(true);
 
-                const res = await fetch("http://localhost:5001/api/seller/gems", {
+                const res = await fetch("/api/seller/gems", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -94,16 +97,11 @@ function SellerAllListings() {
                             <div className="relative">
                                 <div className="rounded-2xl p-2">
                                     <img
-                                        src={
-                                            gem.image_url
-                                                ? `http://localhost:5001/uploads/gem_images/${gem.image_url}`
-                                                : "/placeholder-gem.png"
-                                        }
+                                        src={gem.image_url || "/placeholder-gem.png"}
                                         alt={gem.gem_name}
                                         className="w-full h-48 object-contain rounded-xl"
                                         onError={(e) => {
-                                            (e.target as HTMLImageElement).src =
-                                                "/placeholder-gem.png";
+                                            (e.target as HTMLImageElement).src = "/placeholder-gem.png";
                                         }}
                                     />
                                 </div>
@@ -120,9 +118,17 @@ function SellerAllListings() {
                                 <p className="text-xs text-gray-500">
                                     {gem.carat} ct • {gem.cut}
                                 </p>
-                                <p className="font-bold text-red-500">
-                                    ${Number(gem.price).toLocaleString()}
-                                </p>
+                                <div className="flex items-center justify-between">
+                                    <p className="font-bold text-red-500">
+                                        LKR {Number(gem.price).toLocaleString('en-US')}
+                                    </p>
+                                    <button
+                                        onClick={() => navigate(`/edit-gem/${gem.gem_id}`)}
+                                        className="flex items-center gap-1 text-xs text-[#1F7A73] hover:underline"
+                                    >
+                                        <Pencil className="w-3 h-3" /> Edit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

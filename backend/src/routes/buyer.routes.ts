@@ -2,13 +2,31 @@ import { Router } from "express";
 import {
   getBuyerDashboardSummary,
   getRecentOrders,
+  getAllOrders,
+  getOrderDetails,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
+  getBuyerProfile,
+  updateBuyerProfile,
 } from "../controllers/buyer.controller";
 import { authGuard, authorizeRole } from "../middleware/auth.middleware";
 
 const router = Router();
+
+router.get(
+  "/profile",
+  authGuard,
+  authorizeRole("buyer"),
+  getBuyerProfile
+);
+
+router.patch(
+  "/profile",
+  authGuard,
+  authorizeRole("buyer"),
+  updateBuyerProfile
+);
 
 router.get(
   "/dashboard-summary",
@@ -22,6 +40,20 @@ router.get(
   authGuard,
   authorizeRole("buyer"),
   getRecentOrders
+);
+
+router.get(
+  "/orders/history",
+  authGuard,
+  authorizeRole("buyer"),
+  getAllOrders
+);
+
+router.get(
+  "/orders/:id",
+  authGuard,
+  authorizeRole("buyer"),
+  getOrderDetails
 );
 
 router.get(

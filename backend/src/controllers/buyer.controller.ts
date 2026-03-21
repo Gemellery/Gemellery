@@ -1,6 +1,89 @@
 import { Request, Response } from "express";
 import db from "../database";
 
+// GET /api/buyer/profile
+export const getBuyerProfile = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+        u.full_name,
+        u.mobile,
+        u.email,
+        u.role,
+        u.joined_date,
+
+        c.country_name,
+
+        a.address
+        FROM user u
+        LEFT JOIN address a ON a.user_id = u.user_id
+        LEFT JOIN country c ON c.country_id = u.country_id
+        WHERE u.user_id = ? AND u.role = 'Buyer'
+        `,
+      [buyerId]
+    );
+
+    if (!rows.length) {
+      return res.status(403).json({ error: "Not a buyer" });
+    }
+
+    return res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load buyer profile" });
+  }
+};
+
+// PATCH /api/buyer/profile
+export const updateBuyerProfile = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { full_name, mobile, address } = req.body;
+
+    await db.query(
+      `
+        UPDATE user
+        SET full_name = ?, mobile = ?
+        WHERE user_id = ? AND role = 'Buyer'
+        `,
+      [full_name, mobile, buyerId]
+    );
+
+    // Update or insert address
+    const [existingAddressResult]: any = await db.query(
+      `SELECT address_id FROM address WHERE user_id = ?`,
+      [buyerId]
+    );
+
+    if (existingAddressResult.length > 0) {
+      await db.query(
+        `
+          UPDATE address
+          SET address = ?
+          WHERE user_id = ?
+          `,
+        [address, buyerId]
+      );
+    } else {
+      await db.query(
+        `
+          INSERT INTO address (user_id, address)
+          VALUES (?, ?)
+          `,
+        [buyerId, address]
+      );
+    }
+
+    return res.json({ message: "Profile updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to update buyer profile" });
+  }
+};
+
 // GET /api/buyer/dashboard-summary
 export const getBuyerDashboardSummary = async (req: Request, res: Response) => {
   try {
@@ -52,15 +135,16 @@ export const getRecentOrders = async (req: Request, res: Response) => {
           o.order_status,
           o.total_amount,
           o.created_at,
-          MIN(gi.imageurl) AS image_url
+          g.gem_name,
+          MIN(gi.image_url) AS image_url
         FROM orders o
         LEFT JOIN order_items oi ON oi.order_id = o.order_id
-        LEFT JOIN gem g ON g.gemid = oi.gemid
-        LEFT JOIN gemimages gi ON gi.gemid = g.gemid
+        LEFT JOIN gem g ON g.gem_id = oi.gem_id
+        LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
         WHERE o.buyer_id = ?
-        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at
+        GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, g.gem_name
         ORDER BY o.created_at DESC
-        LIMIT 5
+        LIMIT 10
       `,
       [buyerId]
     );
@@ -72,6 +156,166 @@ export const getRecentOrders = async (req: Request, res: Response) => {
   }
 };
 
+// Complete order history with filters 
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { status, page = 1, limit = 10, sortBy = "created_at", sortOrder = "DESC" } = req.query;
+
+    const pageNum = parseInt(page as string) || 1;
+    const limitNum = parseInt(limit as string) || 10;
+    const offset = (pageNum - 1) * limitNum;
+    const sort = (sortBy as string) || "created_at";
+    const order = ((sortOrder as string) || "DESC").toUpperCase();
+
+    // Validate sort order
+    if (!["ASC", "DESC"].includes(order)) {
+      return res.status(400).json({ error: "Invalid sort order" });
+    }
+
+    // Build query
+    let countQuery = "SELECT COUNT(*) AS total FROM orders WHERE buyer_id = ?";
+    let dataQuery = `
+      SELECT
+        o.order_id,
+        o.order_status,
+        o.total_amount,
+        o.created_at,
+        o.payment_method,
+        NULL AS address_line1,
+        NULL AS city,
+        NULL AS state,
+        NULL AS zip,
+        MIN(gi.image_url) AS image_url,
+        GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
+        COUNT(DISTINCT oi.order_item_id) AS item_count
+      FROM orders o
+      LEFT JOIN order_items oi ON oi.order_id = o.order_id
+      LEFT JOIN gem g ON g.gem_id = oi.gem_id
+      LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+      WHERE o.buyer_id = ?
+    `;
+
+    const params: any[] = [buyerId];
+
+    // Apply status filter
+    if (status && status !== "all") {
+      dataQuery += " AND o.order_status = ?";
+      countQuery += " AND order_status = ?";
+      params.push(status);
+    }
+
+    dataQuery += `
+      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method
+      ORDER BY o.${sort} ${order}
+      LIMIT ? OFFSET ?
+    `;
+
+    // Get total count
+    const [[countResult]]: any = await db.query(
+      countQuery,
+      status && status !== "all" ? [buyerId, status] : [buyerId]
+    );
+    const total = countResult?.total || 0;
+
+    // Get paginated data
+    const [rows]: any = await db.query(dataQuery, [...params, limitNum, offset]);
+
+    return res.json({
+      orders: rows,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum),
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load order history" });
+  }
+};
+
+// Get complete order details with items and status history
+export const getOrderDetails = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id } = req.params;
+
+    // Get order details
+    const [orderRows]: any = await db.query(
+      `
+        SELECT
+          o.order_id,
+          o.order_status,
+          o.total_amount,
+          o.created_at,
+          o.payment_method,
+          NULL AS address_line1,
+          NULL AS address_line2,
+          NULL AS city,
+          NULL AS state,
+          NULL AS zip,
+          NULL AS country,
+          NULL AS phone_number,
+          u.full_name,
+          u.email
+        FROM orders o
+        LEFT JOIN user u ON u.user_id = o.buyer_id
+        WHERE o.order_id = ? AND o.buyer_id = ?
+      `,
+      [id, buyerId]
+    );
+
+    if (orderRows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const order = orderRows[0];
+
+    // Get order items
+    const [items]: any = await db.query(
+      `
+        SELECT
+          oi.order_item_id,
+          oi.gem_id,
+          g.gem_name,
+          g.carat,
+          g.cut,
+          g.clarity,
+          g.color,
+          oi.quantity,
+          oi.price,
+          gi.image_url
+        FROM order_items oi
+        JOIN gem g ON g.gem_id = oi.gem_id
+        LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+        WHERE oi.order_id = ?
+        GROUP BY oi.order_item_id, oi.gem_id, g.gem_name, g.carat, g.cut, g.clarity, g.color, oi.quantity, oi.price
+      `,
+      [id]
+    );
+
+    // Get status history
+    const [statusHistory]: any = await db.query(
+      `
+        SELECT status, updated_at
+        FROM order_status_history
+        WHERE order_id = ?
+        ORDER BY updated_at DESC
+      `,
+      [id]
+    );
+
+    return res.json({
+      order: { ...order, items, statusHistory },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load order details" });
+  }
+};
+
 // GET /api/buyer/wishlist
 export const getWishlist = async (req: Request, res: Response) => {
   try {
@@ -80,19 +324,19 @@ export const getWishlist = async (req: Request, res: Response) => {
     const [rows]: any = await db.query(
       `
         SELECT
-          w.wishlistid,
-          g.gemid,
-          g.gemname,
+          w.wishlist_id,
+          g.gem_id,
+          g.gem_name,
           g.carat,
           g.cut,
           g.price,
-          MIN(gi.imageurl) AS image_url
+          MIN(gi.image_url) AS image_url
         FROM wishlist w
-        JOIN gem g ON g.gemid = w.gemid
-        LEFT JOIN gemimages gi ON gi.gemid = g.gemid
-        WHERE w.userid = ?
-        GROUP BY w.wishlistid, g.gemid
-        ORDER BY w.wishlistid DESC
+        JOIN gem g ON g.gem_id = w.gem_id
+        LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
+        WHERE w.user_id = ?
+        GROUP BY w.wishlist_id, g.gem_id
+        ORDER BY w.wishlist_id DESC
         LIMIT 20
       `,
       [buyerId]
@@ -109,18 +353,18 @@ export const getWishlist = async (req: Request, res: Response) => {
 export const addToWishlist = async (req: Request, res: Response) => {
   try {
     const buyerId = (req.user as any).id;
-    const { gemid } = req.body;
+    const { gem_id } = req.body;
 
-    if (!gemid) {
-      return res.status(400).json({ error: "gemid is required" });
+    if (!gem_id) {
+      return res.status(400).json({ error: "gem_id is required" });
     }
 
     await db.query(
       `
-        INSERT INTO wishlist (userid, gemid)
+        INSERT INTO wishlist (user_id, gem_id)
         VALUES (?, ?)
       `,
-      [buyerId, gemid]
+      [buyerId, gem_id]
     );
 
     return res.status(201).json({ message: "Added to wishlist" });
@@ -142,7 +386,7 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
     await db.query(
       `
         DELETE FROM wishlist
-        WHERE wishlistid = ? AND userid = ?
+        WHERE wishlist_id = ? AND user_id = ?
       `,
       [id, buyerId]
     );

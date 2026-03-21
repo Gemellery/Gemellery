@@ -41,7 +41,7 @@ function ManageBlogPosts() {
     const loadPosts = async () => {
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs?status=${statusFilter}`,
+                `/api/admin/blogs?status=${statusFilter}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -81,8 +81,8 @@ function ManageBlogPosts() {
         }
 
         const url = editingPost
-            ? `http://localhost:5001/api/admin/blogs/${editingPost.blog_id}`
-            : `http://localhost:5001/api/admin/blogs`;
+            ? `/api/admin/blogs/${editingPost.blog_id}`
+            : `/api/admin/blogs`;
 
         const method = editingPost ? "PUT" : "POST";
 
@@ -126,7 +126,7 @@ function ManageBlogPosts() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs/${post.blog_id}`,
+                `/api/admin/blogs/${post.blog_id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -166,7 +166,7 @@ function ManageBlogPosts() {
 
         try {
             const res = await fetch(
-                `http://localhost:5001/api/admin/blogs/${post.blog_id}/status`,
+                `/api/admin/blogs/${post.blog_id}/status`,
                 {
                     method: "PATCH",
                     headers: {
@@ -291,11 +291,11 @@ function ManageBlogPosts() {
                                         <td className="p-4">
                                             {p.blog_image_url ? (
                                                 <img
-                                                    src={`http://localhost:5001${p.blog_image_url}`}
+                                                    src={p.blog_image_url || "/placeholder-blog.png"}
                                                     alt={p.blog_title}
                                                     className="w-16 h-16 object-cover rounded-md border shadow-sm"
                                                     onError={(e) => {
-                                                        (e.target as HTMLImageElement).style.display = "none";
+                                                        (e.target as HTMLImageElement).src = "/placeholder-blog.png";
                                                     }}
                                                 />
                                             ) : (
