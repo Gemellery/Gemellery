@@ -87,7 +87,7 @@ export const getDesignByIdController = async (
             return;
         }
 
-        const design = await getDesignById(parseInt(id), userId);
+        const design = await getDesignById(parseInt(id as string, 10), userId);
 
         if (!design) {
             res.status(404).json({ message: "Design not found" });
@@ -296,7 +296,7 @@ export const saveDesign = async (
         }
 
         // Check if design exists (for guests, just verify it exists by ID)
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        const existingDesign = await getDesignById(parseInt(id as string, 10), userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
@@ -304,7 +304,7 @@ export const saveDesign = async (
         }
 
         // Update design
-        const updated = await updateDesign(parseInt(id), userId, {
+        const updated = await updateDesign(parseInt(id as string, 10), userId, {
             selected_image_url: selectedImageUrl,
         });
 
@@ -314,7 +314,7 @@ export const saveDesign = async (
         }
 
         // Fetch updated design
-        const design = await getDesignById(parseInt(id), userId);
+        const design = await getDesignById(parseInt(id as string, 10), userId);
 
         res.status(200).json({
             message: "Design saved successfully",
@@ -353,7 +353,7 @@ export const refineDesign = async (
         }
 
         // Check if design exists and belongs to user
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        const existingDesign = await getDesignById(parseInt(id as string, 10), userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
@@ -414,13 +414,13 @@ export const refineDesign = async (
         refinements.push(refinement);
 
         // Update design with new refinement
-        await updateDesign(parseInt(id), userId, {
+        await updateDesign(parseInt(id as string, 10), userId, {
             refinements: refinements,
             selected_image_url: refinement.imageUrl,
         });
 
         // Fetch updated design
-        const design = await getDesignById(parseInt(id), userId);
+        const design = await getDesignById(parseInt(id as string, 10), userId);
 
         res.status(200).json({
             message: "Design refined successfully",
@@ -448,7 +448,7 @@ export const deleteDesignController = async (
         }
 
         // Check if design exists and belongs to user
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        const existingDesign = await getDesignById(parseInt(id as string, 10), userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
@@ -456,7 +456,7 @@ export const deleteDesignController = async (
         }
 
         // Delete design
-        const deleted = await deleteDesignFromDB(parseInt(id), userId);
+        const deleted = await deleteDesignFromDB(parseInt(id as string, 10), userId);
 
         if (!deleted) {
             res.status(500).json({ message: "Failed to delete design" });

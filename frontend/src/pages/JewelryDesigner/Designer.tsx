@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Gem, Camera, Sparkles, Wand2,
@@ -40,6 +40,11 @@ const staggerChildren = {
 
 const JewelryDesigner: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    
+    // Automatically extract prefilled gem data if navigating from the Marketplace
+    const prefilledGem = location.state?.prefilledGem;
+
     const [currentStep, setCurrentStep] = useState(1);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
@@ -53,13 +58,36 @@ const JewelryDesigner: React.FC = () => {
     } = useForm<GemFormValues>({
         resolver: zodResolver(gemFormSchema),
         defaultValues: {
-            gemType: '',
-            gemCut: '',
+            gemType: (() => {
+                if (!prefilledGem) return '';
+                const title = prefilledGem.name.toLowerCase();
+                const types = ['sapphire', 'ruby', 'emerald', 'diamond', 'alexandrite', 'aquamarine', 'amethyst', 'spinel', 'tourmaline', 'garnet', 'topaz', 'opal', 'pearl'];
+                for (const t of types) {
+                    if (title.includes(t)) return t;
+                }
+                return 'Other'; // Capitalized to match UI exact values
+            })(),
+            gemTypeOther: prefilledGem ? prefilledGem.name : '',
+            gemCut: (() => {
+                if (!prefilledGem) return '';
+                const cut = prefilledGem.cut.toLowerCase();
+                if (cut.includes('round')) return 'round-brilliant';
+                if (cut.includes('emerald')) return 'emerald-cut';
+                if (cut.includes('oval')) return 'oval';
+                if (cut.includes('cushion')) return 'cushion';
+                if (cut.includes('pear')) return 'pear';
+                if (cut.includes('marquise')) return 'marquise';
+                if (cut.includes('asscher')) return 'asscher';
+                if (cut.includes('princess')) return 'princess';
+                if (cut.includes('radiant')) return 'radiant';
+                if (cut.includes('heart')) return 'heart';
+                return 'round-brilliant';
+            })(),
             gemSizeMode: 'simple',
-            gemSizeSimple: '',
-            gemColor: '',
+            gemSizeSimple: prefilledGem ? prefilledGem.weight : '',
+            gemColor: '', // Could be derived, but better to let user pick explicit color matching UI
             gemTransparency: '',
-            gemImageUrl: '',
+            gemImageUrl: prefilledGem ? prefilledGem.image : '',
             designPrompt: '',
             materials: { metals: [], finish: undefined },
             numImages: 3,
