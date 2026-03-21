@@ -45,7 +45,7 @@ const JewelryDesigner: React.FC = () => {
     // Automatically extract prefilled gem data if navigating from the Marketplace
     const prefilledGem = location.state?.prefilledGem;
 
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(prefilledGem ? 2 : 1);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
 
@@ -61,11 +61,15 @@ const JewelryDesigner: React.FC = () => {
             gemType: (() => {
                 if (!prefilledGem) return '';
                 const title = prefilledGem.name.toLowerCase();
-                const types = ['sapphire', 'ruby', 'emerald', 'diamond', 'alexandrite', 'aquamarine', 'amethyst', 'spinel', 'tourmaline', 'garnet', 'topaz', 'opal', 'pearl'];
+                const types = [
+                    'Sapphire', 'Ruby', 'Emerald', 'Diamond', 'Alexandrite', 
+                    'Aquamarine', 'Amethyst', 'Spinel', 'Tourmaline', 'Garnet', 
+                    'Topaz', 'Opal', 'Pearl'
+                ];
                 for (const t of types) {
-                    if (title.includes(t)) return t;
+                    if (title.includes(t.toLowerCase())) return t;
                 }
-                return 'Other'; // Capitalized to match UI exact values
+                return 'Other'; 
             })(),
             gemTypeOther: prefilledGem ? prefilledGem.name : '',
             gemCut: (() => {
@@ -84,9 +88,40 @@ const JewelryDesigner: React.FC = () => {
                 return 'round-brilliant';
             })(),
             gemSizeMode: 'simple',
-            gemSizeSimple: prefilledGem ? prefilledGem.weight : '',
-            gemColor: '', // Could be derived, but better to let user pick explicit color matching UI
-            gemTransparency: '',
+            gemSizeSimple: (() => {
+                if (!prefilledGem) return '';
+                const ctMatch = prefilledGem.weight.match(/([\d.]+)/);
+                if (ctMatch) {
+                    const ct = parseFloat(ctMatch[1]);
+                    if (ct >= 4) return 'large';
+                    if (ct >= 1.5) return 'medium';
+                    return 'small';
+                }
+                return 'medium';
+            })(),
+            gemColor: (() => {
+                if (!prefilledGem) return '';
+                const type = prefilledGem.name.toLowerCase();
+                if (type.includes('sapphire')) return 'blue-medium';
+                if (type.includes('ruby')) return 'red-medium';
+                if (type.includes('emerald')) return 'green-medium';
+                if (type.includes('diamond')) return 'colorless';
+                if (type.includes('amethyst')) return 'purple-violet';
+                if (type.includes('garnet')) return 'red-dark';
+                if (type.includes('topaz') || type.includes('aquamarine')) return 'blue-light';
+                if (type.includes('alexandrite')) return 'green-dark';
+                if (type.includes('opal') || type.includes('tourmaline')) return 'multi-color';
+                if (type.includes('pearl')) return 'colorless';
+                return 'colorless'; // Fallback so validation passes
+            })(),
+            gemTransparency: (() => {
+                if (!prefilledGem) return '';
+                const type = prefilledGem.name.toLowerCase();
+                if (type.includes('pearl') || type.includes('opal') || type.includes('jade') || type.includes('moonstone')) {
+                    return 'opaque';
+                }
+                return 'transparent'; // Fallback
+            })(),
             gemImageUrl: prefilledGem ? prefilledGem.image : '',
             designPrompt: '',
             materials: { metals: [], finish: undefined },
