@@ -15,6 +15,7 @@ export const GEM_TYPES = [
     'Citrine',
     'Moonstone',
     'Jade',
+    'Alexandrite',
     'Other',
 ] as const;
 
