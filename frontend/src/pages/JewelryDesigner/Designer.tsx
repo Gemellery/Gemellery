@@ -9,7 +9,6 @@ import {
     AlertTriangle, Check,
 } from 'lucide-react';
 import { gemFormSchema, type GemFormValues } from '../../lib/jewelry-designer/validation';
-import { generateDesign } from '../../lib/jewelry-designer/api';
 import { GemTypeSelector } from '../../components/jewelry-designer/forms/GemTypeSelector';
 import { GemCutSelector } from '../../components/jewelry-designer/forms/GemCutSelector';
 import { GemSizeInput } from '../../components/jewelry-designer/forms/GemSizeInput';
@@ -35,7 +34,7 @@ const fadeInUp = {
 };
 
 const staggerChildren = {
-    animate: { transition: { staggerChildren: 0.08 } },
+    animate: { transition: { staggerChildren: 0.1 } },
 };
 
 const JewelryDesigner: React.FC = () => {
@@ -46,7 +45,7 @@ const JewelryDesigner: React.FC = () => {
     const prefilledGem = location.state?.prefilledGem;
 
     const [currentStep, setCurrentStep] = useState(prefilledGem ? 2 : 1);
-    const [isGenerating, setIsGenerating] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const [error, setError] = useState('');
 
     const {
@@ -155,381 +154,260 @@ const JewelryDesigner: React.FC = () => {
 
     const handleNext = () => {
         if (currentStep < 4 && canProceed()) {
+            if (currentStep === 3) {
+                // Prevent aggressive double-clicks from instantly traversing through Step 4
+                setIsTransitioning(true);
+                setTimeout(() => setIsTransitioning(false), 600);
+            }
             setCurrentStep(currentStep + 1);
+            // Scroll to top of form implicitly on mobile
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
     const handleBack = () => {
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
-    const onSubmit = async (data: GemFormValues) => {
-        setIsGenerating(true);
+    const onSubmit = (data: GemFormValues) => {
+        // Navigate IMMEDIATELY — do NOT await the API here.
+        // The Results page will call the API itself so the sidebar can
+        // load concurrently rather than being blocked by the long AI generation.
         setError('');
-
-        try {
-            const response = await generateDesign(data);
-            navigate('/jewelry-designer/results', {
-                state: { design: response.design },
-            });
-        } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'Failed to generate design';
-            setError(errorMessage);
-            setIsGenerating(false);
-        }
+        navigate('/jewelry-designer/results', {
+            state: { pendingData: data },
+        });
     };
 
     return (
-        <div className="min-h-screen" style={{ background: '#FAFAF8', fontFamily: "'Market Sans', sans-serif" }}>
-            <div className="max-w-[1200px] mx-auto px-4 py-10">
-                {/* Badge */}
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex justify-center mb-5"
-                >
-                    <span className="inline-flex items-center px-4 py-2 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-sm text-[#8B6914]" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                        <Crown className="w-4 h-4 mr-2 text-[#D4AF37]" />
-                        AI-Powered Design Studio
-                    </span>
-                </motion.div>
+        <div className="min-h-screen relative bg-[#FAFAF8] overflow-x-hidden selection:bg-[#D4AF37]/30 flex flex-col items-center">
+            {/* Cinematic Background Atmosphere */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-[#D4AF37]/10 to-transparent blur-[120px] mix-blend-multiply opacity-60" />
+                <div className="absolute top-[20%] -right-[10%] w-[60vw] h-[80vw] rounded-full bg-gradient-to-bl from-slate-200/50 to-[#F5D061]/10 blur-[130px] mix-blend-multiply opacity-50" />
+                <div className="absolute -bottom-[20%] left-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#D4AF37]/5 to-transparent blur-[100px] mix-blend-multiply opacity-40" />
+            </div>
 
-                {/* Title */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="text-5xl text-center text-gray-900 mb-3 tracking-tight"
-                    style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}
-                >
-                    Create Your Masterpiece
-                </motion.h1>
+            <div className="w-full max-w-[1400px] px-6 lg:px-16 py-12 md:py-24 relative z-10 min-h-screen flex flex-col" style={{ fontFamily: "'Market Sans', sans-serif" }}>
+                {(
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative flex-1">
+                        {/* Left Column: Fixed Header & Progressive Tracker */}
+                        <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
+                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+                                <span className="flex items-center text-[#B8860B] text-xs font-bold tracking-[0.2em] uppercase mb-6">
+                                    <Crown className="w-4 h-4 mr-2" />
+                                    Bespoke Studio
+                                </span>
+                                <h1 className="text-5xl lg:text-7xl text-gray-900 tracking-tight leading-[1.1] mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>
+                                    <span className="block">Design</span>
+                                    <span className="block italic text-slate-400">Brilliance.</span>
+                                </h1>
+                                
+                                <p className="text-gray-500 leading-relaxed mb-12 max-w-sm">
+                                    Step into our digital atelier. Configure your gemstone, map your vision, and allow our AI artisan to forge concept masterpieces in seconds.
+                                </p>
 
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-center text-gray-500 text-sm mb-10"
-                    style={{ fontFamily: "'Market Sans', sans-serif" }}
-                >
-                    Transform your vision into stunning jewelry with the power of AI
-                </motion.p>
-
-                {/* Step Indicator */}
-                {!isGenerating && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="flex justify-center items-start mb-10 gap-2 max-w-[1000px] mx-auto"
-                    >
-                        {STEPS.map((step, index) => {
-                            const isCompleted = currentStep > step.id;
-                            const isCurrent = currentStep === step.id;
-                            const Icon = step.icon;
-
-                            return (
-                                <React.Fragment key={step.id}>
-                                    <div className="flex flex-col items-center min-w-[90px]">
-                                        {/* Step Icon */}
-                                        <motion.div
-                                            whileHover={{ scale: 1.05 }}
-                                            className={`w-11 h-11 rounded-xl flex items-center justify-center shadow-md transition-all duration-300
-                                                ${isCompleted
-                                                    ? 'bg-gradient-to-br from-[#D4AF37] to-[#B8860B] shadow-[#D4AF37]/20'
-                                                    : isCurrent
-                                                        ? 'bg-gradient-to-br from-[#D4AF37] to-[#F5D061] shadow-[#D4AF37]/20'
-                                                        : 'bg-gray-100 border border-gray-200'
-                                                }`}
-                                        >
-                                            {isCompleted ? (
-                                                <Check className="w-5 h-5 text-white" strokeWidth={3} />
-                                            ) : (
-                                                <Icon className={`w-5 h-5 ${isCurrent ? 'text-white' : 'text-gray-400'}`} />
-                                            )}
-                                        </motion.div>
-
-                                        {/* Step Name */}
-                                        <p className={`mt-2 text-[13px] font-semibold transition-colors duration-300
-                                            ${isCurrent ? 'text-[#B8860B]' : isCompleted ? 'text-gray-900' : 'text-gray-400'}`}
-                                            style={{ fontFamily: "'Market Sans', sans-serif" }}
-                                        >
-                                            {step.name}
-                                        </p>
-
-                                        {/* Step Description */}
-                                        <p className="text-[11px] text-gray-400 text-center" style={{ fontFamily: "'Market Sans', sans-serif" }}>{step.description}</p>
-                                    </div>
-
-                                    {/* Connector Line */}
-                                    {index < STEPS.length - 1 && (
-                                        <div className="w-[120px] h-[2px] mt-[22px] relative overflow-hidden rounded-full">
-                                            <div className={`absolute inset-0 transition-all duration-500
-                                                ${currentStep > step.id
-                                                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#F5D061]'
-                                                    : 'bg-gray-200'
-                                                }`}
-                                            />
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            );
-                        })}
-                    </motion.div>
-                )}
-
-                {/* Form Card */}
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <motion.div
-                        layout
-                        className="rounded-2xl p-8 bg-white border border-gray-200 shadow-sm"
-                    >
-                        <AnimatePresence mode="wait">
-                            {/* Step 1: Gem Details */}
-                            {currentStep === 1 && (
-                                <motion.div key="step1" variants={staggerChildren} {...fadeInUp} className="flex flex-col gap-6">
-                                    <div className="flex items-center mb-2">
-                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B8860B] flex items-center justify-center mr-4 shadow-md shadow-[#D4AF37]/20">
-                                            <Gem className="w-[22px] h-[22px] text-white" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: "'Market Sans', sans-serif" }}>Gem Details</h2>
-                                            <p className="text-[13px] text-gray-500" style={{ fontFamily: "'Market Sans', sans-serif" }}>Tell us about your precious gemstone</p>
-                                        </div>
-                                    </div>
-
-                                    <GemTypeSelector register={register} errors={errors} value={gemType} onChange={(v) => setValue('gemType', v)} />
-                                    <GemCutSelector register={register} errors={errors} value={gemCut} onChange={(v) => setValue('gemCut', v)} />
-                                    <GemSizeInput register={register} errors={errors} sizeMode={gemSizeMode} selectedSize={gemSizeSimple || ''} onSizeModeChange={(m) => setValue('gemSizeMode', m)} onSizeChange={(s) => setValue('gemSizeSimple', s)} />
-                                    <GemColorSelector register={register} errors={errors} value={gemColor} onChange={(v) => setValue('gemColor', v)} />
-                                    <TransparencySelector register={register} errors={errors} value={gemTransparency} onChange={(v) => setValue('gemTransparency', v)} />
-                                </motion.div>
-                            )}
-
-                            {/* Step 2: Reference Image */}
-                            {currentStep === 2 && (
-                                <motion.div key="step2" {...fadeInUp} className="flex flex-col gap-6">
-                                    <div className="flex items-center mb-2">
-                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#F5D061] flex items-center justify-center mr-4 shadow-md shadow-[#D4AF37]/20">
-                                            <Camera className="w-[22px] h-[22px] text-white" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: "'Market Sans', sans-serif" }}>Upload Reference</h2>
-                                            <p className="text-[13px] text-gray-500" style={{ fontFamily: "'Market Sans', sans-serif" }}>Add a photo of your gem (optional)</p>
-                                        </div>
-                                    </div>
-
-                                    <ImageUpload value={gemImageUrl} onChange={(url) => setValue('gemImageUrl', url)} />
-                                    <p className="text-[13px] text-gray-400" style={{ fontFamily: "'Market Sans', sans-serif" }}>This helps our AI create more accurate designs</p>
-                                </motion.div>
-                            )}
-
-                            {/* Step 3: Design Vision */}
-                            {currentStep === 3 && (
-                                <motion.div key="step3" {...fadeInUp} className="flex flex-col gap-6">
-                                    <div className="flex items-center mb-2">
-                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#F5D061] flex items-center justify-center mr-4 shadow-md shadow-[#D4AF37]/20">
-                                            <Sparkles className="w-[22px] h-[22px] text-white" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: "'Market Sans', sans-serif" }}>Design Vision</h2>
-                                            <p className="text-[13px] text-gray-500" style={{ fontFamily: "'Market Sans', sans-serif" }}>Describe your dream jewelry piece</p>
-                                        </div>
-                                    </div>
-
-                                    <DesignPromptInput register={register} errors={errors} value={designPrompt} />
-                                    <MaterialSelector selectedMetals={materials?.metals || []} selectedFinish={materials?.finish} onMetalsChange={(m) => setValue('materials.metals', m)} onFinishChange={(f) => setValue('materials.finish', f)} />
-                                </motion.div>
-                            )}
-
-                            {/* Step 4: Ready to Create */}
-                            {currentStep === 4 && !isGenerating && (
-                                <motion.div key="step4" {...fadeInUp} className="flex flex-col gap-6">
-                                    <div className="flex items-center mb-2">
-                                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#B8860B] flex items-center justify-center mr-4 shadow-md shadow-[#D4AF37]/20">
-                                            <Wand2 className="w-[22px] h-[22px] text-white" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-bold text-gray-900 mb-1" style={{ fontFamily: "'Market Sans', sans-serif" }}>Ready to Create</h2>
-                                            <p className="text-[13px] text-gray-500" style={{ fontFamily: "'Market Sans', sans-serif" }}>Review your choices and generate designs</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Summary Cards */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.1 }}
-                                            className="p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#D4AF37]/40 transition-all duration-300"
-                                        >
-                                            <h3 className="text-[13px] font-semibold text-[#B8860B] mb-3 flex items-center" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                                                <Gem className="w-3.5 h-3.5 mr-2" />
-                                                Gem Specifications
-                                            </h3>
-                                            <div className="flex flex-col gap-2 text-[13px]" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                                                <div className="flex justify-between"><span className="text-gray-400">Type</span><span className="text-gray-900 font-medium capitalize">{gemType}</span></div>
-                                                <div className="flex justify-between"><span className="text-gray-400">Cut</span><span className="text-gray-900 font-medium">{gemCut}</span></div>
-                                                <div className="flex justify-between"><span className="text-gray-400">Color</span><span className="text-gray-900 font-medium">{gemColor}</span></div>
-                                                <div className="flex justify-between"><span className="text-gray-400">Clarity</span><span className="text-gray-900 font-medium">{gemTransparency}</span></div>
+                                {/* Premium Step Indicator (Desktop) */}
+                                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent hidden lg:block">
+                                    {STEPS.map((step) => {
+                                        const isCompleted = currentStep > step.id;
+                                        const isCurrent = currentStep === step.id;
+                                        
+                                        return (
+                                            <div key={step.id} className="relative flex items-center gap-6">
+                                                <div className={`relative z-10 w-6 h-6 flex items-center justify-center rounded-full transition-all duration-500
+                                                    ${isCompleted ? 'bg-[#D4AF37] shadow-lg shadow-[#D4AF37]/30 border-none' : isCurrent ? 'bg-gray-900 ring-4 ring-gray-900/10 border-none' : 'bg-white border-2 border-slate-200'}`}
+                                                >
+                                                    {isCompleted && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                                                    {isCurrent && <div className="w-2 h-2 bg-white rounded-full animate-pulse" />}
+                                                </div>
+                                                <div className={`transition-all duration-300 ${isCurrent ? 'opacity-100 translate-x-1' : isCompleted ? 'opacity-70' : 'opacity-40'}`}>
+                                                    <p className={`text-sm tracking-wide uppercase font-bold ${isCurrent ? 'text-gray-900' : 'text-gray-500'}`}>{step.name}</p>
+                                                    <p className="text-xs text-gray-400 mt-1">{step.description}</p>
+                                                </div>
                                             </div>
-                                        </motion.div>
-
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 }}
-                                            className="p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#D4AF37]/40 transition-all duration-300"
-                                        >
-                                            <h3 className="text-[13px] font-semibold text-[#B8860B] mb-3 flex items-center" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                                                <Sparkles className="w-3.5 h-3.5 mr-2" />
-                                                Design Vision
-                                            </h3>
-                                            <p className="text-[13px] text-gray-600 leading-relaxed line-clamp-4" style={{ fontFamily: "'Market Sans', sans-serif" }}>{designPrompt}</p>
-                                        </motion.div>
-                                    </div>
-
-                                    {/* Variations */}
-                                    <div className="flex items-center justify-center gap-3 py-2">
-                                        <span className="text-[13px] text-gray-500" style={{ fontFamily: "'Market Sans', sans-serif" }}>Variations:</span>
-                                        {[2, 3, 4].map((num) => (
-                                            <motion.button
-                                                key={num}
-                                                type="button"
-                                                whileHover={{ scale: 1.1 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => setValue('numImages', num)}
-                                                className={`w-9 h-9 rounded-lg font-semibold text-sm cursor-pointer transition-all duration-200
-                                                    ${numImages === num
-                                                        ? 'border-2 border-[#D4AF37] bg-[#D4AF37]/15 text-[#8B6914] shadow-md shadow-[#D4AF37]/10'
-                                                        : 'border border-gray-300 bg-white text-gray-400 hover:border-gray-400'
-                                                    }`}
-                                                style={{ fontFamily: "'Market Sans', sans-serif" }}
-                                            >
-                                                {num}
-                                            </motion.button>
-                                        ))}
-                                    </div>
-
-                                    {/* Generate Button */}
-                                    <motion.button
-                                        type="submit"
-                                        whileHover={{ scale: 1.01, boxShadow: '0 8px 30px rgba(212, 175, 55, 0.25)' }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="w-full py-4 rounded-xl border-none bg-gradient-to-r from-[#D4AF37] via-[#F5D061] to-[#D4AF37] text-white font-bold text-[15px] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40 transition-shadow duration-300"
-                                        style={{ fontFamily: "'Market Sans', sans-serif" }}
-                                    >
-                                        <Wand2 className="w-[18px] h-[18px]" />
-                                        Generate My Design
-                                    </motion.button>
-
-                                    <p className="text-center text-xs text-gray-400" style={{ fontFamily: "'Market Sans', sans-serif" }}>This will take 10-15 seconds</p>
-
-                                    {/* Disclaimer */}
-                                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
-                                        <div className="flex items-start">
-                                            <AlertTriangle className="w-[18px] h-[18px] text-amber-500 mr-3 shrink-0 mt-0.5" />
-                                            <p className="text-[13px] text-amber-700 leading-relaxed" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                                                <strong className="text-amber-800">Important:</strong> These are concept renderings, not final production designs.
-                                                Actual jewelry may vary. Consult a professional jeweler for production-ready designs.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* Generating State */}
-                            {isGenerating && (
-                                <motion.div key="generating" {...fadeInUp} className="text-center py-16">
-                                    {/* Animated circle */}
-                                    <div className="relative w-[110px] h-[110px] mx-auto mb-8">
-                                        {/* Spinning outer ring */}
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                                            className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#D4AF37] border-r-[#F5D061]/50"
-                                        />
-                                        {/* Inner gold circle */}
-                                        <motion.div
-                                            animate={{ scale: [1, 1.05, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                                            className="absolute inset-3 rounded-full bg-gradient-to-br from-[#F5A623] via-[#D4AF37] to-[#B8860B] flex items-center justify-center shadow-xl shadow-[#D4AF37]/20"
-                                        >
-                                            <Wand2 className="w-9 h-9 text-white" />
-                                        </motion.div>
-                                    </div>
-
-                                    <h2 className="text-[28px] text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>
-                                        Creating Magic
-                                    </h2>
-                                    <p className="text-gray-500 text-sm mb-6" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-                                        AI is crafting {numImages} unique designs...
-                                    </p>
-
-                                    {/* Animated progress bar */}
-                                    <div className="w-[200px] mx-auto h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ x: '-100%' }}
-                                            animate={{ x: '200%' }}
-                                            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                                            className="w-1/2 h-full bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent rounded-full"
-                                        />
-                                    </div>
-                                    <p className="text-[11px] text-gray-400 mt-4" style={{ fontFamily: "'Market Sans', sans-serif" }}>Usually takes 15-30 seconds</p>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {error && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="mt-6 p-4 rounded-xl bg-red-50 border border-red-200"
-                            >
-                                <p className="text-sm text-red-600" style={{ fontFamily: "'Market Sans', sans-serif" }}>{error}</p>
+                                        );
+                                    })}
+                                </div>
+                                
+                                {/* Mobile Mobile Step Indicator */}
+                                <div className="lg:hidden flex items-center gap-2 mb-8 pr-4">
+                                     {STEPS.map((step) => (
+                                          <div key={step.id} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${currentStep >= step.id ? 'bg-[#D4AF37]' : 'bg-slate-200'}`} />
+                                     ))}
+                                </div>
                             </motion.div>
-                        )}
-                    </motion.div>
-
-                    {/* Navigation */}
-                    {!isGenerating && (
-                        <div className="flex justify-between mt-6">
-                            <motion.button
-                                type="button"
-                                onClick={handleBack}
-                                disabled={currentStep === 1}
-                                whileHover={currentStep > 1 ? { x: -3 } : {}}
-                                className={`flex items-center px-4 py-2.5 bg-transparent border-none text-sm cursor-pointer transition-colors duration-200
-                                    ${currentStep === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-gray-900'}`}
-                                style={{ fontFamily: "'Market Sans', sans-serif" }}
-                            >
-                                <ChevronLeft className="w-4 h-4 mr-1" />
-                                Back
-                            </motion.button>
-
-                            {currentStep < 4 && (
-                                <motion.button
-                                    type="button"
-                                    onClick={handleNext}
-                                    disabled={!canProceed()}
-                                    whileHover={canProceed() ? { scale: 1.02, boxShadow: '0 4px 20px rgba(212, 175, 55, 0.2)' } : {}}
-                                    whileTap={canProceed() ? { scale: 0.98 } : {}}
-                                    className={`flex items-center px-6 py-2.5 rounded-lg border-none font-semibold text-sm transition-all duration-200
-                                        ${canProceed()
-                                            ? 'bg-gradient-to-r from-[#D4AF37] to-[#F5D061] text-white cursor-pointer shadow-md shadow-[#D4AF37]/15'
-                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        }`}
-                                    style={{ fontFamily: "'Market Sans', sans-serif" }}
-                                >
-                                    Continue
-                                    <ChevronRight className="w-4 h-4 ml-1" />
-                                </motion.button>
-                            )}
                         </div>
-                    )}
-                </form>
+
+                        {/* Right Column: Form Canvas */}
+                        <div className="lg:col-span-8 lg:mt-16 w-full max-w-3xl">
+                            <form onSubmit={handleSubmit(onSubmit)} className="relative h-full flex flex-col">
+                                <div className="flex-1 min-h-[400px]">
+                                    <AnimatePresence mode="wait">
+                                        
+                                        {/* Step 1: Gem Details */}
+                                        {currentStep === 1 && (
+                                            <motion.div key="step1" variants={staggerChildren} {...fadeInUp} className="space-y-12">
+                                                <div className="mb-4 border-b border-slate-200 pb-6">
+                                                    <h2 className="text-3xl md:text-4xl text-gray-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>01. The Gemstone</h2>
+                                                    <p className="text-sm md:text-base text-gray-500">Every profound piece begins with the perfect stone. Detail your centerpiece below.</p>
+                                                </div>
+                                                <div className="space-y-10">
+                                                    <GemTypeSelector register={register} errors={errors} value={gemType} onChange={(v) => setValue('gemType', v)} />
+                                                    <GemCutSelector register={register} errors={errors} value={gemCut} onChange={(v) => setValue('gemCut', v)} />
+                                                    <GemSizeInput register={register} errors={errors} sizeMode={gemSizeMode} selectedSize={gemSizeSimple || ''} onSizeModeChange={(m) => setValue('gemSizeMode', m)} onSizeChange={(s) => setValue('gemSizeSimple', s)} />
+                                                    <GemColorSelector register={register} errors={errors} value={gemColor} onChange={(v) => setValue('gemColor', v)} />
+                                                    <TransparencySelector register={register} errors={errors} value={gemTransparency} onChange={(v) => setValue('gemTransparency', v)} />
+                                                </div>
+                                            </motion.div>
+                                        )}
+
+                                        {/* Step 2: Reference Image */}
+                                        {currentStep === 2 && (
+                                            <motion.div key="step2" {...fadeInUp} className="space-y-12">
+                                                <div className="mb-4 border-b border-slate-200 pb-6">
+                                                    <h2 className="text-3xl md:text-4xl text-gray-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>02. Visual Anchor</h2>
+                                                    <p className="text-sm md:text-base text-gray-500">Attach an inspiration photo or a direct capture of your stone to guide our AI.</p>
+                                                </div>
+                                                <ImageUpload value={gemImageUrl} onChange={(url) => setValue('gemImageUrl', url)} />
+                                            </motion.div>
+                                        )}
+
+                                        {/* Step 3: Design Vision */}
+                                        {currentStep === 3 && (
+                                            <motion.div key="step3" {...fadeInUp} className="space-y-12">
+                                                <div className="mb-4 border-b border-slate-200 pb-6">
+                                                    <h2 className="text-3xl md:text-4xl text-gray-900 mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>03. The Vision</h2>
+                                                    <p className="text-sm md:text-base text-gray-500">Translate your imagination into words. The more precise the prompt, the more breathtaking the result.</p>
+                                                </div>
+                                                <div className="space-y-10">
+                                                    <DesignPromptInput register={register} errors={errors} value={designPrompt} />
+                                                    <MaterialSelector selectedMetals={materials?.metals || []} selectedFinish={materials?.finish} onMetalsChange={(m) => setValue('materials.metals', m)} onFinishChange={(f) => setValue('materials.finish', f)} />
+                                                </div>
+                                            </motion.div>
+                                        )}
+
+                                        {/* Step 4: Ready to Create */}
+                                        {currentStep === 4 && (
+                                            <motion.div key="step4" {...fadeInUp} className="space-y-6">
+                                                <div className="mb-2 border-b border-slate-200 pb-4">
+                                                    <h2 className="text-3xl md:text-4xl text-gray-900 mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>04. The Manifest</h2>
+                                                    <p className="text-sm md:text-base text-gray-500">Review your bespoke parameters before initializing the artisan AI.</p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="p-6 rounded-2xl bg-white/50 backdrop-blur-md border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                                                        <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#B8860B] mb-4 flex items-center">
+                                                            <Gem className="w-4 h-4 mr-3" />
+                                                            Stone Specs
+                                                        </h3>
+                                                        <div className="space-y-3 text-sm">
+                                                            <div className="flex justify-between border-b border-slate-100 pb-2"><span className="text-slate-400">Type</span><span className="text-gray-900 font-semibold capitalize">{gemType}</span></div>
+                                                            <div className="flex justify-between border-b border-slate-100 pb-2"><span className="text-slate-400">Cut</span><span className="text-gray-900 font-semibold">{gemCut}</span></div>
+                                                            <div className="flex justify-between border-b border-slate-100 pb-2"><span className="text-slate-400">Color</span><span className="text-gray-900 font-semibold">{gemColor}</span></div>
+                                                            <div className="flex justify-between"><span className="text-slate-400">Clarity</span><span className="text-gray-900 font-semibold">{gemTransparency}</span></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-6 rounded-2xl bg-white/50 backdrop-blur-md border border-slate-200 shadow-sm hover:shadow-md transition-shadow text-left">
+                                                        <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#B8860B] mb-4 flex items-center">
+                                                            <Sparkles className="w-4 h-4 mr-3" />
+                                                            Prompt
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600 leading-relaxed italic border-l-2 border-[#D4AF37] pl-4 whitespace-pre-wrap">{designPrompt}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 bg-slate-50/80 rounded-2xl border border-slate-200 gap-4">
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-gray-900">Variations</p>
+                                                        <p className="text-xs text-slate-500 mt-1">Select the volume of concepts to generate</p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        {[2, 3, 4].map((num) => (
+                                                            <button
+                                                                key={num}
+                                                                type="button"
+                                                                onClick={() => setValue('numImages', num)}
+                                                                className={`w-12 h-12 rounded-full font-bold text-sm transition-all duration-300
+                                                                    ${numImages === num
+                                                                        ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
+                                                                        : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-400 hover:text-gray-900'
+                                                                    }`}
+                                                            >
+                                                                {num}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="p-5 rounded-2xl bg-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-start gap-4">
+                                                    <AlertTriangle className="w-5 h-5 text-[#B8860B] shrink-0 mt-0.5" />
+                                                    <p className="text-xs text-[#8B6914] leading-relaxed">
+                                                        These are conceptual renderings designed to inspire. Final production jewelry may require structural adaptations by a master jeweler.
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                    
+                                    {error && (
+                                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-5 rounded-xl bg-red-50/80 backdrop-blur-sm border border-red-200">
+                                            <p className="text-sm text-red-600 font-medium">{error}</p>
+                                        </motion.div>
+                                    )}
+                                </div>
+
+                                {/* Floating Master Navigation Bar */}
+                                <div className="mt-12 pt-8 border-t border-slate-200 flex items-center justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={handleBack}
+                                        disabled={currentStep === 1}
+                                        className={`flex items-center px-1 py-3 text-sm tracking-widest uppercase font-bold transition-all duration-300
+                                            ${currentStep === 1 ? 'opacity-0 pointer-events-none' : 'text-gray-500 hover:text-gray-900 hover:-translate-x-2'}`}
+                                    >
+                                        <ChevronLeft className="w-4 h-4 mr-2" />
+                                        Back
+                                    </button>
+
+                                    {currentStep < 4 ? (
+                                        <button
+                                            type="button"
+                                            onClick={handleNext}
+                                            disabled={!canProceed()}
+                                            className={`flex items-center px-8 py-4 rounded-full text-sm tracking-widest uppercase font-bold transition-all duration-500
+                                                ${canProceed()
+                                                    ? 'bg-gray-900 text-white shadow-xl shadow-gray-900/20 hover:shadow-2xl hover:shadow-gray-900/40 hover:scale-[1.02] cursor-pointer'
+                                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            Next Phase
+                                            <ChevronRight className="w-4 h-4 ml-2" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="submit"
+                                            disabled={isTransitioning}
+                                            className={`flex items-center px-8 md:px-10 py-4 rounded-full text-sm tracking-widest uppercase font-bold transition-all duration-500
+                                                ${isTransitioning 
+                                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50' 
+                                                    : 'bg-gradient-to-r from-[#D4AF37] via-[#F5D061] to-[#D4AF37] text-gray-900 shadow-xl shadow-[#D4AF37]/30 hover:shadow-2xl hover:shadow-[#D4AF37]/50 hover:scale-[1.02] cursor-pointer'
+                                                }
+                                            `}
+                                        >
+                                            <Wand2 className="w-4 h-4 mr-2 md:mr-3" />
+                                            Forge Masterpiece
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

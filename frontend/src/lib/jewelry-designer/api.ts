@@ -120,6 +120,19 @@ export async function uploadGemImage(file: File): Promise<UploadGemImageResponse
     return response.json();
 }
 
+// Delete a design
+export async function deleteDesign(id: number): Promise<void> {
+    const response = await fetch(`${API_BASE}/api/jewelry-design/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeader(),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to delete design');
+    }
+}
+
 // Check AI status
 export async function getAIStatus(): Promise<{ geminiConfigured: boolean; firebaseConfigured: boolean; aiAvailable: boolean }> {
     const response = await fetch(`${API_BASE}/api/jewelry-design/status`);
