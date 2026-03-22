@@ -36,7 +36,7 @@ function AdminNavbar({
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:5001/api/admin/profile",
+        "/api/admin/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`

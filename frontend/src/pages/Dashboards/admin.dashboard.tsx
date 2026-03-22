@@ -52,7 +52,7 @@ const AdminDashboardLayout: React.FC = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:5001/api/admin/dashboard-stats",
+        "/api/admin/dashboard-stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
