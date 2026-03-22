@@ -3,6 +3,8 @@ import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { GemFormValues } from '../../../lib/jewelry-designer/validation';
 import { GEM_TRANSPARENCY } from '../../../lib/jewelry-designer/constants';
 import { Eye, EyeOff, Circle } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 interface TransparencySelectorProps {
     register: UseFormRegister<GemFormValues>;
@@ -38,60 +40,50 @@ export const TransparencySelector: React.FC<TransparencySelectorProps> = ({
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontFamily: "'Market Sans', sans-serif" }}>
-            <label style={{ fontSize: '14px', fontWeight: 600, color: '#1F2937' }}>
-                How see-through is your gem? <span style={{ color: '#EF4444' }}>*</span>
-            </label>
+        <div className="flex flex-col gap-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
+            <Label className="text-sm font-semibold text-gray-800">
+                How see-through is your gem? <span className="text-red-500">*</span>
+            </Label>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            <RadioGroup value={value} onValueChange={onChange} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {GEM_TRANSPARENCY.map((option) => {
                     const isSelected = value === option.value;
                     return (
-                        <button
+                        <Label
                             key={option.value}
-                            type="button"
-                            onClick={() => onChange(option.value)}
-                            style={{
-                                padding: '16px',
-                                borderRadius: '12px',
-                                border: isSelected ? '2px solid #D4AF37' : '2px solid #E5E7EB',
-                                background: isSelected ? 'rgba(212, 175, 55, 0.08)' : '#F9FAFB',
-                                textAlign: 'center',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                fontFamily: "'Market Sans', sans-serif",
-                            }}
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all text-center group
+                                ${isSelected 
+                                    ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-sm shadow-[#D4AF37]/10' 
+                                    : 'border-gray-100 bg-white/50 backdrop-blur-sm hover:border-gray-200 hover:bg-white/80'
+                                }
+                            `}
                         >
+                            <RadioGroupItem value={option.value} className="sr-only" />
                             {/* Icon */}
-                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                            <div className="flex justify-center mb-2 transition-transform group-hover:scale-105">
                                 {getIcon(option.value, isSelected)}
                             </div>
 
-                            <p style={{
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                color: isSelected ? '#1F2937' : '#6B7280',
-                                marginBottom: '4px',
-                            }}>
+                            <p className={`text-[13px] font-semibold mb-1 ${isSelected ? 'text-gray-900' : 'text-gray-600'}`}>
                                 {option.label}
                             </p>
-                            <p style={{ fontSize: '11px', color: '#9CA3AF' }}>
+                            <p className="text-[11px] text-gray-500 font-normal leading-tight">
                                 {option.description}
                             </p>
-                        </button>
+                        </Label>
                     );
                 })}
-            </div>
+            </RadioGroup>
 
             {/* Hidden input for form registration */}
             <input type="hidden" {...register('gemTransparency')} value={value} />
 
-            <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
+            <p className="text-[12px] text-gray-400 mt-1">
                 This helps us render light and reflections accurately
             </p>
 
             {errors.gemTransparency && (
-                <p style={{ fontSize: '13px', color: '#EF4444' }}>{errors.gemTransparency.message}</p>
+                <p className="text-[13px] text-red-500 mt-1">{errors.gemTransparency.message}</p>
             )}
         </div>
     );

@@ -3,6 +3,8 @@ import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { GemFormValues } from '../../../lib/jewelry-designer/validation';
 import { PROMPT_EXAMPLES } from '../../../lib/jewelry-designer/constants';
 import { ChevronDown, ChevronUp, Lightbulb } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface DesignPromptInputProps {
     register: UseFormRegister<GemFormValues>;
@@ -29,23 +31,23 @@ export const DesignPromptInput: React.FC<DesignPromptInputProps> = ({
 
     return (
         <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-            <label className="block text-sm font-semibold text-gray-800">
+            <Label className="block text-sm font-semibold text-gray-800">
                 Describe your dream jewelry design <span className="text-red-500">*</span>
-            </label>
+            </Label>
 
             <div className="relative">
-                <textarea
+                <Textarea
                     {...register('designPrompt')}
                     rows={6}
                     placeholder={`Examples:\n${PROMPT_EXAMPLES.map(e => `- ${e}`).join('\n')}`}
                     className={`
-            w-full px-4 py-3 rounded-xl border resize-none
-            bg-gray-50 text-gray-900 placeholder-gray-400
-            ${errors.designPrompt
-                            ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
-                            : 'border-gray-300 hover:border-gray-400 focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20'
-                        }
-          `}
+                        w-full p-4 rounded-xl border resize-none
+                        bg-white/50 backdrop-blur-sm transition-all focus-visible:ring-2 focus-visible:ring-[#D4AF37]/20 focus-visible:border-[#D4AF37] text-base
+                        ${errors.designPrompt
+                                        ? 'border-red-400 focus-visible:ring-red-200'
+                                        : 'border-gray-100 hover:border-gray-200 shadow-inner'
+                                    }
+                    `}
                     style={{ fontFamily: "'Market Sans', sans-serif" }}
                 />
 
