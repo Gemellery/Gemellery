@@ -98,11 +98,13 @@ function SignIn() {
     }
   };
 
-  // Google OAuth hook initialization
   const triggerGoogleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => {
       setError("Google sign-in was cancelled or failed.");
+      setGoogleLoading(false);
+    },
+    onNonOAuthError: () => {
       setGoogleLoading(false);
     },
   });
