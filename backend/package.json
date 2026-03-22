@@ -15,6 +15,7 @@
     "@aws-sdk/client-s3": "^3.1007.0",
     "@google/generative-ai": "^0.24.1",
     "bcrypt": "^6.0.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.3.1",
     "ethers": "^6.16.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/json2csv": "^5.0.7",
