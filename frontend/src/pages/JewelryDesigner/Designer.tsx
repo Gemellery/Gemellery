@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Gem, Camera, Sparkles, Wand2,
@@ -40,7 +40,12 @@ const staggerChildren = {
 
 const JewelryDesigner: React.FC = () => {
     const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(1);
+    const location = useLocation();
+    
+    // Automatically extract prefilled gem data if navigating from the Marketplace
+    const prefilledGem = location.state?.prefilledGem;
+
+    const [currentStep, setCurrentStep] = useState(prefilledGem ? 2 : 1);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState('');
 
@@ -53,13 +58,71 @@ const JewelryDesigner: React.FC = () => {
     } = useForm<GemFormValues>({
         resolver: zodResolver(gemFormSchema),
         defaultValues: {
-            gemType: '',
-            gemCut: '',
+            gemType: (() => {
+                if (!prefilledGem) return '';
+                const title = prefilledGem.name.toLowerCase();
+                const types = [
+                    'Sapphire', 'Ruby', 'Emerald', 'Diamond', 'Alexandrite', 
+                    'Aquamarine', 'Amethyst', 'Spinel', 'Tourmaline', 'Garnet', 
+                    'Topaz', 'Opal', 'Pearl'
+                ];
+                for (const t of types) {
+                    if (title.includes(t.toLowerCase())) return t;
+                }
+                return 'Other'; 
+            })(),
+            gemTypeOther: prefilledGem ? prefilledGem.name : '',
+            gemCut: (() => {
+                if (!prefilledGem) return '';
+                const cut = prefilledGem.cut.toLowerCase();
+                if (cut.includes('round')) return 'round-brilliant';
+                if (cut.includes('emerald')) return 'emerald-cut';
+                if (cut.includes('oval')) return 'oval';
+                if (cut.includes('cushion')) return 'cushion';
+                if (cut.includes('pear')) return 'pear';
+                if (cut.includes('marquise')) return 'marquise';
+                if (cut.includes('asscher')) return 'asscher';
+                if (cut.includes('princess')) return 'princess';
+                if (cut.includes('radiant')) return 'radiant';
+                if (cut.includes('heart')) return 'heart';
+                return 'round-brilliant';
+            })(),
             gemSizeMode: 'simple',
-            gemSizeSimple: '',
-            gemColor: '',
-            gemTransparency: '',
-            gemImageUrl: '',
+            gemSizeSimple: (() => {
+                if (!prefilledGem) return '';
+                const ctMatch = prefilledGem.weight.match(/([\d.]+)/);
+                if (ctMatch) {
+                    const ct = parseFloat(ctMatch[1]);
+                    if (ct >= 4) return 'large';
+                    if (ct >= 1.5) return 'medium';
+                    return 'small';
+                }
+                return 'medium';
+            })(),
+            gemColor: (() => {
+                if (!prefilledGem) return '';
+                const type = prefilledGem.name.toLowerCase();
+                if (type.includes('sapphire')) return 'blue-medium';
+                if (type.includes('ruby')) return 'red-medium';
+                if (type.includes('emerald')) return 'green-medium';
+                if (type.includes('diamond')) return 'colorless';
+                if (type.includes('amethyst')) return 'purple-violet';
+                if (type.includes('garnet')) return 'red-dark';
+                if (type.includes('topaz') || type.includes('aquamarine')) return 'blue-light';
+                if (type.includes('alexandrite')) return 'green-dark';
+                if (type.includes('opal') || type.includes('tourmaline')) return 'multi-color';
+                if (type.includes('pearl')) return 'colorless';
+                return 'colorless'; // Fallback so validation passes
+            })(),
+            gemTransparency: (() => {
+                if (!prefilledGem) return '';
+                const type = prefilledGem.name.toLowerCase();
+                if (type.includes('pearl') || type.includes('opal') || type.includes('jade') || type.includes('moonstone')) {
+                    return 'opaque';
+                }
+                return 'transparent'; // Fallback
+            })(),
+            gemImageUrl: prefilledGem ? prefilledGem.image : '',
             designPrompt: '',
             materials: { metals: [], finish: undefined },
             numImages: 3,

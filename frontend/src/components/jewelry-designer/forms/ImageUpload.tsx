@@ -131,11 +131,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     />
                 </div>
             ) : (
-                <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                <div className="relative max-w-md mx-auto rounded-xl overflow-hidden border-2 border-gray-200 bg-[#F4F6F8] flex items-center justify-center shadow-inner">
                     <img
                         src={value}
                         alt="Uploaded gem"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-[400px] p-4 object-contain"
                     />
                     <button
                         type="button"

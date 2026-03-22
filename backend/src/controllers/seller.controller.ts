@@ -472,6 +472,7 @@ export const getSellerInventory = async (req: Request, res: Response) => {
                COUNT(*) AS total,
                SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS available,
                SUM(CASE WHEN status = 'Reserved' THEN 1 ELSE 0 END) AS unavailable,
+               SUM(CASE WHEN status = 'Sold' THEN 1 ELSE 0 END) AS sold,
                SUM(CASE WHEN verification_status = 'pending' THEN 1 ELSE 0 END) AS pending,
                SUM(CASE WHEN verification_status = 'approved' THEN 1 ELSE 0 END) AS approved,
                SUM(CASE WHEN verification_status = 'rejected' THEN 1 ELSE 0 END) AS rejected
@@ -485,6 +486,7 @@ export const getSellerInventory = async (req: Request, res: Response) => {
                 total: Number(counts.total),
                 available: Number(counts.available),
                 unavailable: Number(counts.unavailable),
+                sold: Number(counts.sold || 0),
                 pending: Number(counts.pending),
                 approved: Number(counts.approved),
                 rejected: Number(counts.rejected),
@@ -511,12 +513,12 @@ export const updateGemStatus = async (req: Request, res: Response) => {
         }
 
         const [result]: any = await db.query(
-            `UPDATE gem SET status = ? WHERE gem_id = ? AND seller_id = ?`,
+            `UPDATE gem SET status = ? WHERE gem_id = ? AND seller_id = ? AND status != 'Sold'`,
             [status, gemId, sellerId]
         );
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Gem not found" });
+            return res.status(404).json({ error: "Gem not found or cannot change status of sold item" });
         }
 
         return res.json({ message: "Status updated" });

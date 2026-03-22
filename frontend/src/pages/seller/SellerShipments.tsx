@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SellerSidebar from "../../components/SellerSidebar";
+import Footer from "../../components/BasicFooter";
 import { Menu, Package, Truck, CheckCircle2, Clock, Eye, X } from "lucide-react";
 import API_CONFIG from "../../lib/api.config";
 
@@ -379,6 +380,7 @@ export default function SellerShipments() {
               </div>
           </div>
         )}
+        <Footer />
       </main>
 
       {/* Shipment Modal */}

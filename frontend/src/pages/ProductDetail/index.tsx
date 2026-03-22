@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import AdvancedFooter from '@/components/AdvancedFooter'
 import ProductGallery from '../../components/ProductGallery'
@@ -14,7 +14,7 @@ import Certification from '../../components/Certification'
 import RatingSummary from '../../components/RatingSummary'
 import SellerOtherListings from '../../components/SellerOtherListings'
 import { FileText } from 'lucide-react'
-import { fetchGemById } from '@/lib/gems/api'
+import { fetchGemById, getGemImageUrl } from '@/lib/gems/api'
 import type { GemData } from '@/lib/gems/types'
 import { fetchSellerProfile } from '@/services/sellerService'
 import type { SellerProfileResponse } from '@/types/seller.types'
@@ -25,6 +25,7 @@ const ProductDetail = () => {
   const [sellerProfile, setSellerProfile] = useState<SellerProfileResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loadGemData = async () => {
@@ -72,7 +73,23 @@ const ProductDetail = () => {
   }
 
   const handleTryAIDesign = () => {
-    console.log('Opening AI Design Studio')
+    if (product) {
+      navigate('/jewelry-designer', {
+        state: { 
+          prefilledGem: { 
+            id: product.gem_id.toString(), 
+            name: product.gem_name, 
+            price: `LKR ${product.price.toLocaleString()}`, 
+            weight: `${product.carat} ct`, 
+            cut: product.cut, 
+            origin: product.origin, 
+            image: (product.images && product.images.length > 0) ? 
+              (product.images[0].startsWith('http') ? product.images[0] : `/uploads/${product.images[0]}`) 
+              : ''
+          } 
+        }
+      });
+    }
   }
 
   if (isLoading) {

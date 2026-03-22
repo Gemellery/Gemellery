@@ -30,6 +30,9 @@ import ManageAdmins from "./pages/Admin/ManageAdmins";
 import SellerProfile from "./pages/seller/SellerProfile";
 import OrderHistory from "./pages/OrderHistory/index";
 import WishlistPage from "./pages/buyer/BuyerWishlist";
+import BuyerSettings from "./pages/buyer/BuyerSettings";
+import BuyerOrderStatus from "./pages/buyer/BuyerOrderStatus";
+import BuyerMyDesigns from "./pages/buyer/BuyerMyDesigns";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -52,6 +55,8 @@ import AccessDenied from "./pages/AccessDenied";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import AiChat from "./components/AiChat";
 import FAQ from "./pages/FAQ";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
 
 function MaintenancePage() {
   return (
@@ -225,6 +230,24 @@ function AppRoutes() {
       />
 
       <Route
+        path="/buyer/ai-designs"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <BuyerMyDesigns />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/buyer/settings"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <BuyerSettings />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/dashboard"
         element={
           <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
@@ -341,7 +364,9 @@ function App() {
           <Route path="/403" element={<AccessDenied />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/seller/:id" element={<SellerProfile />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
           <Route
             path="/seller/dashboard"
@@ -429,6 +454,33 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <WishlistPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/ai-designs"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerMyDesigns />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/order-status"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerOrderStatus />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/settings"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerSettings />
               </ProtectedRoute>
             }
           />
