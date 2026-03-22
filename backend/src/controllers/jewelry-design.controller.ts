@@ -11,14 +11,12 @@ import {
     Refinement,
 } from "../models/JewelryDesign.model";
 import {
-    buildJewelryPrompt,
     generateJewelryDesigns,
     refineJewelryDesign,
     isGeminiConfigured,
     DesignPromptInput,
 } from "../utils/gemini";
 import {
-    uploadDesignImage,
     uploadGemImage as uploadGemImageToStorage,
     isFirebaseConfigured,
     getPlaceholderImageUrl,
@@ -50,7 +48,40 @@ const transformDesign = (d: any) => ({
     updatedAt: d.updated_at,
 });
 
+// Stripped down transformer for lists (like sidebars) to prevent multi-megabyte base64 payloads
+const transformDesignList = (d: any) => {
+    let optimizedImages = d.generated_images || [];
+    if (optimizedImages.length > 0) {
+        // Only keep the first image's thumbnail to save massive bandwidth
+        optimizedImages = [{
+            ...optimizedImages[0],
+            url: "", // Strip the raw 1.5MB base64 url
+        }];
+    }
 
+    return {
+        id: d.id,
+        userId: d.user_id,
+        gemType: d.gem_type,
+        gemCut: d.gem_cut,
+        gemColor: d.gem_color,
+        designPrompt: d.design_prompt,
+        generatedImages: optimizedImages,
+        createdAt: d.created_at,
+    };
+};
+
+const parseDesignId = (req: Request): number | null => {
+    const rawId = req.params.id;
+    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+    const designId = Number.parseInt(id, 10);
+
+    if (Number.isNaN(designId)) {
+        return null;
+    }
+
+    return designId;
+};
 
 export const getUserDesigns = async (
     req: Request,
@@ -59,7 +90,6 @@ export const getUserDesigns = async (
     try {
         const userId = (req as any).user?.id;
 
-        // No logged-in user — return empty (don't show guest designs)
         if (!userId) {
             res.status(200).json({ designs: [] });
             return;
@@ -67,7 +97,7 @@ export const getUserDesigns = async (
 
         const designs = await getUserDesignsFromDB(userId);
 
-        res.status(200).json({ designs: designs.map(transformDesign) });
+        res.status(200).json({ designs: designs.map(transformDesignList) });
     } catch (error) {
         console.error("Error fetching user designs:", error);
         res.status(500).json({ message: "Failed to fetch designs" });
@@ -79,7 +109,7 @@ export const getDesignByIdController = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { id } = req.params;
+        const designId = parseDesignId(req);
         const userId = (req as any).user?.id;
 
         if (!userId) {
@@ -87,7 +117,12 @@ export const getDesignByIdController = async (
             return;
         }
 
-        const design = await getDesignById(parseInt(id), userId);
+        if (designId === null) {
+            res.status(400).json({ message: "Invalid design id" });
+            return;
+        }
+
+        const design = await getDesignById(designId, userId);
 
         if (!design) {
             res.status(404).json({ message: "Design not found" });
@@ -106,7 +141,6 @@ export const generateDesign = async (
     res: Response
 ): Promise<void> => {
     try {
-        // Use authenticated user ID — login required for design generation
         const userId = (req as any).user?.id;
         if (!userId) {
             res.status(401).json({ message: "Login required to generate designs" });
@@ -130,7 +164,6 @@ export const generateDesign = async (
             numImages = 3,
         } = req.body;
 
-        // Validation
         if (!gemType || !gemCut || !gemColor || !gemTransparency || !designPrompt) {
             res.status(400).json({ message: "Missing required fields" });
             return;
@@ -143,7 +176,6 @@ export const generateDesign = async (
 
         console.log(`[Design] Generating ${numImages} designs for user ${userId}...`);
 
-        // Build prompt input for Gemini
         const promptInput: DesignPromptInput = {
             gemProperties: {
                 gemType,
@@ -163,15 +195,12 @@ export const generateDesign = async (
         };
 
         let generatedImages: GeneratedImage[] = [];
-
-        // Check if Gemini and Firebase are configured
         const aiConfigured = isGeminiConfigured() && isFirebaseConfigured();
 
         if (aiConfigured) {
             console.log("[Design] Using AI generation...");
 
             try {
-                // Generate designs using Gemini
                 const aiDesigns = await generateJewelryDesigns(promptInput, numImages);
 
                 for (let i = 0; i < aiDesigns.length; i++) {
@@ -179,8 +208,7 @@ export const generateDesign = async (
                     const imageId = uuidv4();
 
                     if (design.imageBase64 && design.imageBase64.length > 100) {
-                        // Real AI-generated image — use as data URI directly
-                        const imageDataUri = `data:${design.mimeType || 'image/png'};base64,${design.imageBase64}`;
+                        const imageDataUri = `data:${design.mimeType || "image/png"};base64,${design.imageBase64}`;
                         generatedImages.push({
                             id: imageId,
                             url: imageDataUri,
@@ -189,7 +217,6 @@ export const generateDesign = async (
                         });
                         console.log(`[Design] Image ${i + 1}: Real AI image used (${design.imageBase64.length} chars)`);
                     } else {
-                        // No image data — use SVG placeholder
                         generatedImages.push({
                             id: imageId,
                             url: getPlaceholderImageUrl(`Design ${i + 1}`),
@@ -200,7 +227,6 @@ export const generateDesign = async (
                     }
                 }
 
-                // If Gemini returned fewer designs than requested, fill with placeholders
                 for (let i = generatedImages.length; i < numImages; i++) {
                     generatedImages.push({
                         id: uuidv4(),
@@ -213,7 +239,6 @@ export const generateDesign = async (
                 console.log(`[Design] Generated ${generatedImages.length} designs`);
             } catch (aiError) {
                 console.error("[Design] AI generation failed, using placeholders:", aiError);
-                // Fall back to placeholders
                 for (let i = 0; i < numImages; i++) {
                     generatedImages.push({
                         id: `fallback-${Date.now()}-${i}`,
@@ -225,7 +250,6 @@ export const generateDesign = async (
             }
         } else {
             console.log("[Design] AI not configured, using placeholder images...");
-            // Use placeholder images when AI is not configured
             for (let i = 0; i < numImages; i++) {
                 generatedImages.push({
                     id: `placeholder-${Date.now()}-${i}`,
@@ -236,7 +260,6 @@ export const generateDesign = async (
             }
         }
 
-        // Prepare design data
         const designData: JewelryDesignInput = {
             user_id: userId,
             gem_type: gemType,
@@ -251,14 +274,11 @@ export const generateDesign = async (
             gem_transparency: gemTransparency,
             gem_image_url: gemImageUrl,
             design_prompt: designPrompt,
-            materials: materials,
+            materials,
             generated_images: generatedImages,
         };
 
-        // Create design in database
         const designId = await createDesign(designData);
-
-        // Fetch the created design to return
         const design = await getDesignById(designId, userId);
 
         res.status(201).json({
@@ -271,7 +291,7 @@ export const generateDesign = async (
         console.error("Error details:", error?.message, error?.code);
         res.status(500).json({
             message: "Failed to generate design",
-            error: error?.message || "Unknown error"
+            error: error?.message || "Unknown error",
         });
     }
 };
@@ -281,10 +301,16 @@ export const saveDesign = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { id } = req.params;
+        const designId = parseDesignId(req);
         const userId = (req as any).user?.id;
+
         if (!userId) {
             res.status(401).json({ message: "Login required to save designs" });
+            return;
+        }
+
+        if (designId === null) {
+            res.status(400).json({ message: "Invalid design id" });
             return;
         }
 
@@ -295,16 +321,14 @@ export const saveDesign = async (
             return;
         }
 
-        // Check if design exists (for guests, just verify it exists by ID)
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        const existingDesign = await getDesignById(designId, userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
             return;
         }
 
-        // Update design
-        const updated = await updateDesign(parseInt(id), userId, {
+        const updated = await updateDesign(designId, userId, {
             selected_image_url: selectedImageUrl,
         });
 
@@ -313,8 +337,7 @@ export const saveDesign = async (
             return;
         }
 
-        // Fetch updated design
-        const design = await getDesignById(parseInt(id), userId);
+        const design = await getDesignById(designId, userId);
 
         res.status(200).json({
             message: "Design saved successfully",
@@ -331,10 +354,16 @@ export const refineDesign = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { id } = req.params;
+        const designId = parseDesignId(req);
         const userId = (req as any).user?.id;
+
         if (!userId) {
             res.status(401).json({ message: "Login required to refine designs" });
+            return;
+        }
+
+        if (designId === null) {
+            res.status(400).json({ message: "Invalid design id" });
             return;
         }
 
@@ -346,42 +375,35 @@ export const refineDesign = async (
         }
 
         if (strength < 0 || strength > 1) {
-            res
-                .status(400)
-                .json({ message: "Refinement strength must be between 0 and 1" });
+            res.status(400).json({ message: "Refinement strength must be between 0 and 1" });
             return;
         }
 
-        // Check if design exists and belongs to user
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        const existingDesign = await getDesignById(designId, userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
             return;
         }
 
-        console.log(`[Refine] Refining design ${id} for user ${userId}...`);
+        console.log(`[Refine] Refining design ${designId} for user ${userId}...`);
 
         let refinedImageUrl = "";
         let refinedThumbnailUrl = "";
         const refinementId = uuidv4();
-
-        // Check if AI is configured
         const aiConfigured = isGeminiConfigured() && isFirebaseConfigured();
 
         if (aiConfigured) {
             try {
-                // Pass the base image so Gemini can edit it directly
                 const refined = await refineJewelryDesign(
                     existingDesign.design_prompt,
                     refinementPrompt,
-                    baseImageUrl, // Pass actual base64/data-URI for true image editing
+                    baseImageUrl,
                     strength
                 );
 
                 if (refined && refined.imageBase64 && refined.imageBase64.length > 100) {
-                    // Real AI refined image
-                    refinedImageUrl = `data:${refined.mimeType || 'image/png'};base64,${refined.imageBase64}`;
+                    refinedImageUrl = `data:${refined.mimeType || "image/png"};base64,${refined.imageBase64}`;
                     refinedThumbnailUrl = refinedImageUrl;
                     console.log(`[Refine] Got real AI refined image (${refined.imageBase64.length} chars)`);
                 } else {
@@ -392,7 +414,6 @@ export const refineDesign = async (
             }
         }
 
-        // Fallback to placeholder only if no real image was generated
         if (!refinedImageUrl) {
             refinedImageUrl = getPlaceholderImageUrl("Refined");
             refinedThumbnailUrl = getPlaceholderThumbnailUrl("Refined");
@@ -401,26 +422,23 @@ export const refineDesign = async (
         const refinement: Refinement = {
             id: refinementId,
             prompt: refinementPrompt,
-            baseImageId: baseImageId || undefined,  // ID-based matching for gallery
-            baseImageUrl: baseImageUrl,
+            baseImageId: baseImageId || undefined,
+            baseImageUrl,
             imageUrl: refinedImageUrl,
             thumbnailUrl: refinedThumbnailUrl,
-            strength: strength,
+            strength,
             refinedAt: new Date().toISOString(),
         };
 
-        // Add to refinements array
         const refinements = existingDesign.refinements || [];
         refinements.push(refinement);
 
-        // Update design with new refinement
-        await updateDesign(parseInt(id), userId, {
-            refinements: refinements,
+        await updateDesign(designId, userId, {
+            refinements,
             selected_image_url: refinement.imageUrl,
         });
 
-        // Fetch updated design
-        const design = await getDesignById(parseInt(id), userId);
+        const design = await getDesignById(designId, userId);
 
         res.status(200).json({
             message: "Design refined successfully",
@@ -439,7 +457,7 @@ export const deleteDesignController = async (
     res: Response
 ): Promise<void> => {
     try {
-        const { id } = req.params;
+        const designId = parseDesignId(req);
         const userId = (req as any).user?.id;
 
         if (!userId) {
@@ -447,16 +465,19 @@ export const deleteDesignController = async (
             return;
         }
 
-        // Check if design exists and belongs to user
-        const existingDesign = await getDesignById(parseInt(id), userId);
+        if (designId === null) {
+            res.status(400).json({ message: "Invalid design id" });
+            return;
+        }
+
+        const existingDesign = await getDesignById(designId, userId);
 
         if (!existingDesign) {
             res.status(404).json({ message: "Design not found" });
             return;
         }
 
-        // Delete design
-        const deleted = await deleteDesignFromDB(parseInt(id), userId);
+        const deleted = await deleteDesignFromDB(designId, userId);
 
         if (!deleted) {
             res.status(500).json({ message: "Failed to delete design" });
@@ -482,7 +503,6 @@ export const uploadGemImage = async (
             return;
         }
 
-        // Check if file was uploaded (multer puts it on req.file)
         const file = (req as any).file;
 
         if (!file) {
@@ -492,20 +512,16 @@ export const uploadGemImage = async (
 
         console.log(`[Upload] Processing gem image for user ${userId}...`);
 
-        // Check if Firebase is configured
         if (!isFirebaseConfigured()) {
             res.status(503).json({
                 message: "Image upload service not configured",
-                error: "Firebase Storage is not configured. Please set up Firebase credentials."
+                error: "Firebase Storage is not configured. Please set up Firebase credentials.",
             });
             return;
         }
 
         try {
-            // Process and optimize the image
             const processedBuffer = await processUploadedImage(file.buffer);
-
-            // Upload to Firebase Storage
             const uploadResult = await uploadGemImageToStorage(processedBuffer, userId);
 
             res.status(200).json({
@@ -518,7 +534,7 @@ export const uploadGemImage = async (
             console.error("[Upload] Error processing/uploading image:", uploadError);
             res.status(500).json({
                 message: "Failed to upload image",
-                error: uploadError.message
+                error: uploadError.message,
             });
         }
     } catch (error) {

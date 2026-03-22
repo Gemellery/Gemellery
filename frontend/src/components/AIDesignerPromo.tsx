@@ -18,7 +18,7 @@ export default function AIDesignerPromo() {
     return (
         <div
             ref={ref}
-            className="w-full py-24 px-6 relative overflow-hidden"
+            className="w-full py-16 md:py-24 px-4 sm:px-6 relative overflow-hidden"
             style={{ background: "linear-gradient(135deg, #070f1c 0%, #0d1829 60%, #091524 100%)" }}
         >
             {/* Grid background */}
@@ -34,7 +34,7 @@ export default function AIDesignerPromo() {
             <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9A24D]/6 rounded-full blur-3xl pointer-events-none" />
 
             <div className="max-w-6xl mx-auto relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
                     {/* Left: content */}
                     <div>
@@ -42,7 +42,7 @@ export default function AIDesignerPromo() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={inView ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.45 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A24D]/30 bg-[#C9A24D]/10 text-[#C9A24D] text-sm font-semibold mb-6"
+                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-[#C9A24D]/30 bg-[#C9A24D]/10 text-[#C9A24D] text-xs sm:text-sm font-semibold mb-4 sm:mb-6"
                         >
                             <Sparkles className="w-4 h-4" />
                             Powered by Gemini AI
@@ -52,7 +52,7 @@ export default function AIDesignerPromo() {
                             initial={{ opacity: 0, y: 24 }}
                             animate={inView ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.5, delay: 0.1 }}
-                            className="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-5"
+                            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4 sm:mb-5"
                         >
                             Design Your Dream{" "}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A24D] to-[#FFE066]">
@@ -65,7 +65,7 @@ export default function AIDesignerPromo() {
                             initial={{ opacity: 0 }}
                             animate={inView ? { opacity: 1 } : {}}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="text-gray-400 text-lg leading-relaxed mb-8"
+                            className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8"
                         >
                             Describe your ideal piece, pick your gem, and our AI creates
                             stunning bespoke jewellery designs — unique to you, generated in seconds.
@@ -75,7 +75,7 @@ export default function AIDesignerPromo() {
                             initial={{ opacity: 0 }}
                             animate={inView ? { opacity: 1 } : {}}
                             transition={{ duration: 0.5, delay: 0.28 }}
-                            className="flex flex-col gap-3 mb-10"
+                            className="flex flex-col gap-2 sm:gap-3 mb-8 sm:mb-10"
                         >
                             {steps.map(({ icon: Icon, text }, i) => (
                                 <div key={text} className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function AIDesignerPromo() {
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             onClick={() => navigate("/jewelry-designer")}
-                            className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-bold text-black text-base transition-all hover:shadow-2xl hover:shadow-[#C9A24D]/25"
+                            className="w-full sm:w-auto justify-center sm:justify-start inline-flex items-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-black text-sm sm:text-base transition-all hover:shadow-2xl hover:shadow-[#C9A24D]/25"
                             style={{ background: "linear-gradient(135deg, #C9A24D 0%, #FFE066 100%)" }}
                         >
                             <Wand2 className="w-5 h-5" />

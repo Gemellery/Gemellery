@@ -3,6 +3,9 @@ import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { GemFormValues } from '../../../lib/jewelry-designer/validation';
 import { GEM_SIZES } from '../../../lib/jewelry-designer/constants';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface GemSizeInputProps {
     register: UseFormRegister<GemFormValues>;
@@ -31,38 +34,36 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
 
     return (
         <div className="space-y-3" style={{ fontFamily: "'Market Sans', sans-serif" }}>
-            <label className="block text-sm font-semibold text-gray-800">
+            <Label className="block text-sm font-semibold text-gray-800">
                 What size is your gem? <span className="text-red-500">*</span>
-            </label>
+            </Label>
 
             {/* Simple Mode - Radio buttons */}
             {!showAdvanced && (
                 <div className="space-y-2">
-                    {GEM_SIZES.map((size) => (
-                        <label
-                            key={size.value}
-                            className={`
-                flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all
-                ${selectedSize === size.value
-                                    ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                    : 'border-gray-200 bg-gray-50 hover:border-gray-300'
-                                }
-              `}
-                        >
-                            <input
-                                type="radio"
-                                {...register('gemSizeSimple')}
-                                value={size.value}
-                                checked={selectedSize === size.value}
-                                onChange={() => onSizeChange(size.value)}
-                                className="mt-1 w-4 h-4 text-[#D4AF37] bg-white border-gray-300 focus:ring-[#D4AF37] focus:ring-offset-0"
-                            />
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-900">{size.label}</p>
-                                <p className="text-xs text-gray-500">{size.description}</p>
-                            </div>
-                        </label>
-                    ))}
+                    <RadioGroup value={selectedSize} onValueChange={onSizeChange} className="grid grid-cols-1 gap-3">
+                        {GEM_SIZES.map((size) => (
+                            <Label
+                                key={size.value}
+                                className={`
+                                    flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all hover:bg-gray-50/50
+                                    ${selectedSize === size.value
+                                        ? 'border-[#D4AF37] bg-[#D4AF37]/5 shadow-sm shadow-[#D4AF37]/10'
+                                        : 'border-gray-100 bg-white/50 backdrop-blur-sm hover:border-gray-200'
+                                    }
+                                `}
+                            >
+                                <RadioGroupItem value={size.value} className="mt-0.5 text-[#D4AF37] border-gray-300 focus-visible:ring-[#D4AF37]" />
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-gray-900 leading-none mb-1.5">{size.label}</p>
+                                    <p className="text-xs text-gray-500 leading-tight font-normal">{size.description}</p>
+                                </div>
+                            </Label>
+                        ))}
+                    </RadioGroup>
+
+                    {/* Hidden input to ensure react-hook-form grabs the value and triggers validation if unmodified */}
+                    <input type="hidden" {...register('gemSizeSimple')} value={selectedSize} />
 
                     {errors.gemSizeSimple && (
                         <p className="text-sm text-red-500">{errors.gemSizeSimple.message}</p>
@@ -72,56 +73,48 @@ export const GemSizeInput: React.FC<GemSizeInputProps> = ({
 
             {/* Advanced Mode - Dimension inputs */}
             {showAdvanced && (
-                <div className="space-y-4 p-4 rounded-xl border-2 border-gray-200 bg-gray-50">
-                    <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-4 p-5 rounded-xl border-2 border-gray-100 bg-white/40 backdrop-blur-md shadow-inner">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">Length (mm)</label>
-                            <input
+                            <Label className="block text-xs text-gray-500 mb-2">Length (mm)</Label>
+                            <Input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeLengthMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
-                  focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
+                                className="bg-white/80 focus-visible:ring-[#D4AF37]/50 focus-visible:border-[#D4AF37] py-5"
                                 placeholder="0.0"
-                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">Width (mm)</label>
-                            <input
+                            <Label className="block text-xs text-gray-500 mb-2">Width (mm)</Label>
+                            <Input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeWidthMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
-                  focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
+                                className="bg-white/80 focus-visible:ring-[#D4AF37]/50 focus-visible:border-[#D4AF37] py-5"
                                 placeholder="0.0"
-                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">Height (mm)</label>
-                            <input
+                            <Label className="block text-xs text-gray-500 mb-2">Height (mm)</Label>
+                            <Input
                                 type="number"
                                 step="0.1"
                                 {...register('gemSizeHeightMm', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
-                  focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
+                                className="bg-white/80 focus-visible:ring-[#D4AF37]/50 focus-visible:border-[#D4AF37] py-5"
                                 placeholder="0.0"
-                                style={{ fontFamily: "'Market Sans', sans-serif" }}
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Carat Weight (optional)</label>
-                        <input
+                    <div className="pt-2">
+                        <Label className="block text-xs text-gray-500 mb-2">Carat Weight (optional)</Label>
+                        <Input
                             type="number"
                             step="0.01"
                             {...register('gemSizeCarat', { valueAsNumber: true })}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-900
-                focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
+                            className="bg-white/80 focus-visible:ring-[#D4AF37]/50 focus-visible:border-[#D4AF37] py-5"
                             placeholder="0.00"
-                            style={{ fontFamily: "'Market Sans', sans-serif" }}
                         />
                     </div>
 

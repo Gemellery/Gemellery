@@ -44,7 +44,7 @@ export default function BlockchainSection() {
         <div
             ref={ref}
             style={{ background: "linear-gradient(135deg, #050d1a 0%, #0a1628 60%, #071220 100%)" }}
-            className="w-full py-24 px-6 relative overflow-hidden"
+            className="w-full py-16 md:py-24 px-4 sm:px-6 relative overflow-hidden"
         >
             {/* Background grid */}
             <div
@@ -60,7 +60,7 @@ export default function BlockchainSection() {
             <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-[#C9A24D]/6 rounded-full blur-3xl pointer-events-none" />
 
             <div className="max-w-6xl mx-auto relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
                     {/* Left: Content */}
                     <div>
@@ -68,7 +68,7 @@ export default function BlockchainSection() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={inView ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.5 }}
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1F7A73]/40 bg-[#1F7A73]/10 text-[#1F7A73] text-sm font-semibold mb-6"
+                            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-[#1F7A73]/40 bg-[#1F7A73]/10 text-[#1F7A73] text-xs sm:text-sm font-semibold mb-4 sm:mb-6"
                         >
                             <Link2 className="w-4 h-4" />
                             Blockchain Technology
@@ -78,7 +78,7 @@ export default function BlockchainSection() {
                             initial={{ opacity: 0, y: 24 }}
                             animate={inView ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.55, delay: 0.1 }}
-                            className="text-4xl md:text-5xl font-extrabold text-white leading-tight mb-5"
+                            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight mb-4 sm:mb-5"
                         >
                             Your Gem's Entire Story.{" "}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A24D] to-[#FFE066]">
@@ -90,7 +90,7 @@ export default function BlockchainSection() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={inView ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="text-gray-400 text-lg leading-relaxed mb-8"
+                            className="text-gray-400 text-base md:text-lg leading-relaxed mb-6 sm:mb-8"
                         >
                             Every gemstone on Gemellery receives a permanent, tamper-proof digital
                             passport on the blockchain — recording its origin, certification, and
@@ -121,7 +121,7 @@ export default function BlockchainSection() {
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             onClick={() => window.location.href = "/marketplace"}
-                            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white border border-[#1F7A73]/50 bg-[#1F7A73]/15 hover:bg-[#1F7A73]/25 transition-all duration-300"
+                            className="w-full sm:w-auto justify-center sm:justify-start inline-flex items-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-white border border-[#1F7A73]/50 bg-[#1F7A73]/15 hover:bg-[#1F7A73]/25 transition-all duration-300"
                         >
                             View Blockchain Passports
                             <ArrowRight className="w-4 h-4" />
@@ -129,7 +129,7 @@ export default function BlockchainSection() {
                     </div>
 
                     {/* Right: Step flow visual */}
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-3 sm:gap-4">
                         {steps.map((step, i) => (
                             <motion.div
                                 key={step.label}

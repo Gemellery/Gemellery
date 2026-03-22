@@ -31,9 +31,9 @@ function StatCard({ value, suffix, label, delay, inView }: { value: number; suff
             initial={{ opacity: 0, y: 24 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay }}
-            className="text-center py-10 px-6"
+            className="text-center py-8 sm:py-10 px-4 sm:px-6"
         >
-            <div className="text-4xl md:text-5xl font-extrabold text-[#1F7A73] mb-2">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1F7A73] mb-2">
                 {count}{suffix}
             </div>
             <div className="text-sm text-gray-500 font-medium">{label}</div>
@@ -46,7 +46,7 @@ export default function StatsSection() {
     const inView = useInView(ref, { once: true, margin: "-100px" });
 
     return (
-        <div ref={ref} className="w-full py-20 px-6 bg-white">
+        <div ref={ref} className="w-full py-16 md:py-20 px-4 sm:px-6 bg-white">
             <div className="max-w-5xl mx-auto">
                 <motion.p
                     initial={{ opacity: 0 }}
@@ -59,7 +59,7 @@ export default function StatsSection() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={inView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.45, delay: 0.08 }}
-                    className="text-center text-3xl md:text-4xl font-extrabold text-gray-900 mb-12"
+                    className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-10 md:mb-12"
                 >
                     The Numbers Speak for Themselves
                 </motion.h2>

@@ -5,7 +5,6 @@ import FilterSection from '../../components/FilterSection'
 import Navbar from '@/components/Navbar'
 import AdvancedFooter from '../../components/AdvancedFooter'
 import GemCard from '../../components/GemCard'
-import CoverImg from '../../../public/other_img/1.png'
 import { ChevronLeft, ChevronRight, Loader2, AlertCircle } from 'lucide-react'
 import { fetchGems } from '@/lib/gems/api'
 import { transformGemForCard } from '@/lib/gems/utils'
@@ -131,7 +130,7 @@ const Marketplace = () => {
       <div className="max-w-[1536px] mx-auto px-4 sm:px-6 py-4">
         <div 
           className="relative px-4 sm:px-6 md:px-12 py-16 sm:py-24 rounded-2xl text-center bg-cover bg-center overflow-hidden"
-          style={{ backgroundImage: `url(${CoverImg})` }}
+          style={{ backgroundImage: `url('/other_img/1.png')` }}
         >
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="relative z-10">
@@ -208,7 +207,7 @@ const Marketplace = () => {
           {/*  Gems Grid  */}
           {!loading && !error && gems.length > 0 && (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12 w-full justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12 w-full justify-items-center">
                 {gems.map((gem) => (
                   <GemCard
                     key={gem.id}

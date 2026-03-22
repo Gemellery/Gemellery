@@ -189,8 +189,17 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
           >
             {buttonText}
           </button>
-          <button className="bg-[#F4F6F8] hover:bg-[#E5E9ED] rounded-[12px] p-3 transition-colors shrink-0 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-[#5A6A85]" />
+          <button 
+            title="Design jewelry with this gem"
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate('/jewelry-designer', {
+                state: { prefilledGem: { id, name, price, weight, cut, origin, image } }
+              })
+            }}
+            className="bg-[#F4F6F8] hover:bg-[#E5E9ED] rounded-[12px] p-3 transition-colors shrink-0 flex items-center justify-center group/designer"
+          >
+            <Sparkles className="w-5 h-5 text-[#5A6A85] group-hover/designer:text-[#D4AF37]" />
           </button>
         </div>
       </div>

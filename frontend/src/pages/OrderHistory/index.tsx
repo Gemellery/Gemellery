@@ -520,6 +520,7 @@ function OrderHistory() {
             </div>
           </div>
         )}
+        <Footer />
       </main>
     </div>
   );

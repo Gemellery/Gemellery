@@ -30,7 +30,7 @@ function CheckoutContent() {
   const elements = useElements();
 
   /* ---------------- Cart Items ---------------- */
-  const { items: cartItems, totalAmount, isLoading: isCartLoading } = useCart();
+  const { items: cartItems, totalAmount, isLoading: isCartLoading, refreshCart } = useCart();
 
   /* ---------------- Shipping ---------------- */
   const [shipping, setShipping] = useState({
@@ -181,6 +181,7 @@ function CheckoutContent() {
 
       // Success! Redirect to order confirmation or history page
       if (response.order_id) {
+        await refreshCart();
         navigate(`/buyer/orders/history`);
       }
     } catch (err) {
