@@ -48,6 +48,29 @@ const transformDesign = (d: any) => ({
     updatedAt: d.updated_at,
 });
 
+// Stripped down transformer for lists (like sidebars) to prevent multi-megabyte base64 payloads
+const transformDesignList = (d: any) => {
+    let optimizedImages = d.generated_images || [];
+    if (optimizedImages.length > 0) {
+        // Only keep the first image's thumbnail to save massive bandwidth
+        optimizedImages = [{
+            ...optimizedImages[0],
+            url: "", // Strip the raw 1.5MB base64 url
+        }];
+    }
+
+    return {
+        id: d.id,
+        userId: d.user_id,
+        gemType: d.gem_type,
+        gemCut: d.gem_cut,
+        gemColor: d.gem_color,
+        designPrompt: d.design_prompt,
+        generatedImages: optimizedImages,
+        createdAt: d.created_at,
+    };
+};
+
 const parseDesignId = (req: Request): number | null => {
     const rawId = req.params.id;
     const id = Array.isArray(rawId) ? rawId[0] : rawId;
@@ -74,7 +97,7 @@ export const getUserDesigns = async (
 
         const designs = await getUserDesignsFromDB(userId);
 
-        res.status(200).json({ designs: designs.map(transformDesign) });
+        res.status(200).json({ designs: designs.map(transformDesignList) });
     } catch (error) {
         console.error("Error fetching user designs:", error);
         res.status(500).json({ message: "Failed to fetch designs" });

@@ -94,13 +94,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
                     className={`
-            border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
-            ${dragActive
-                            ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                            : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                        }
-            ${error ? 'border-red-400' : ''}
-          `}
+                        border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
+                        ${dragActive
+                                        ? 'border-[#D4AF37] bg-[#D4AF37]/10'
+                                        : 'border-gray-300 bg-white/50 backdrop-blur-sm hover:border-gray-400 hover:bg-white/80'
+                                    }
+                        ${error ? 'border-red-400 bg-red-50/50' : ''}
+                    `}
                 >
                     {uploading ? (
                         <div className="space-y-3">
@@ -131,11 +131,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     />
                 </div>
             ) : (
-                <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+                <div className="relative max-w-md mx-auto rounded-xl overflow-hidden border-2 border-gray-100 bg-white/50 backdrop-blur-sm flex items-center justify-center shadow-inner p-2">
                     <img
                         src={value}
                         alt="Uploaded gem"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-[400px] p-4 object-contain"
                     />
                     <button
                         type="button"
