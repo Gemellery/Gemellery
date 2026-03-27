@@ -68,6 +68,15 @@ interface PaginationInfo {
   pages: number;
 }
 
+/** Handles both full S3 URLs and bare filenames */
+function getGemImageSrc(image_url: string | null | undefined, fallback: string): string {
+  if (!image_url) return fallback;
+  if (image_url.startsWith("http")) return image_url;
+  if (image_url.includes("uploads/")) return `${API_CONFIG.BASE_URL}/${image_url.startsWith("/") ? image_url.substring(1) : image_url}`;
+  if (image_url.includes("gem_images/")) return `${API_CONFIG.BASE_URL}/uploads/${image_url}`;
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${image_url}`;
+}
+
 const statusColors: { [key: string]: string } = {
   Processing: "bg-yellow-100 text-yellow-800",
   Shipped: "bg-blue-100 text-blue-800",
@@ -270,11 +279,7 @@ function OrderHistory() {
                       {/* Left - Order Info */}
                       <div className="flex gap-4 flex-1">
                         <img
-                          src={
-                            order.image_url
-                              ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
-                              : image
-                          }
+                          src={getGemImageSrc(order.image_url, image)}
                           alt="Order"
                           className="w-16 h-16 rounded-lg object-cover"
                           onError={(e) => {
@@ -425,11 +430,7 @@ function OrderHistory() {
                         className="flex gap-3 p-3 border rounded-lg"
                       >
                         <img
-                          src={
-                            item.image_url
-                              ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`
-                              : image
-                          }
+                          src={getGemImageSrc(item.image_url, image)}
                           alt={item.gem_name}
                           className="w-16 h-16 rounded object-cover"
                           onError={(e) => {

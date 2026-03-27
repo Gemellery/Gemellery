@@ -41,6 +41,15 @@ interface WishlistItem {
   image_url: string | null;
 }
 
+/** Handles both full S3 URLs and bare filenames */
+function getGemImageSrc(image_url: string | null, fallback: string): string {
+  if (!image_url) return fallback;
+  if (image_url.startsWith("http")) return image_url;
+  if (image_url.includes("uploads/")) return `${API_CONFIG.BASE_URL}/${image_url.startsWith("/") ? image_url.substring(1) : image_url}`;
+  if (image_url.includes("gem_images/")) return `${API_CONFIG.BASE_URL}/uploads/${image_url}`;
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${image_url}`;
+}
+
 function BuyerDashboardLayout() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const navigate = useNavigate();
@@ -247,11 +256,7 @@ function BuyerDashboardLayout() {
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center p-1">
                             <img
-                            src={
-                                order.image_url
-                                ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
-                                : image
-                            }
+                            src={getGemImageSrc(order.image_url, image)}
                             alt="Order item"
                             className="w-full h-full object-contain rounded-lg"
                             onError={(e) => {
@@ -332,13 +337,7 @@ function BuyerDashboardLayout() {
                 >
                   <div className="relative aspect-square bg-gray-50/50 p-6 flex-shrink-0">
                     <img
-                      src={
-                        item.image_url
-                          ? (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')
-                              ? item.image_url
-                              : `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`)
-                          : "/placeholder-gem.png"
-                      }
+                      src={getGemImageSrc(item.image_url, "/placeholder-gem.png")}
                       alt={item.gem_name}
                       className="w-full h-full object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
