@@ -64,7 +64,7 @@ function BuyerMyDesigns() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
 
         {/* Sticky Header */}
         <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
@@ -95,7 +95,7 @@ function BuyerMyDesigns() {
           </button>
         </div>
 
-        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10">
+        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-10 flex-1">
 
           {/* Loading skeletons */}
           {loading && (

@@ -137,7 +137,8 @@ function SellerSettings() {
             />
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+                <div className="p-6 md:p-8 flex-1">
                 {/* HEADER */}
                 <div className="flex items-center justify-between mb-6">
                     <button
@@ -151,7 +152,7 @@ function SellerSettings() {
                 </div>
 
                 {/* CONTENT */}
-                <div className="max-w-4xl space-y-6">
+                <div className="max-w-4xl space-y-6 flex-1">
                     {/* Personal Information */}
                     <section className="bg-[#fcfbf8] border rounded-xl p-6 space-y-4 relative">
                         <div className="flex items-center justify-between">
@@ -254,6 +255,7 @@ function SellerSettings() {
                     </p>
                 </div>
 
+                </div>
                 <Footer />
             </main>
         </div>

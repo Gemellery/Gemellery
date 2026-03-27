@@ -147,7 +147,7 @@ function BuyerDashboardLayout() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
         {/* Header container */}
         <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ function BuyerDashboardLayout() {
           </button>
         </div>
 
-        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-12 flex-1">
 
           {/* Summary cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
