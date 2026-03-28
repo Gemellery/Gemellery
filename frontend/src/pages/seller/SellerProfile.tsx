@@ -6,6 +6,8 @@ import SellerStarRating from "../../components/seller/SellerStarRating";
 import { fetchSellerProfile } from "../../services/sellerService";
 import GemCard from "../../components/GemCard";
 import type { SellerProfileResponse } from "../../types/seller.types";
+import { formatPrice, formatWeight, isVerified } from "../../lib/gems/utils";
+import { getGemImageUrl } from "../../lib/gems/api";
 
 type ActiveTab = "gems" | "reviews";
 
@@ -191,17 +193,17 @@ const SellerProfile: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {gems.map((gem) => (
+                  {gems.filter(gem => gem.inStock).map((gem) => (
                     <GemCard
                       key={gem.id}
                       id={String(gem.id)}
                       name={gem.name}
-                      price={`LKR ${Number(gem.price).toLocaleString()}`}
-                      weight={gem.carat ? `${gem.carat}ct` : "N/A"}
-                      cut={gem.type || "N/A"}
+                      price={formatPrice(gem.price)}
+                      weight={formatWeight(String(gem.carat))}
+                      cut={gem.cut || "N/A"}
                       origin={gem.origin || "N/A"}
-                      verified={false}
-                      image={gem.imageUrl ? `/uploads/gem_images/${gem.imageUrl.split('/').pop()}` : "/sample_gems/handfulgems.jpg"}
+                      verified={isVerified(gem.verificationStatus)}
+                      image={getGemImageUrl(gem.imageUrl || "")}
                     />
                   ))}
                 </div>

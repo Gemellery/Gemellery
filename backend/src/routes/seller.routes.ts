@@ -86,11 +86,12 @@ router.get("/:id", async (req: Request, res: Response) => {
     // Get gems + images
     const [gemRows]: any = await pool.query(
       `SELECT g.gem_id, g.gem_name, g.gem_type, g.price, g.description,
-              g.color, g.carat, g.origin, g.status,
+              g.color, g.carat, g.origin, g.status, g.cut, g.clarity,
+              g.verification_status, g.created_at,
               MIN(gi.image_url) AS image_url
        FROM gem g
        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
-       WHERE g.seller_id = ?
+       WHERE g.seller_id = ? AND g.status = 'Available'
        GROUP BY g.gem_id`,
       [sellerId]
     );
@@ -135,8 +136,14 @@ router.get("/:id", async (req: Request, res: Response) => {
         color: gem.color,
         carat: gem.carat,
         origin: gem.origin,
+        cut: gem.cut,
+        clarity: gem.clarity,
+        verificationStatus: gem.verification_status,
+        createdAt: gem.created_at,
         inStock: gem.status === "Available",
-        imageUrl: gem.image_url ? `/uploads/${gem.image_url}` : null,
+        imageUrl: gem.image_url 
+          ? (gem.image_url.startsWith('http') ? gem.image_url : `uploads/${gem.image_url}`) 
+          : null,
       })),
       reviews: reviewRows.map((review: any) => ({
         id: review.review_id,
