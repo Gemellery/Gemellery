@@ -330,6 +330,7 @@ export const getWishlist = async (req: Request, res: Response) => {
           g.carat,
           g.cut,
           g.price,
+          g.status,
           MIN(gi.image_url) AS image_url
         FROM wishlist w
         JOIN gem g ON g.gem_id = w.gem_id

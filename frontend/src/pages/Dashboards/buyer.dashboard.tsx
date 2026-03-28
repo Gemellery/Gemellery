@@ -15,6 +15,7 @@ import image from "../../assets/logos/example_ring.png";
 import API_CONFIG from "../../lib/api.config";
 import { getUserDesigns } from "../../lib/jewelry-designer/api";
 import type { JewelryDesign } from "../../lib/jewelry-designer/types";
+import { removeFromWishlist as removeFromWishlistApi } from "../../lib/wishlist/api";
 
 interface Summary {
   activeOrders: number;
@@ -39,6 +40,7 @@ interface WishlistItem {
   cut: string;
   price: number;
   image_url: string | null;
+  status?: string;
 }
 
 /** Handles both full S3 URLs and bare filenames */
@@ -65,6 +67,16 @@ function BuyerDashboardLayout() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [designs, setDesigns] = useState<JewelryDesign[]>([]);
   const [designsLoading, setDesignsLoading] = useState(true);
+
+  const handleRemoveWishlistItem = async (e: React.MouseEvent, gemId: number) => {
+    e.stopPropagation();
+    try {
+      await removeFromWishlistApi(gemId);
+      setWishlist((prev) => prev.filter((item) => item.gem_id !== gemId));
+    } catch (err) {
+      console.error("failed to remove item", err);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -329,41 +341,56 @@ function BuyerDashboardLayout() {
                 </div>
               )}
 
-              {wishlist.slice(0, 4).map((item) => (
-                <div
-                  key={item.wishlist_id}
-                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
-                  onClick={() => navigate(`/product-detail/${item.gem_id}`)}
-                >
-                  <div className="relative aspect-square bg-gray-50/50 p-6 flex-shrink-0">
-                    <img
-                      src={getGemImageSrc(item.image_url, "/placeholder-gem.png")}
-                      alt={item.gem_name}
-                      className="w-full h-full object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "/placeholder-gem.png";
-                      }}
-                    />
-                    <button className="absolute top-3 right-3 h-9 w-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm text-red-500 hover:bg-red-50 transition-colors z-10">
-                      <Heart className="h-4 w-4 fill-current" />
-                    </button>
-                  </div>
-                  <div className="p-4 md:p-5 flex-1 flex flex-col justify-between border-t border-gray-50">
-                    <div>
-                      <h3 className="font-bold text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1 mb-1">
-                        {item.gem_name}
-                      </h3>
-                      <p className="text-xs font-medium text-gray-400 mb-3">
-                        {item.carat} ct • {item.cut}
+              {wishlist.slice(0, 4).map((item) => {
+                const isSold = item.status?.toLowerCase() === 'sold';
+                return (
+                  <div
+                    key={item.wishlist_id}
+                    className={`bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 group flex flex-col relative ${
+                      isSold ? "opacity-70 pointer-events-none" : "hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1 cursor-pointer"
+                    }`}
+                    onClick={() => !isSold && navigate(`/product-detail/${item.gem_id}`)}
+                  >
+                    <div className="relative aspect-square bg-gray-50/50 p-6 flex-shrink-0">
+                      <img
+                        src={getGemImageSrc(item.image_url, "/placeholder-gem.png")}
+                        alt={item.gem_name}
+                        className={`w-full h-full object-contain drop-shadow-sm transition-transform duration-500 ${isSold ? "grayscale opacity-80" : "group-hover:scale-110"}`}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "/placeholder-gem.png";
+                        }}
+                      />
+                      {isSold && (
+                        <div className="absolute inset-0 flex items-center justify-center z-10">
+                          <span className="bg-black/70 text-white px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-sm">
+                            Sold Out
+                          </span>
+                        </div>
+                      )}
+                      <button 
+                        onClick={(e) => handleRemoveWishlistItem(e, item.gem_id)}
+                        className="absolute top-3 right-3 h-9 w-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm text-red-500 hover:bg-red-50 transition-colors z-20 pointer-events-auto"
+                      >
+                        <Heart className="h-4 w-4 fill-current" />
+                      </button>
+                    </div>
+                    <div className="p-4 md:p-5 flex-1 flex flex-col justify-between border-t border-gray-50">
+                      <div>
+                        <h3 className={`font-bold transition-colors line-clamp-1 mb-1 ${isSold ? "text-gray-500" : "text-gray-900 group-hover:text-red-700"}`}>
+                          {item.gem_name}
+                        </h3>
+                        <p className="text-xs font-medium text-gray-400 mb-3">
+                          {item.carat} ct • {item.cut}
+                        </p>
+                      </div>
+                      <p className={`font-bold text-base ${isSold ? "text-gray-400 line-through" : "text-[#cc000b]"}`}>
+                        LKR {Number(item.price).toLocaleString()}
                       </p>
                     </div>
-                    <p className="font-bold text-[#cc000b] text-base">
-                      LKR {Number(item.price).toLocaleString()}
-                    </p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
 
