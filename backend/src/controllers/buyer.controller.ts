@@ -398,3 +398,99 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
   }
 };
 
+export const getPendingReviews = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          g.seller_id AS id,
+          u.full_name AS fullName,
+          s.business_name AS businessName,
+          MAX(g.gem_name) AS latest_item_name,
+          MIN(gi.image_url) AS image_url,
+          MAX(o.created_at) AS order_date
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        JOIN seller s ON g.seller_id = s.seller_id
+        JOIN user u ON s.seller_id = u.user_id
+        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+        LEFT JOIN seller_reviews sr ON sr.buyer_id = o.buyer_id AND sr.seller_id = g.seller_id
+        WHERE o.buyer_id = ?
+          AND o.order_status = 'Delivered'
+          AND sr.review_id IS NULL
+        GROUP BY g.seller_id, u.full_name, s.business_name
+        ORDER BY order_date DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load pending reviews" });
+  }
+};
+
+export const getCompletedReviews = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          sr.review_id AS id,
+          sr.seller_id,
+          s.business_name AS businessName,
+          u.full_name AS fullName,
+          sr.rating,
+          sr.review AS comment,
+          sr.review_date AS date
+        FROM seller_reviews sr
+        JOIN seller s ON sr.seller_id = s.seller_id
+        JOIN user u ON s.seller_id = u.user_id
+        WHERE sr.buyer_id = ?
+        ORDER BY sr.review_date DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load completed reviews" });
+  }
+};
+
+export const updateReview = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id: review_id } = req.params;
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: "Rating must be between 1 and 5" });
+    }
+
+    const [result]: any = await db.query(
+      `
+        UPDATE seller_reviews
+        SET rating = ?, review = ?
+        WHERE review_id = ? AND buyer_id = ?
+      `,
+      [rating, comment || "", review_id, buyerId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Review not found or unauthorized" });
+    }
+
+    return res.json({ message: "Review updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to update review" });
+  }
+};
+
