@@ -158,7 +158,7 @@ function SignIn() {
 
       {/* === Top Navigation Bar === */}
       <nav className="w-full px-6 sm:px-12 md:px-48 py-4 flex justify-between items-center border-b border-gray-100 bg-white">
-        <img src={logo} alt="Gemellery Logo" className="h-10 w-auto" />
+        <img src="src\assets\logos\Elegance Jewelry.png" alt="Gemellery Logo" className="h-10 w-auto" />
         <span className="flex items-center gap-1.5 text-xs font-semibold text-[#1F7A73]">
           <LockKeyhole size={14} /> Secure
         </span>
