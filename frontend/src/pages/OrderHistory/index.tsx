@@ -272,7 +272,9 @@ function OrderHistory() {
                         <img
                           src={
                             order.image_url
-                              ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
+                              ? (order.image_url.startsWith('http://') || order.image_url.startsWith('https://')
+                                  ? order.image_url
+                                  : `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`)
                               : image
                           }
                           alt="Order"
@@ -427,7 +429,9 @@ function OrderHistory() {
                         <img
                           src={
                             item.image_url
-                              ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`
+                              ? (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')
+                                  ? item.image_url
+                                  : `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`)
                               : image
                           }
                           alt={item.gem_name}
