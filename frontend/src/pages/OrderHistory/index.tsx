@@ -46,6 +46,7 @@ interface Order {
   city: string;
   state: string;
   zip: string;
+  country: string;
   item_count: number;
   image_url?: string;
   gem_name?: string;
@@ -182,7 +183,7 @@ function OrderHistory() {
   const filteredOrders = orders.filter(
     (order) =>
       order.order_id.toString().includes(searchTerm) ||
-      order.city.toLowerCase().includes(searchTerm.toLowerCase())
+      (order.city || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -315,7 +316,7 @@ function OrderHistory() {
                             </div>
                             <div className="flex items-center gap-2">
                               <MapPin className="w-4 h-4" />
-                              {order.city}, {order.state}
+                              {order.city}, {order.state} {order.country}
                             </div>
                           </div>
                         </div>

@@ -182,14 +182,16 @@ export const getAllOrders = async (req: Request, res: Response) => {
         o.total_amount,
         o.created_at,
         o.payment_method,
-        NULL AS address_line1,
-        NULL AS city,
-        NULL AS state,
-        NULL AS zip,
+        sa.street AS address_line1,
+        sa.city,
+        '' AS state,
+        sa.postal_code AS zip,
+        sa.country AS country,
         MIN(gi.image_url) AS image_url,
         GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
         COUNT(DISTINCT oi.order_item_id) AS item_count
       FROM orders o
+      LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
       LEFT JOIN order_items oi ON oi.order_id = o.order_id
       LEFT JOIN gem g ON g.gem_id = oi.gem_id
       LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
@@ -206,7 +208,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     }
 
     dataQuery += `
-      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method
+      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method, sa.street, sa.city, sa.postal_code, sa.country
       ORDER BY o.${sort} ${order}
       LIMIT ? OFFSET ?
     `;
@@ -251,17 +253,18 @@ export const getOrderDetails = async (req: Request, res: Response) => {
           o.total_amount,
           o.created_at,
           o.payment_method,
-          NULL AS address_line1,
+          sa.street AS address_line1,
           NULL AS address_line2,
-          NULL AS city,
-          NULL AS state,
-          NULL AS zip,
-          NULL AS country,
-          NULL AS phone_number,
-          u.full_name,
+          sa.city,
+          '' AS state,
+          sa.postal_code AS zip,
+          sa.country,
+          u.mobile AS phone_number,
+          COALESCE(NULLIF(CONCAT(sa.first_name, ' ', sa.last_name), ' '), u.full_name) AS full_name,
           u.email
         FROM orders o
         LEFT JOIN user u ON u.user_id = o.buyer_id
+        LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
         WHERE o.order_id = ? AND o.buyer_id = ?
       `,
       [id, buyerId]
