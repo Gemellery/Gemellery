@@ -138,6 +138,7 @@ const ProductDetail = () => {
             <ProductGallery
               images={displayImages}
               productName={product.gem_name}
+              verified={product.verified}
             />
 
             {/* AI Design Studio */}

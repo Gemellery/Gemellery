@@ -173,7 +173,8 @@ export default function SellerShipments() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8 bg-gray-50">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto bg-gray-50 flex flex-col">
+        <div className="p-6 md:p-8 flex-1">
         {/* Header */}
         <div className="flex items-center mb-6">
           <button
@@ -380,6 +381,7 @@ export default function SellerShipments() {
               </div>
           </div>
         )}
+        </div>
         <Footer />
       </main>
 

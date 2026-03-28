@@ -100,7 +100,7 @@ function SellerDashboardLayout() {
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
                 <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <button
@@ -132,7 +132,7 @@ function SellerDashboardLayout() {
                     </button>
                 </div>
 
-                <div className="px-6 pt-4 pb-6 md:px-10 md:pt-5 md:pb-10 max-w-7xl mx-auto">
+                <div className="px-6 pt-4 pb-6 md:px-10 md:pt-5 md:pb-10 max-w-7xl mx-auto flex-1 w-full">
 
                 {/* Verification Status Banner */}
                 {seller && (
