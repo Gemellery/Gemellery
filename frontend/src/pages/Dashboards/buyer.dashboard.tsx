@@ -249,7 +249,9 @@ function BuyerDashboardLayout() {
                             <img
                             src={
                                 order.image_url
-                                ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
+                                ? (order.image_url.startsWith('http://') || order.image_url.startsWith('https://')
+                                    ? order.image_url
+                                    : `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`)
                                 : image
                             }
                             alt="Order item"
