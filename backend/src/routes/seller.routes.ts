@@ -28,10 +28,13 @@ router.patch("/gems/:id/status", authGuard, authorizeRole("seller"), updateGemSt
 router.post("/:id/reviews", authGuard, async (req: Request, res: Response) => {
   const sellerId = req.params.id;
   const buyerId = (req as any).user?.id;
-  const { rating, comment } = req.body;
+  const { rating, comment, order_id } = req.body;
 
   if (!buyerId) {
     return res.status(401).json({ message: "Not authenticated" });
+  }
+  if (!order_id) {
+    return res.status(400).json({ message: "Order ID is required" });
   }
   if (!rating || rating < 1 || rating > 5) {
     return res.status(400).json({ message: "Rating must be between 1 and 5" });
@@ -40,9 +43,9 @@ router.post("/:id/reviews", authGuard, async (req: Request, res: Response) => {
   try {
     // Insert the review
     const [insertResult]: any = await pool.query(
-      `INSERT INTO seller_reviews (seller_id, buyer_id, rating, review, review_date)
-       VALUES (?, ?, ?, ?, NOW())`,
-      [sellerId, buyerId, rating, comment || ""]
+      `INSERT INTO seller_reviews (seller_id, buyer_id, order_id, rating, review, review_date)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [sellerId, buyerId, order_id, rating, comment || ""]
     );
 
     // Fetch buyer name to return with the response

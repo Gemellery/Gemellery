@@ -12,6 +12,7 @@ interface PendingReview {
   latest_item_name: string;
   image_url: string;
   order_date: string;
+  order_id: number;
 }
 
 interface CompletedReview {
@@ -34,7 +35,7 @@ export default function BuyerReviews() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
-  const [selectedSeller, setSelectedSeller] = useState<{ id: number; name: string } | null>(null);
+  const [selectedSeller, setSelectedSeller] = useState<{ id: number; name: string; order_id?: number } | null>(null);
   const [selectedReview, setSelectedReview] = useState<CompletedReview | null>(null);
 
   const fetchReviews = async () => {
@@ -60,9 +61,9 @@ export default function BuyerReviews() {
     fetchReviews();
   }, []);
 
-  const handleOpenCreateMoadal = (sellerId: number, name: string) => {
+  const handleOpenCreateMoadal = (sellerId: number, name: string, orderId: number) => {
     setModalMode("create");
-    setSelectedSeller({ id: sellerId, name });
+    setSelectedSeller({ id: sellerId, name, order_id: orderId });
     setSelectedReview(null);
     setIsModalOpen(true);
   };
@@ -82,7 +83,7 @@ export default function BuyerReviews() {
         const res = await fetch(`${API_CONFIG.BASE_URL}/api/seller/${selectedSeller.id}/reviews`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ rating, comment }),
+          body: JSON.stringify({ rating, comment, order_id: selectedSeller.order_id }),
         });
         if (!res.ok) throw new Error("Failed to submit review");
         toast.success("Review submitted successfully");
@@ -202,7 +203,7 @@ export default function BuyerReviews() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleOpenCreateMoadal(seller.id, seller.businessName || seller.fullName)}
+                      onClick={() => handleOpenCreateMoadal(seller.id, seller.businessName || seller.fullName, seller.order_id)}
                       className="w-full sm:w-auto px-6 py-2.5 bg-white border border-[#cc000b] text-[#cc000b] font-semibold rounded-xl hover:bg-red-50 transition-colors shrink-0"
                     >
                       Review Seller

@@ -414,7 +414,8 @@ export const getPendingReviews = async (req: Request, res: Response) => {
           s.business_name AS businessName,
           MAX(g.gem_name) AS latest_item_name,
           MIN(gi.image_url) AS image_url,
-          MAX(o.created_at) AS order_date
+          MAX(o.created_at) AS order_date,
+          MAX(o.order_id) AS order_id
         FROM orders o
         JOIN order_items oi ON o.order_id = oi.order_id
         JOIN gem g ON oi.gem_id = g.gem_id
