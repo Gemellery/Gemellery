@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import { saveContactMessage } from '../models/contactModel';
 
+
 export const sendContactMessage = async (req: Request, res: Response): Promise<void> => {
   const { firstName, lastName, email, inquiryType, message, subscribe } = req.body;
 
@@ -39,7 +40,7 @@ export const sendContactMessage = async (req: Request, res: Response): Promise<v
 
     await transporter.sendMail({
       from: `"Gemellery Contact Form" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_TO,
+      to: process.env.EMAIL_TO || process.env.EMAIL_USER,
       replyTo: email,
       subject: `[${inquiryType || 'General Inquiry'}] New message from ${firstName} ${lastName}`,
       html: `
@@ -48,8 +49,8 @@ export const sendContactMessage = async (req: Request, res: Response): Promise<v
           <tr><td><strong>Name</strong></td><td>${firstName} ${lastName}</td></tr>
           <tr><td><strong>Email</strong></td><td>${email}</td></tr>
           <tr><td><strong>Inquiry Type</strong></td><td>${inquiryType}</td></tr>
-          <tr><td><strong>Subscribe</strong></td><td>${subscribe ? 'Yes' : 'No'}</td></tr>
           <tr><td><strong>Message</strong></td><td>${message}</td></tr>
+          <tr><td><strong>Subscribe</strong></td><td>${subscribe ? 'Yes' : 'No'}</td></tr>
         </table>
       `,
     });
