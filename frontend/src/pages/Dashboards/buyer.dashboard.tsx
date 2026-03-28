@@ -15,6 +15,7 @@ import image from "../../assets/logos/example_ring.png";
 import API_CONFIG from "../../lib/api.config";
 import { getUserDesigns } from "../../lib/jewelry-designer/api";
 import type { JewelryDesign } from "../../lib/jewelry-designer/types";
+import { removeFromWishlist as removeFromWishlistApi } from "../../lib/wishlist/api";
 
 interface Summary {
   activeOrders: number;
@@ -39,6 +40,16 @@ interface WishlistItem {
   cut: string;
   price: number;
   image_url: string | null;
+  status?: string;
+}
+
+/** Handles both full S3 URLs and bare filenames */
+function getGemImageSrc(image_url: string | null, fallback: string): string {
+  if (!image_url) return fallback;
+  if (image_url.startsWith("http")) return image_url;
+  if (image_url.includes("uploads/")) return `${API_CONFIG.BASE_URL}/${image_url.startsWith("/") ? image_url.substring(1) : image_url}`;
+  if (image_url.includes("gem_images/")) return `${API_CONFIG.BASE_URL}/uploads/${image_url}`;
+  return `${API_CONFIG.BASE_URL}/uploads/gem_images/${image_url}`;
 }
 
 function BuyerDashboardLayout() {
@@ -56,6 +67,16 @@ function BuyerDashboardLayout() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [designs, setDesigns] = useState<JewelryDesign[]>([]);
   const [designsLoading, setDesignsLoading] = useState(true);
+
+  const handleRemoveWishlistItem = async (e: React.MouseEvent, gemId: number) => {
+    e.stopPropagation();
+    try {
+      await removeFromWishlistApi(gemId);
+      setWishlist((prev) => prev.filter((item) => item.gem_id !== gemId));
+    } catch (err) {
+      console.error("failed to remove item", err);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -147,9 +168,9 @@ function BuyerDashboardLayout() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
+      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
         {/* Header container */}
-        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+        <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -176,7 +197,7 @@ function BuyerDashboardLayout() {
           </button>
         </div>
 
-        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-12">
+        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-12 flex-1">
 
           {/* Summary cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -242,16 +263,12 @@ function BuyerDashboardLayout() {
                   {orders.slice(0, 4).map((order) => (
                     <div
                       key={order.order_id}
-                      className="p-4 md:px-6 md:py-5 flex items-center justify-between"
+                      className="p-4 md:px-6 md:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-gray-50 rounded-xl border border-gray-100 overflow-hidden shrink-0 flex items-center justify-center p-1">
                             <img
-                            src={
-                                order.image_url
-                                ? `${API_CONFIG.BASE_URL}/uploads/gem_images/${order.image_url}`
-                                : image
-                            }
+                            src={getGemImageSrc(order.image_url, image)}
                             alt="Order item"
                             className="w-full h-full object-contain rounded-lg"
                             onError={(e) => {
@@ -270,7 +287,7 @@ function BuyerDashboardLayout() {
                         </div>
                       </div>
                       
-                      <div className="flex flex-col items-end gap-2">
+                      <div className="flex w-full sm:w-auto items-center sm:flex-col justify-between sm:items-end gap-2">
                         <span className="font-bold text-gray-900">
                           LKR {Number(order.total_amount).toLocaleString()}
                         </span>
@@ -317,54 +334,63 @@ function BuyerDashboardLayout() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {wishlist.length === 0 && (
                 <div className="col-span-full p-8 text-center text-gray-500 bg-white border border-gray-100 rounded-2xl shadow-sm">
                   Your wishlist is empty.
                 </div>
               )}
 
-              {wishlist.slice(0, 4).map((item) => (
-                <div
-                  key={item.wishlist_id}
-                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
-                  onClick={() => navigate(`/product-detail/${item.gem_id}`)}
-                >
-                  <div className="relative aspect-square bg-gray-50/50 p-6 flex-shrink-0">
-                    <img
-                      src={
-                        item.image_url
-                          ? (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')
-                              ? item.image_url
-                              : `${API_CONFIG.BASE_URL}/uploads/gem_images/${item.image_url}`)
-                          : "/placeholder-gem.png"
-                      }
-                      alt={item.gem_name}
-                      className="w-full h-full object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "/placeholder-gem.png";
-                      }}
-                    />
-                    <button className="absolute top-3 right-3 h-9 w-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm text-red-500 hover:bg-red-50 transition-colors z-10">
-                      <Heart className="h-4 w-4 fill-current" />
-                    </button>
-                  </div>
-                  <div className="p-4 md:p-5 flex-1 flex flex-col justify-between border-t border-gray-50">
-                    <div>
-                      <h3 className="font-bold text-gray-900 group-hover:text-red-700 transition-colors line-clamp-1 mb-1">
-                        {item.gem_name}
-                      </h3>
-                      <p className="text-xs font-medium text-gray-400 mb-3">
-                        {item.carat} ct • {item.cut}
+              {wishlist.slice(0, 4).map((item) => {
+                const isSold = item.status?.toLowerCase() === 'sold';
+                return (
+                  <div
+                    key={item.wishlist_id}
+                    className={`bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 group flex flex-col relative ${
+                      isSold ? "opacity-70 pointer-events-none" : "hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.08)] hover:-translate-y-1 cursor-pointer"
+                    }`}
+                    onClick={() => !isSold && navigate(`/product-detail/${item.gem_id}`)}
+                  >
+                    <div className="relative aspect-square bg-gray-50/50 p-6 flex-shrink-0">
+                      <img
+                        src={getGemImageSrc(item.image_url, "/placeholder-gem.png")}
+                        alt={item.gem_name}
+                        className={`w-full h-full object-contain drop-shadow-sm transition-transform duration-500 ${isSold ? "grayscale opacity-80" : "group-hover:scale-110"}`}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "/placeholder-gem.png";
+                        }}
+                      />
+                      {isSold && (
+                        <div className="absolute inset-0 flex items-center justify-center z-10">
+                          <span className="bg-black/70 text-white px-4 py-2 rounded-full font-bold text-xs uppercase tracking-wider backdrop-blur-sm">
+                            Sold Out
+                          </span>
+                        </div>
+                      )}
+                      <button 
+                        onClick={(e) => handleRemoveWishlistItem(e, item.gem_id)}
+                        className="absolute top-3 right-3 h-9 w-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm text-red-500 hover:bg-red-50 transition-colors z-20 pointer-events-auto"
+                      >
+                        <Heart className="h-4 w-4 fill-current" />
+                      </button>
+                    </div>
+                    <div className="p-4 md:p-5 flex-1 flex flex-col justify-between border-t border-gray-50">
+                      <div>
+                        <h3 className={`font-bold transition-colors line-clamp-1 mb-1 ${isSold ? "text-gray-500" : "text-gray-900 group-hover:text-red-700"}`}>
+                          {item.gem_name}
+                        </h3>
+                        <p className="text-xs font-medium text-gray-400 mb-3">
+                          {item.carat} ct • {item.cut}
+                        </p>
+                      </div>
+                      <p className={`font-bold text-base ${isSold ? "text-gray-400 line-through" : "text-[#cc000b]"}`}>
+                        LKR {Number(item.price).toLocaleString()}
                       </p>
                     </div>
-                    <p className="font-bold text-[#cc000b] text-base">
-                      LKR {Number(item.price).toLocaleString()}
-                    </p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
 
@@ -393,7 +419,7 @@ function BuyerDashboardLayout() {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {designsLoading ? (
                 /* Skeleton Loaders */
                 [1, 2, 3, 4].map((i) => (

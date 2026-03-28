@@ -1,7 +1,9 @@
 import logo from '../assets/logos/Elegance Jewelry.png';
 import { Instagram, Linkedin, X, Facebook } from 'lucide-react';
 
+
 function AdvancedFooter() {
+        
     return (
         <>
             <footer className="w-full bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-xl border-t border-white/30 shadow-2xl flex flex-col items-center justify-center">
@@ -70,12 +72,6 @@ function AdvancedFooter() {
                             <li>
                                 <a href="/terms-and-conditions" className="text-gray-700 hover:text-[#D4AF37] cursor-pointer transition-colors duration-300">
                                     Terms of Service
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/help" className="text-gray-700 hover:text-[#D4AF37] cursor-pointer transition-colors duration-300">
-                                    Need Help ?
                                 </a>
                             </li>
                         </ul>

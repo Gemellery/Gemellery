@@ -100,8 +100,8 @@ function SellerDashboardLayout() {
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto w-full">
-                <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-50">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+                <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setSidebarOpen(true)}
@@ -132,11 +132,11 @@ function SellerDashboardLayout() {
                     </button>
                 </div>
 
-                <div className="px-6 pt-4 pb-6 md:px-10 md:pt-5 md:pb-10 max-w-7xl mx-auto">
+                <div className="px-6 pt-4 pb-6 md:px-10 md:pt-5 md:pb-10 max-w-7xl mx-auto flex-1 w-full">
 
                 {/* Verification Status Banner */}
                 {seller && (
-                    <div className={`rounded-2xl p-4 mb-6 flex items-center gap-4 border ${seller.verification_status === "approved"
+                    <div className={`rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 border ${seller.verification_status === "approved"
                         ? "bg-green-100 border-green-300"
                         : seller.verification_status === "pending"
                             ? "bg-yellow-50 border-yellow-200"
@@ -144,7 +144,7 @@ function SellerDashboardLayout() {
                                 ? "bg-red-50 border-red-200"
                                 : "bg-orange-50 border-orange-200"
                         }`}>
-                        <div className={`p-3 rounded-xl ${seller.verification_status === "approved"
+                        <div className={`p-3 rounded-xl shrink-0 ${seller.verification_status === "approved"
                             ? "bg-green-200"
                             : seller.verification_status === "pending"
                                 ? "bg-yellow-100"
@@ -198,7 +198,7 @@ function SellerDashboardLayout() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
 
                     {/* Total Revenue */}
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
@@ -273,7 +273,7 @@ function SellerDashboardLayout() {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
 
                     {gemsLoading && (
                         [1,2,3,4].map((i) => (

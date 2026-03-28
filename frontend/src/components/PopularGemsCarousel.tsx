@@ -55,9 +55,9 @@ function PrevArrow({ onClick }: { onClick?: () => void }) {
     return (
         <button
             onClick={onClick}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:bg-[#1F7A73] hover:text-white hover:border-[#1F7A73] transition-all duration-200"
+            className="absolute left-0 sm:left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-5 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:bg-[#1F7A73] hover:text-white hover:border-[#1F7A73] transition-all duration-200"
         >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
         </button>
     );
 }
@@ -66,9 +66,9 @@ function NextArrow({ onClick }: { onClick?: () => void }) {
     return (
         <button
             onClick={onClick}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 z-10 w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:bg-[#1F7A73] hover:text-white hover:border-[#1F7A73] transition-all duration-200"
+            className="absolute right-0 sm:right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-5 z-10 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center hover:bg-[#1F7A73] hover:text-white hover:border-[#1F7A73] transition-all duration-200"
         >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
         </button>
     );
 }
@@ -96,15 +96,15 @@ export default function PopularGemsCarousel() {
     };
 
     return (
-        <div className="w-full py-24 px-6 bg-[#f7f8fa]">
+        <div className="w-full py-16 md:py-24 px-4 sm:px-6 bg-[#f7f8fa]">
             <div className="max-w-7xl mx-auto">
                 <p className="text-center text-xs uppercase tracking-widest text-[#C9A24D] font-bold mb-2">
                     Collection
                 </p>
-                <h2 className="text-center text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
+                <h2 className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
                     Popular Gemstones
                 </h2>
-                <p className="text-center text-gray-500 text-base max-w-xl mx-auto mb-14">
+                <p className="text-center text-gray-500 text-sm md:text-base max-w-xl mx-auto mb-10 md:mb-14 px-2">
                     NGJA-certified gems sourced directly from Sri Lanka's finest mining regions —
                     each verified on the blockchain.
                 </p>

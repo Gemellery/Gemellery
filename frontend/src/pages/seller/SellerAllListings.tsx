@@ -61,7 +61,8 @@ function SellerAllListings() {
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
+            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+                <div className="p-6 md:p-8 flex-1">
                 <div className="flex items-center mb-6">
                     <button
                         onClick={() => setSidebarOpen(true)}
@@ -75,7 +76,7 @@ function SellerAllListings() {
                     </h1>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mt-6">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4 mt-6 flex-1">
 
                     {loading && (
                         <p className="col-span-full text-sm text-gray-500">
@@ -133,8 +134,7 @@ function SellerAllListings() {
                         </div>
                     ))}
                 </div>
-
-
+                </div>
                 <Footer />
             </main>
         </div>

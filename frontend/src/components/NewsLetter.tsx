@@ -9,7 +9,7 @@ function NewsLetter() {
     return (
         <div
             ref={ref}
-            className="w-full py-20 px-6"
+            className="w-full py-16 md:py-20 px-4 sm:px-6"
             style={{ background: "linear-gradient(135deg, #071018 0%, #0d1a28 100%)" }}
         >
             <div className="max-w-6xl mx-auto">
@@ -30,13 +30,13 @@ function NewsLetter() {
                         initial={{ opacity: 0, x: 30 }}
                         animate={inView ? { opacity: 1, x: 0 } : {}}
                         transition={{ duration: 0.55, delay: 0.15 }}
-                        className="p-8 md:p-12 flex flex-col gap-5 bg-white/4 backdrop-blur-md border-l border-white/8"
+                        className="p-6 sm:p-8 md:p-12 flex flex-col gap-4 sm:gap-5 bg-white/4 backdrop-blur-md border-t md:border-t-0 md:border-l border-white/8"
                     >
                         <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#C9A24D]/30 bg-[#C9A24D]/10 text-[#C9A24D] w-fit">
                             Newsletter
                         </span>
 
-                        <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+                        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight">
                             Stay Connected with{" "}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A24D] to-[#FFE066]">
                                 Gemellery

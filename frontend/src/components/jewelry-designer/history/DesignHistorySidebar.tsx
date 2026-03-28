@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, History, ChevronLeft, ChevronRight, Gem, Clock } from 'lucide-react';
-import { getUserDesigns } from '../../../lib/jewelry-designer/api';
+import { Plus, History, ChevronLeft, ChevronRight, Gem, Clock, MoreHorizontal, Pin, Trash2 } from 'lucide-react';
+import { getUserDesigns, deleteDesign } from '../../../lib/jewelry-designer/api';
 import type { JewelryDesign } from '../../../lib/jewelry-designer/types';
 
 interface DesignHistorySidebarProps {
@@ -10,7 +10,7 @@ interface DesignHistorySidebarProps {
     onDesignCreated?: number; // design ID to trigger refresh
 }
 
-// Group designs by date
+// Group designs by date (pinned designs always on top)
 function groupByDate(designs: JewelryDesign[]): { label: string; designs: JewelryDesign[] }[] {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -35,7 +35,6 @@ function groupByDate(designs: JewelryDesign[]): { label: string; designs: Jewelr
     return groups.filter((g) => g.designs.length > 0);
 }
 
-// Get a small thumbnail from the first generated image (or a placeholder)
 function getDesignThumbnail(design: JewelryDesign): string | null {
     if (design.generatedImages && design.generatedImages.length > 0) {
         return design.generatedImages[0].thumbnailUrl || design.generatedImages[0].url;
@@ -51,17 +50,25 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
     const navigate = useNavigate();
     const location = useLocation();
     const [designs, setDesigns] = useState<JewelryDesign[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [pinnedIds, setPinnedIds] = useState<Set<number>>(() => {
+        try {
+            const stored = localStorage.getItem('pinnedDesigns');
+            return stored ? new Set(JSON.parse(stored)) : new Set();
+        } catch {
+            return new Set();
+        }
+    });
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const fetchDesigns = useCallback(async () => {
-        setLoading(true);
         try {
             const data = await getUserDesigns();
-            // Sort newest first
             setDesigns(data.sort((a: JewelryDesign, b: JewelryDesign) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         } catch (err) {
             console.error('Failed to load design history:', err);
-            setDesigns([]);
         } finally {
             setLoading(false);
         }
@@ -71,9 +78,68 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
         fetchDesigns();
     }, [fetchDesigns, onDesignCreated, location.pathname]);
 
-    const groups = groupByDate(designs);
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setOpenMenuId(null);
+            }
+        };
+        if (openMenuId !== null) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [openMenuId]);
 
-    // Check if a design is currently selected
+    const togglePin = (designId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        setPinnedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(designId)) {
+                next.delete(designId);
+            } else {
+                next.add(designId);
+            }
+            localStorage.setItem('pinnedDesigns', JSON.stringify([...next]));
+            return next;
+        });
+    };
+
+    const handleDelete = async (designId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setOpenMenuId(null);
+        setDeletingId(designId);
+        try {
+            await deleteDesign(designId);
+            setDesigns(prev => prev.filter(d => d.id !== designId));
+            // If we're viewing the deleted design, navigate away
+            if (location.pathname.includes(`/jewelry-designer/design/${designId}`)) {
+                navigate('/jewelry-designer');
+            }
+        } catch (err) {
+            console.error('Failed to delete design:', err);
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    // Sort: pinned first, then by date
+    const sortedDesigns = [
+        ...designs.filter(d => pinnedIds.has(d.id)),
+        ...designs.filter(d => !pinnedIds.has(d.id)),
+    ];
+
+    // Pinned group + date groups for unpinned
+    const pinnedDesigns = sortedDesigns.filter(d => pinnedIds.has(d.id));
+    const unpinnedDesigns = sortedDesigns.filter(d => !pinnedIds.has(d.id));
+    const dateGroups = groupByDate(unpinnedDesigns);
+
+    const allGroups: { label: string; designs: JewelryDesign[] }[] = [
+        ...(pinnedDesigns.length > 0 ? [{ label: '📌 Pinned', designs: pinnedDesigns }] : []),
+        ...dateGroups,
+    ];
+
     const getActiveDesignId = (): number | null => {
         const match = location.pathname.match(/\/jewelry-designer\/design\/(\d+)/);
         return match ? parseInt(match[1]) : null;
@@ -84,57 +150,17 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
         navigate(`/jewelry-designer/design/${designId}`);
     };
 
-    const handleNewDesign = () => {
-        navigate('/jewelry-designer');
-    };
-
-    // Sidebar styles
-    const sidebarStyle: React.CSSProperties = {
-        width: isOpen ? '280px' : '0px',
-        minWidth: isOpen ? '280px' : '0px',
-        height: '100%',
-        background: '#FFFFFF',
-        borderRight: isOpen ? '1px solid #E5E7EB' : 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        transition: 'width 0.3s ease, min-width 0.3s ease',
-        position: 'relative',
-        fontFamily: "'Market Sans', sans-serif",
-    };
-
-    const toggleBtnStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: '16px',
-        right: isOpen ? '12px' : '-36px',
-        width: '28px',
-        height: '28px',
-        borderRadius: '6px',
-        background: '#F3F4F6',
-        border: '1px solid #E5E7EB',
-        color: '#6B7280',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        zIndex: 10,
-        transition: 'all 0.2s ease',
-    };
+    const sidebarClasses = `
+        h-full bg-white flex flex-col overflow-hidden transition-all duration-300 relative
+        ${isOpen ? 'w-[280px] min-w-[280px] border-r border-gray-200' : 'w-0 min-w-0 border-r-0'}
+    `;
 
     return (
-        <div style={sidebarStyle}>
+        <div className={sidebarClasses} style={{ fontFamily: "'Market Sans', sans-serif" }}>
             {/* Toggle button */}
             <div
-                style={toggleBtnStyle}
+                className={`absolute top-4 ${isOpen ? 'right-3' : '-right-9'} w-7 h-7 rounded-md bg-gray-100 border border-gray-200 text-gray-500 flex items-center justify-center cursor-pointer z-10 transition-all duration-200 hover:bg-gray-200 hover:text-gray-900 md:flex hidden`}
                 onClick={onToggle}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#E5E7EB';
-                    e.currentTarget.style.color = '#111827';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#F3F4F6';
-                    e.currentTarget.style.color = '#6B7280';
-                }}
             >
                 {isOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
             </div>
@@ -149,10 +175,8 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
                                 Design History
                             </span>
                         </div>
-
-                        {/* New Design button */}
                         <button
-                            onClick={handleNewDesign}
+                            onClick={() => navigate('/jewelry-designer')}
                             style={{
                                 width: '100%',
                                 padding: '10px 14px',
@@ -184,7 +208,7 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
                     </div>
 
                     {/* Design list */}
-                    <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
+                    <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }} ref={menuRef}>
                         {loading ? (
                             <div style={{ textAlign: 'center', padding: '24px', color: '#6B7280' }}>
                                 <Clock size={20} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.5 }} />
@@ -199,38 +223,37 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
                                 </p>
                             </div>
                         ) : (
-                            groups.map((group) => (
+                            allGroups.map((group) => (
                                 <div key={group.label} style={{ marginBottom: '12px' }}>
-                                    {/* Group label */}
-                                    <div
-                                        style={{
-                                            fontSize: '11px',
-                                            color: '#6B7280',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.5px',
-                                            padding: '4px 8px',
-                                            fontWeight: 600,
-                                        }}
-                                    >
+                                    <div style={{
+                                        fontSize: '11px',
+                                        color: '#6B7280',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.5px',
+                                        padding: '4px 8px',
+                                        fontWeight: 600,
+                                    }}>
                                         {group.label}
                                     </div>
 
-                                    {/* Designs in group */}
                                     {group.designs.map((design) => {
                                         const isActive = activeDesignId === design.id;
+                                        const isPinned = pinnedIds.has(design.id);
+                                        const isDeleting = deletingId === design.id;
+                                        const isMenuOpen = openMenuId === design.id;
                                         const thumb = getDesignThumbnail(design);
 
                                         return (
                                             <div
                                                 key={design.id}
-                                                onClick={() => handleDesignClick(design.id)}
                                                 style={{
+                                                    position: 'relative',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: '10px',
                                                     padding: '8px',
                                                     borderRadius: '8px',
-                                                    cursor: 'pointer',
+                                                    cursor: isDeleting ? 'wait' : 'pointer',
                                                     background: isActive
                                                         ? 'rgba(212, 175, 55, 0.12)'
                                                         : 'transparent',
@@ -239,41 +262,40 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
                                                         : '1px solid transparent',
                                                     marginBottom: '2px',
                                                     transition: 'all 0.15s ease',
+                                                    opacity: isDeleting ? 0.4 : 1,
                                                 }}
+                                                onClick={() => !isDeleting && handleDesignClick(design.id)}
                                                 onMouseEnter={(e) => {
-                                                    if (!isActive) {
-                                                        e.currentTarget.style.background = '#F9FAFB';
-                                                    }
+                                                    if (!isActive) e.currentTarget.style.background = '#F9FAFB';
+                                                    // Show the three-dot button
+                                                    const btn = e.currentTarget.querySelector<HTMLElement>('.three-dot-btn');
+                                                    if (btn) btn.style.opacity = '1';
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    if (!isActive) {
-                                                        e.currentTarget.style.background = 'transparent';
+                                                    if (!isActive) e.currentTarget.style.background = 'transparent';
+                                                    if (!isMenuOpen) {
+                                                        const btn = e.currentTarget.querySelector<HTMLElement>('.three-dot-btn');
+                                                        if (btn) btn.style.opacity = '0';
                                                     }
                                                 }}
                                             >
                                                 {/* Thumbnail */}
-                                                <div
-                                                    style={{
-                                                        width: '36px',
-                                                        height: '36px',
-                                                        borderRadius: '6px',
-                                                        background: '#F3F4F6',
-                                                        flexShrink: 0,
-                                                        overflow: 'hidden',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                    }}
-                                                >
+                                                <div style={{
+                                                    width: '36px',
+                                                    height: '36px',
+                                                    borderRadius: '6px',
+                                                    background: '#F3F4F6',
+                                                    flexShrink: 0,
+                                                    overflow: 'hidden',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                }}>
                                                     {thumb ? (
                                                         <img
                                                             src={thumb}
                                                             alt=""
-                                                            style={{
-                                                                width: '100%',
-                                                                height: '100%',
-                                                                objectFit: 'cover',
-                                                            }}
+                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                         />
                                                     ) : (
                                                         <Gem size={16} color="#4B5563" />
@@ -282,32 +304,120 @@ export const DesignHistorySidebar: React.FC<DesignHistorySidebarProps> = ({
 
                                                 {/* Info */}
                                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div
-                                                        style={{
-                                                            fontSize: '13px',
-                                                            color: isActive ? '#B8860B' : '#374151',
-                                                            fontWeight: isActive ? 600 : 400,
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis',
-                                                        }}
-                                                    >
+                                                    <div style={{
+                                                        fontSize: '13px',
+                                                        color: isActive ? '#B8860B' : '#374151',
+                                                        fontWeight: isActive ? 600 : 400,
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}>
+                                                        {isPinned && <span style={{ marginRight: '4px', fontSize: '11px' }}>📌</span>}
                                                         {design.gemType} {design.gemCut}
                                                     </div>
-                                                    <div
-                                                        style={{
-                                                            fontSize: '11px',
-                                                            color: '#6B7280',
-                                                            whiteSpace: 'nowrap',
-                                                            overflow: 'hidden',
-                                                            textOverflow: 'ellipsis',
-                                                        }}
-                                                    >
-                                                        {design.designPrompt.length > 30
-                                                            ? design.designPrompt.slice(0, 30) + '…'
+                                                    <div style={{
+                                                        fontSize: '11px',
+                                                        color: '#6B7280',
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}>
+                                                        {design.designPrompt.length > 28
+                                                            ? design.designPrompt.slice(0, 28) + '…'
                                                             : design.designPrompt}
                                                     </div>
                                                 </div>
+
+                                                {/* Three-dot menu button */}
+                                                <button
+                                                    className="three-dot-btn"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenMenuId(isMenuOpen ? null : design.id);
+                                                    }}
+                                                    style={{
+                                                        opacity: isMenuOpen ? 1 : 0,
+                                                        flexShrink: 0,
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        borderRadius: '4px',
+                                                        border: 'none',
+                                                        background: isMenuOpen ? '#F3F4F6' : 'transparent',
+                                                        color: '#6B7280',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        transition: 'opacity 0.15s ease, background 0.15s ease',
+                                                        padding: 0,
+                                                    }}
+                                                    title="More options"
+                                                >
+                                                    <MoreHorizontal size={14} />
+                                                </button>
+
+                                                {/* Dropdown Menu */}
+                                                {isMenuOpen && (
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '100%',
+                                                            right: '4px',
+                                                            zIndex: 100,
+                                                            background: '#FFFFFF',
+                                                            border: '1px solid #E5E7EB',
+                                                            borderRadius: '8px',
+                                                            boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                                                            minWidth: '140px',
+                                                            overflow: 'hidden',
+                                                        }}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <button
+                                                            onClick={(e) => togglePin(design.id, e)}
+                                                            style={{
+                                                                width: '100%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '8px',
+                                                                padding: '9px 12px',
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontSize: '13px',
+                                                                color: '#374151',
+                                                                textAlign: 'left',
+                                                            }}
+                                                            onMouseEnter={(e) => { e.currentTarget.style.background = '#F9FAFB'; }}
+                                                            onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                                                        >
+                                                            <Pin size={13} color="#D4AF37" />
+                                                            {isPinned ? 'Unpin' : 'Pin'}
+                                                        </button>
+                                                        <div style={{ height: '1px', background: '#F3F4F6' }} />
+                                                        <button
+                                                            onClick={(e) => handleDelete(design.id, e)}
+                                                            style={{
+                                                                width: '100%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '8px',
+                                                                padding: '9px 12px',
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                fontSize: '13px',
+                                                                color: '#DC2626',
+                                                                textAlign: 'left',
+                                                            }}
+                                                            onMouseEnter={(e) => { e.currentTarget.style.background = '#FEF2F2'; }}
+                                                            onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                                                        >
+                                                            <Trash2 size={13} />
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })}

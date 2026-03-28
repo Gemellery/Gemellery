@@ -3,6 +3,7 @@ import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import authRoutes from "./routes/auth.routes";
 import countryRoutes from "./routes/country.routes";
 import jewelryDesignRoutes from "./routes/jewelry-design.routes";
@@ -34,6 +35,17 @@ import reportRoutes from "./routes/report.routes";
 import systemSettingsRoutes from "./routes/systemSettings.routes";
 
 const app = express();
+
+// Enable gzip compression - but skip heavy AI generation endpoints to avoid CPU overhead on large base64 payloads
+app.use(compression({
+  filter: (req, res) => {
+    if (req.path.includes('/jewelry-design/generate') || req.path.includes('/jewelry-design/refine')) {
+      return false; // Skip compression for AI image endpoints
+    }
+    return compression.filter(req, res);
+  },
+  level: 6, // Good balance between speed and compression ratio
+}));
 
 app.use(
   cors({

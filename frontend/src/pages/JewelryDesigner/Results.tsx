@@ -1,23 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, AlertCircle, CheckCircle, Share2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle, Share2, AlertTriangle, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { JewelryDesign, GeneratedImage } from '../../lib/jewelry-designer/types';
-import { saveDesign } from '../../lib/jewelry-designer/api';
+import { generateDesign, saveDesign } from '../../lib/jewelry-designer/api';
 import { DesignGallery } from '../../components/jewelry-designer/results/DesignGallery';
 
 const JewelryResults: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    // Try location.state first, then sessionStorage fallback (for back-navigation)
-    const design = (location.state?.design ||
+
+    // Two modes:
+    // 1. pendingData — came from Designer.tsx immediately without waiting; we must call the API ourselves
+    // 2. design — already generated (e.g. back-navigation via sessionStorage)
+    const pendingData = location.state?.pendingData;
+    const existingDesign = (location.state?.design ||
         (() => {
             try { return JSON.parse(sessionStorage.getItem('lastJewelryDesign') || ''); } catch { return null; }
         })()
     ) as JewelryDesign | undefined;
 
+    const [design, setDesign] = useState<JewelryDesign | undefined>(existingDesign);
+    const [isGenerating, setIsGenerating] = useState(!!pendingData && !existingDesign);
+    const [generationError, setGenerationError] = useState('');
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
+
+    // If we have pendingData, fire off the generation immediately
+    useEffect(() => {
+        if (!pendingData) return;
+
+        let cancelled = false;
+        setIsGenerating(true);
+        setGenerationError('');
+
+        generateDesign(pendingData)
+            .then((response) => {
+                if (cancelled) return;
+                setDesign(response.design);
+                setIsGenerating(false);
+                try { sessionStorage.setItem('lastJewelryDesign', JSON.stringify(response.design)); } catch { /* quota */ }
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                setGenerationError(err instanceof Error ? err.message : 'Failed to generate design');
+                setIsGenerating(false);
+            });
+
+        return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
 
     // Persist design to sessionStorage whenever it changes
     useEffect(() => {
@@ -26,34 +59,21 @@ const JewelryResults: React.FC = () => {
         }
     }, [design]);
 
+    // If no pending data AND no existing design, redirect back
     useEffect(() => {
-        if (!design) {
+        if (!pendingData && !design) {
             navigate('/jewelry-designer');
         }
-    }, [design, navigate]);
-
-    if (!design) {
-        return (
-            <div style={{ minHeight: '100vh', background: '#FAFAF8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Market Sans', sans-serif" }}>
-                <p style={{ color: '#6B7280' }}>Redirecting...</p>
-            </div>
-        );
-    }
-
-    // Safe access for potentially missing fields
-    const generatedImages = design.generatedImages || [];
-    const metals = design.materials?.metals || [];
-
+    }, [pendingData, design, navigate]);
 
     const handleSelectDesign = async (image: GeneratedImage) => {
+        if (!design) return;
         setSaving(true);
         setError('');
 
         try {
             await saveDesign(design.id, image.url);
             setSaved(true);
-
-            // Navigate to refinement page (Phase 5)
             setTimeout(() => {
                 navigate(`/jewelry-designer/refine/${design.id}`, {
                     state: { design, selectedImage: image },
@@ -73,15 +93,83 @@ const JewelryResults: React.FC = () => {
                 title: 'My AI Jewelry Design',
                 text: 'Check out my custom jewelry design created with AI!',
                 url: window.location.href,
-            }).catch(() => {
-                // User cancelled or share failed
-            });
+            }).catch(() => {});
         } else {
-            // Fallback: Copy URL to clipboard
             navigator.clipboard.writeText(window.location.href);
             alert('Link copied to clipboard!');
         }
     };
+
+    // ── Generating State ──────────────────────────────────────────────────
+    if (isGenerating) {
+        const numImages = pendingData?.numImages || 3;
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] max-w-2xl mx-auto text-center py-24 px-6"
+                style={{ fontFamily: "'Market Sans', sans-serif" }}>
+                <div className="relative w-[140px] h-[140px] mx-auto mb-12">
+                    <motion.div
+                        animate={{ rotate: 360 }} transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                        className="absolute inset-0 rounded-full border-[1px] border-slate-200 border-t-[#D4AF37]"
+                    />
+                    <motion.div
+                        animate={{ rotate: -360 }} transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                        className="absolute inset-4 rounded-full border-[1px] border-slate-200 border-b-[#B8860B]"
+                    />
+                    <motion.div
+                        animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        className="absolute inset-8 rounded-full bg-gradient-to-br from-[#111] to-[#222] flex items-center justify-center shadow-2xl"
+                    >
+                        <Sparkles className="w-8 h-8 text-[#D4AF37]" />
+                    </motion.div>
+                </div>
+
+                <h2 className="text-5xl md:text-6xl text-gray-900 mb-6 tracking-tight"
+                    style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}>
+                    Synthesizing...
+                </h2>
+                <p className="text-base md:text-lg text-gray-500 mb-12 max-w-md mx-auto">
+                    Our AI artisan is examining your prompt and rendering {numImages} exclusive variations.
+                </p>
+                <div className="w-full max-w-xs mx-auto h-[2px] bg-slate-200 rounded-full overflow-hidden">
+                    <motion.div
+                        initial={{ x: '-100%' }} animate={{ x: '200%' }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                        className="w-1/2 h-full bg-[#D4AF37] rounded-full"
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    // ── Generation Failed State ───────────────────────────────────────────
+    if (generationError) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] max-w-2xl mx-auto text-center py-24 px-6"
+                style={{ fontFamily: "'Market Sans', sans-serif" }}>
+                <AlertCircle className="w-16 h-16 text-red-400 mb-6 mx-auto" />
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Generation Failed</h2>
+                <p className="text-gray-500 mb-8">{generationError}</p>
+                <Link to="/jewelry-designer"
+                    className="inline-flex items-center px-6 py-3 rounded-xl border border-gray-300 text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Try Again
+                </Link>
+            </div>
+        );
+    }
+
+    if (!design) {
+        return (
+            <div style={{ minHeight: '100vh', background: '#FAFAF8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Market Sans', sans-serif" }}>
+                <p style={{ color: '#6B7280' }}>Redirecting...</p>
+            </div>
+        );
+    }
+
+    // ── Results State ─────────────────────────────────────────────────────
+    const generatedImages = design.generatedImages || [];
+    const metals = design.materials?.metals || [];
 
     return (
         <div className="min-h-screen" style={{ background: '#FAFAF8', fontFamily: "'Market Sans', sans-serif" }}>
@@ -98,7 +186,8 @@ const JewelryResults: React.FC = () => {
 
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl md:text-4xl mb-2 text-gray-900" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>
+                            <h1 className="text-3xl md:text-4xl mb-2 text-gray-900"
+                                style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400 }}>
                                 Your Designs are Ready
                             </h1>
                             <p className="text-gray-500">
@@ -117,9 +206,7 @@ const JewelryResults: React.FC = () => {
 
                 {/* Design Summary */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                        Design Specifications
-                    </h2>
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Design Specifications</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         <div className="p-3 rounded-lg bg-gray-50">
                             <p className="text-xs text-gray-400 mb-1">Gem Type</p>
@@ -151,9 +238,7 @@ const JewelryResults: React.FC = () => {
                     <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200">
                         <div className="flex items-center">
                             <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-                            <p className="text-green-800">
-                                Design saved successfully! Redirecting to refinement...
-                            </p>
+                            <p className="text-green-800">Design saved successfully! Redirecting to refinement...</p>
                         </div>
                     </div>
                 )}
@@ -187,9 +272,7 @@ const JewelryResults: React.FC = () => {
 
                 {/* Call to Action */}
                 <div className="mt-12 text-center">
-                    <h3 className="text-xl text-gray-900 mb-2 font-semibold">
-                        Love your design? Take the next step!
-                    </h3>
+                    <h3 className="text-xl text-gray-900 mb-2 font-semibold">Love your design? Take the next step!</h3>
                     <p className="text-gray-500 mb-6">
                         Select your favorite design to refine it further, or create a new design from scratch.
                     </p>

@@ -123,7 +123,7 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
       className="w-full max-w-[320px] bg-white rounded-[20px] pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden cursor-pointer hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100"
     >
       {/* Image Container */}
-      <div className="relative bg-[#FDF8EE] h-64 shrink-0 flex items-center justify-center overflow-hidden group">
+      <div className="relative bg-white h-64 shrink-0 flex items-center justify-center overflow-hidden group">
         <img 
           src={image || `https://placehold.co/400x300/FDF8EE/b45309?text=${encodeURIComponent(name)}`} 
           alt={name}
@@ -189,8 +189,17 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
           >
             {buttonText}
           </button>
-          <button className="bg-[#F4F6F8] hover:bg-[#E5E9ED] rounded-[12px] p-3 transition-colors shrink-0 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-[#5A6A85]" />
+          <button 
+            title="Design jewelry with this gem"
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate('/jewelry-designer', {
+                state: { prefilledGem: { id, name, price, weight, cut, origin, image } }
+              })
+            }}
+            className="bg-[#F4F6F8] hover:bg-[#E5E9ED] rounded-[12px] p-3 transition-colors shrink-0 flex items-center justify-center group/designer"
+          >
+            <Sparkles className="w-5 h-5 text-[#5A6A85] group-hover/designer:text-[#D4AF37]" />
           </button>
         </div>
       </div>

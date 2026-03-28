@@ -71,9 +71,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const cart = await cartApi.getCart();
+      
+      const deduplicatedItems = cart.items.filter((item: any, index: number, self: any[]) => 
+        index === self.findIndex((t) => t.cart_item_id === item.cart_item_id)
+      );
 
       // Parse prices as numbers to prevent string concatenation
-      const parsedItems = cart.items.map(item => ({
+      const parsedItems = deduplicatedItems.map((item: any) => ({
         ...item,
         price: Number(item.price) || 0,
         total_price: Number(item.total_price) || 0,

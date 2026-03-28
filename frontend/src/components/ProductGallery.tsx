@@ -5,11 +5,13 @@ import { ZoomIn, ZoomOut, RotateCcw, CheckCircle, X, ChevronLeft, ChevronRight, 
 interface ProductGalleryProps {
   images?: string[]
   productName?: string
+  verified?: boolean | number | string
 }
 
 const ProductGallery: React.FC<ProductGalleryProps> = ({
   images = [],
-  productName = ''
+  productName = '',
+  verified = false
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -21,6 +23,13 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
   const fullscreenRef = useRef<HTMLDivElement>(null)
   const mainImageRef = useRef<HTMLDivElement>(null)
 
+  // Normalize verified to a real boolean
+  const isVerified = 
+    verified === true || 
+    verified === 1 || 
+    verified === '1' || 
+    verified === 'true' || 
+    verified === 'approved' 
 
   // Handle keyboard navigation in fullscreen
   useEffect(() => {
@@ -144,10 +153,12 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
           onMouseMove={handleInlineMouseMove}
         >
           {/* Verified Badge */}
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
-            <CheckCircle size={13} className="text-emerald-500" />
-            <span className="text-[11px] font-semibold text-gray-700 tracking-wide">Verified</span>
-          </div>
+          {isVerified && (
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm border border-gray-100">
+              <CheckCircle size={13} className="text-emerald-500" />
+              <span className="text-[11px] font-semibold text-gray-700 tracking-wide">Verified</span>
+            </div>
+          )}
 
           {/* Image Counter */}
           <div className="absolute top-4 right-4 z-10 bg-black/50 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-[11px] font-medium tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-300">
