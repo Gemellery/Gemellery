@@ -33,6 +33,7 @@ import WishlistPage from "./pages/buyer/BuyerWishlist";
 import BuyerSettings from "./pages/buyer/BuyerSettings";
 import BuyerOrderStatus from "./pages/buyer/BuyerOrderStatus";
 import BuyerMyDesigns from "./pages/buyer/BuyerMyDesigns";
+import BuyerReviews from "./pages/buyer/BuyerReviews";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -234,6 +235,24 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={["buyer"]}>
             <BuyerMyDesigns />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/buyer/reviews"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <BuyerReviews />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/buyer/reviews"
+        element={
+          <ProtectedRoute allowedRoles={["buyer"]}>
+            <BuyerReviews />
           </ProtectedRoute>
         }
       />
@@ -463,6 +482,24 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerMyDesigns />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/reviews"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerReviews />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/reviews"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerReviews />
               </ProtectedRoute>
             }
           />
