@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck, Star } from "lucide-react";
+import API_CONFIG from "../lib/api.config";
 
 interface BuyerSidebarProps {
   buyerName: string;
@@ -10,6 +12,26 @@ interface BuyerSidebarProps {
 function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
   const navigate = useNavigate();
   const location = window.location;
+  const [pendingReviewCount, setPendingReviewCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPendingReviewsCount = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/buyer/reviews/pending`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPendingReviewCount(data.length);
+        }
+      } catch (err) {
+        console.error("Failed to fetch pending reviews count", err);
+      }
+    };
+    fetchPendingReviewsCount();
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -69,6 +91,23 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
             </button>
 
             <button
+              onClick={() => navigate("/buyer/reviews")}
+              className="flex items-center justify-between w-full text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <Star className="w-4 h-4" />
+                <span className={location.pathname === '/buyer/reviews' ? 'underline decoration-black decoration-2' : 'group-hover:underline'}>
+                  Reviews
+                </span>
+              </div>
+              {pendingReviewCount > 0 && (
+                <span className="bg-[#cc000b] text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center justify-center !no-underline">
+                  {pendingReviewCount}
+                </span>
+              )}
+            </button>
+
+            <button
               onClick={() => navigate("/buyer/ai-designs")}
               className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/ai-designs' ? ' underline decoration-black decoration-2' : ''}`}
             >
@@ -81,8 +120,6 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
             >
               <Rows3 className="w-4 h-4" /> Wishlist
             </button>
-
-
           </nav>
         </div>
 
