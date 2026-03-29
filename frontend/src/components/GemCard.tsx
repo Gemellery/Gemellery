@@ -123,7 +123,7 @@ const GemCard: React.FC<GemCardProps> = ({ id, name, price, weight, cut, origin,
       className="w-full max-w-[320px] bg-white rounded-[20px] pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden cursor-pointer hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full border border-gray-100"
     >
       {/* Image Container */}
-      <div className="relative bg-[#FDF8EE] h-64 shrink-0 flex items-center justify-center overflow-hidden group">
+      <div className="relative bg-white h-64 shrink-0 flex items-center justify-center overflow-hidden group">
         <img 
           src={image || `https://placehold.co/400x300/FDF8EE/b45309?text=${encodeURIComponent(name)}`} 
           alt={name}

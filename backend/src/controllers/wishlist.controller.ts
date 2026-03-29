@@ -23,6 +23,7 @@ export const getWishlist = async (req: Request, res: Response) => {
         g.clarity,
         g.origin,
         g.verification_status,
+        g.status,
         gi.image_url
       FROM wishlist w
       JOIN gem g ON w.gem_id = g.gem_id
@@ -36,6 +37,7 @@ export const getWishlist = async (req: Request, res: Response) => {
       [userId]
     );
 
+    console.log("Wishlist rows sent:", JSON.stringify(rows));
     return res.status(200).json({
       success: true,
       items: rows,
@@ -142,5 +144,28 @@ export const checkWishlist = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error checking wishlist:", error);
     return res.status(500).json({ message: "Failed to check wishlist" });
+  }
+};
+
+// ============================================================
+// DELETE /api/wishlist — Remove all wishlist items for the user
+// ============================================================
+export const clearWishlist = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+
+    const [result] = await pool.query<ResultSetHeader>(
+      "DELETE FROM wishlist WHERE user_id = ?",
+      [userId]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Wishlist cleared",
+      count: result.affectedRows,
+    });
+  } catch (error) {
+    console.error("Error clearing wishlist:", error);
+    return res.status(500).json({ message: "Failed to clear wishlist" });
   }
 };

@@ -76,3 +76,17 @@ export async function checkWishlist(gemId: number): Promise<boolean> {
   const data = await response.json();
   return data.isWishlisted;
 }
+
+// Remove all items from wishlist
+export async function clearWishlist(): Promise<boolean> {
+  const response = await fetch(`${API_CONFIG.BASE_URL}/api/wishlist/all`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to clear wishlist");
+  }
+
+  return true;
+}

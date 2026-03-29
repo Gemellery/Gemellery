@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BasicFooter from '../../components/BasicFooter';
 import { useGoogleLogin } from "@react-oauth/google";
+import logo from '../../assets/logos/Elegance Jewelry.png';
 
 function SignIn() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -98,11 +99,13 @@ function SignIn() {
     }
   };
 
-  // Google OAuth hook initialization
   const triggerGoogleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => {
       setError("Google sign-in was cancelled or failed.");
+      setGoogleLoading(false);
+    },
+    onNonOAuthError: () => {
       setGoogleLoading(false);
     },
   });
@@ -155,7 +158,7 @@ function SignIn() {
 
       {/* === Top Navigation Bar === */}
       <nav className="w-full px-6 sm:px-12 md:px-48 py-4 flex justify-between items-center border-b border-gray-100 bg-white">
-        <img src="src\assets\logos\Elegance Jewelry.png" alt="Gemellery Logo" className="h-10 w-auto" />
+        <img src={logo} alt="Gemellery Logo" className="h-10 w-auto" />
         <span className="flex items-center gap-1.5 text-xs font-semibold text-[#1F7A73]">
           <LockKeyhole size={14} /> Secure
         </span>
