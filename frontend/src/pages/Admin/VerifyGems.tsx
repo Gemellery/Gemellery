@@ -230,7 +230,7 @@ function VerifyGems() {
                 onClose={() => setIsOpen(false)}
             />
 
-            <div className="flex-1 p-8 ml-0 md:ml-64 overflow-y-auto">
+            <div className="flex-1 p-8 ml-0 md:ml-72 overflow-y-auto">
                 {/* Mobile Header */}
                 <div className="flex items-center gap-4 mb-6 md:hidden">
                     <button onClick={() => setIsOpen(true)}>

@@ -72,7 +72,7 @@ const SellerAnalyticsPage: React.FC = () => {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+      <main className="flex-1 ml-0 md:ml-72 overflow-y-auto flex flex-col">
         <div className="p-4 md:p-6 lg:p-8 flex-1 flex flex-col">
           <div className="flex items-start md:items-center mb-6">
           <button
