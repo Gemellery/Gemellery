@@ -4,6 +4,7 @@ import {
   getRecentOrders,
   getAllOrders,
   getOrderDetails,
+  downloadOrderReceipt,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -57,6 +58,13 @@ router.get(
 );
 
 router.get(
+  "/orders/:id/receipt",
+  authGuard,
+  authorizeRole("buyer"),
+  downloadOrderReceipt
+);
+
+router.get(
   "/wishlist",
   authGuard,
   authorizeRole("buyer"),
@@ -75,6 +83,34 @@ router.delete(
   authGuard,
   authorizeRole("buyer"),
   removeFromWishlist
+);
+
+// Review endoints
+import {
+  getPendingReviews,
+  getCompletedReviews,
+  updateReview,
+} from "../controllers/buyer.controller";
+
+router.get(
+  "/reviews/pending",
+  authGuard,
+  authorizeRole("buyer"),
+  getPendingReviews
+);
+
+router.get(
+  "/reviews/completed",
+  authGuard,
+  authorizeRole("buyer"),
+  getCompletedReviews
+);
+
+router.put(
+  "/reviews/:id",
+  authGuard,
+  authorizeRole("buyer"),
+  updateReview
 );
 
 export default router;

@@ -142,10 +142,10 @@ function ReportModal({ reportType, onClose }: Props) {
                     <td className="p-3">{row.quantity ?? "-"}</td>
 
                     <td className="p-3">
-                        {row.price ? `$${row.price}` : "-"}
+                        {row.price ? `LKR ${row.price}` : "-"}
                     </td>
 
-                    <td className="p-3 font-medium">${row.total}</td>
+                    <td className="p-3 font-medium">LKR {row.total}</td>
 
                 </tr>
             ));
@@ -253,7 +253,7 @@ function ReportModal({ reportType, onClose }: Props) {
                                     Total Sales
                                 </p>
                                 <p className="text-xl font-semibold">
-                                    ${summary.totalSales}
+                                    LKR {summary.totalSales}
                                 </p>
                             </div>
 

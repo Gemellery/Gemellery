@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, FileText, ChevronDown, Sparkles, Gem } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import AdvancedFooter from '../../components/AdvancedFooter';
@@ -23,6 +23,34 @@ const ConciergeContactPage: React.FC = () => {
   });
 
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user && user.email) {
+          let fName = user.first_name || '';
+          let lName = user.last_name || '';
+          
+          if (!fName && !lName && user.full_name) {
+            const parts = user.full_name.split(' ');
+            fName = parts[0] || '';
+            lName = parts.slice(1).join(' ') || '';
+          }
+
+          setFormData(prev => ({
+            ...prev,
+            firstName: fName || prev.firstName,
+            lastName: lName || prev.lastName,
+            email: user.email || prev.email
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Failed to parse user from localStorage', err);
+    }
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>

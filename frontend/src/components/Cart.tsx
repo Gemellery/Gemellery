@@ -25,6 +25,7 @@ function Cart() {
 
   // Calculate totals
   const subtotal = Number(totalAmount) || 0;
+  
   const shipping = 0;
   const estimatedTax = 0.00;
   const total = subtotal + shipping + estimatedTax;

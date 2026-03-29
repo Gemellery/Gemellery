@@ -9,6 +9,10 @@ export interface GemFromDB {
   color: string;
   carat: number;
   origin: string;
+  cut: string;
+  clarity: string;
+  verificationStatus: string;
+  createdAt: string;
   inStock: boolean;
   imageUrl: string | null;
 }

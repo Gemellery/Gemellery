@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import db from "../database";
+import PDFDocument from "pdfkit";
 
 // GET /api/buyer/profile
 export const getBuyerProfile = async (req: Request, res: Response) => {
@@ -182,14 +183,16 @@ export const getAllOrders = async (req: Request, res: Response) => {
         o.total_amount,
         o.created_at,
         o.payment_method,
-        NULL AS address_line1,
-        NULL AS city,
-        NULL AS state,
-        NULL AS zip,
+        sa.street AS address_line1,
+        sa.city,
+        '' AS state,
+        sa.postal_code AS zip,
+        sa.country AS country,
         MIN(gi.image_url) AS image_url,
         GROUP_CONCAT(DISTINCT g.gem_name SEPARATOR ', ') AS gem_name,
         COUNT(DISTINCT oi.order_item_id) AS item_count
       FROM orders o
+      LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
       LEFT JOIN order_items oi ON oi.order_id = o.order_id
       LEFT JOIN gem g ON g.gem_id = oi.gem_id
       LEFT JOIN gem_images gi ON gi.gem_id = g.gem_id
@@ -206,7 +209,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
     }
 
     dataQuery += `
-      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method
+      GROUP BY o.order_id, o.order_status, o.total_amount, o.created_at, o.payment_method, sa.street, sa.city, sa.postal_code, sa.country
       ORDER BY o.${sort} ${order}
       LIMIT ? OFFSET ?
     `;
@@ -251,17 +254,18 @@ export const getOrderDetails = async (req: Request, res: Response) => {
           o.total_amount,
           o.created_at,
           o.payment_method,
-          NULL AS address_line1,
+          sa.street AS address_line1,
           NULL AS address_line2,
-          NULL AS city,
-          NULL AS state,
-          NULL AS zip,
-          NULL AS country,
-          NULL AS phone_number,
-          u.full_name,
+          sa.city,
+          '' AS state,
+          sa.postal_code AS zip,
+          sa.country,
+          u.mobile AS phone_number,
+          COALESCE(NULLIF(CONCAT(sa.first_name, ' ', sa.last_name), ' '), u.full_name) AS full_name,
           u.email
         FROM orders o
         LEFT JOIN user u ON u.user_id = o.buyer_id
+        LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
         WHERE o.order_id = ? AND o.buyer_id = ?
       `,
       [id, buyerId]
@@ -316,6 +320,125 @@ export const getOrderDetails = async (req: Request, res: Response) => {
   }
 };
 
+// GET /api/buyer/orders/:id/receipt
+export const downloadOrderReceipt = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id } = req.params;
+
+    const [orderRows]: any = await db.query(
+      `
+        SELECT
+          o.order_id,
+          o.total_amount,
+          o.payment_method,
+          o.payment_status,
+          o.created_at,
+          sa.street AS address_line1,
+          sa.city,
+          sa.postal_code AS zip,
+          sa.country,
+          COALESCE(NULLIF(CONCAT(sa.first_name, ' ', sa.last_name), ' '), u.full_name) AS buyer_name,
+          u.email
+        FROM orders o
+        LEFT JOIN user u ON u.user_id = o.buyer_id
+        LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
+        WHERE o.order_id = ? AND o.buyer_id = ?
+        LIMIT 1
+      `,
+      [id, buyerId]
+    );
+
+    if (!orderRows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const order = orderRows[0];
+
+    if (order.payment_status !== "Paid") {
+      return res.status(400).json({ error: "Receipt is available only for paid orders" });
+    }
+
+    const [items]: any = await db.query(
+      `
+        SELECT
+          g.gem_name,
+          oi.quantity,
+          oi.price
+        FROM order_items oi
+        JOIN gem g ON g.gem_id = oi.gem_id
+        WHERE oi.order_id = ?
+        ORDER BY oi.order_item_id ASC
+      `,
+      [id]
+    );
+
+    const formatAmount = (value: number) =>
+      `LKR ${Number(value || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+
+    const filename = `payment_receipt_order_${order.order_id}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    doc.pipe(res);
+
+    doc.fontSize(20).text("Gemellery Payment Receipt", { align: "center" });
+    doc.moveDown(1.2);
+
+    doc.fontSize(12).text(`Receipt Number: RCPT-${order.order_id}`);
+    doc.text(`Order ID: ${order.order_id}`);
+    doc.text(`Payment Date: ${new Date(order.created_at).toLocaleString()}`);
+    doc.text(`Payment Method: ${order.payment_method || "Card"}`);
+    doc.text(`Payment Status: ${order.payment_status}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Buyer Details", { underline: true });
+    doc.moveDown(0.3);
+    doc.text(`Name: ${order.buyer_name || "N/A"}`);
+    doc.text(`Email: ${order.email || "N/A"}`);
+    doc.text(`Address: ${order.address_line1 || ""}`);
+    doc.text(`City: ${order.city || ""}`);
+    doc.text(`Postal Code: ${order.zip || ""}`);
+    doc.text(`Country: ${order.country || ""}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Items", { underline: true });
+    doc.moveDown(0.3);
+
+    if (!items.length) {
+      doc.text("No items found for this order.");
+    } else {
+      items.forEach((item: any, index: number) => {
+        const lineTotal = Number(item.price) * Number(item.quantity);
+        doc.text(
+          `${index + 1}. ${item.gem_name}  |  Qty: ${item.quantity}  |  Unit: ${formatAmount(
+            Number(item.price)
+          )}  |  Line Total: ${formatAmount(lineTotal)}`
+        );
+      });
+    }
+
+    doc.moveDown(1.2);
+    doc.fontSize(14).text(`Total Paid: ${formatAmount(Number(order.total_amount))}`, {
+      align: "right",
+    });
+    doc.moveDown(1.2);
+    doc.fontSize(10).fillColor("#555").text("This is a system-generated payment receipt.", {
+      align: "center",
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to generate payment receipt" });
+  }
+};
+
 // GET /api/buyer/wishlist
 export const getWishlist = async (req: Request, res: Response) => {
   try {
@@ -330,6 +453,7 @@ export const getWishlist = async (req: Request, res: Response) => {
           g.carat,
           g.cut,
           g.price,
+          g.status,
           MIN(gi.image_url) AS image_url
         FROM wishlist w
         JOIN gem g ON g.gem_id = w.gem_id
@@ -395,6 +519,103 @@ export const removeFromWishlist = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to remove from wishlist" });
+  }
+};
+
+export const getPendingReviews = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          g.seller_id AS id,
+          u.full_name AS fullName,
+          s.business_name AS businessName,
+          MAX(g.gem_name) AS latest_item_name,
+          MIN(gi.image_url) AS image_url,
+          MAX(o.created_at) AS order_date,
+          MAX(o.order_id) AS order_id
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        JOIN seller s ON g.seller_id = s.seller_id
+        JOIN user u ON s.seller_id = u.user_id
+        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+        LEFT JOIN seller_reviews sr ON sr.buyer_id = o.buyer_id AND sr.seller_id = g.seller_id
+        WHERE o.buyer_id = ?
+          AND o.order_status = 'Delivered'
+          AND sr.review_id IS NULL
+        GROUP BY g.seller_id, u.full_name, s.business_name
+        ORDER BY order_date DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load pending reviews" });
+  }
+};
+
+export const getCompletedReviews = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          sr.review_id AS id,
+          sr.seller_id,
+          s.business_name AS businessName,
+          u.full_name AS fullName,
+          sr.rating,
+          sr.review AS comment,
+          sr.review_date AS date
+        FROM seller_reviews sr
+        JOIN seller s ON sr.seller_id = s.seller_id
+        JOIN user u ON s.seller_id = u.user_id
+        WHERE sr.buyer_id = ?
+        ORDER BY sr.review_date DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load completed reviews" });
+  }
+};
+
+export const updateReview = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id: review_id } = req.params;
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: "Rating must be between 1 and 5" });
+    }
+
+    const [result]: any = await db.query(
+      `
+        UPDATE seller_reviews
+        SET rating = ?, review = ?
+        WHERE review_id = ? AND buyer_id = ?
+      `,
+      [rating, comment || "", review_id, buyerId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Review not found or unauthorized" });
+    }
+
+    return res.json({ message: "Review updated successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to update review" });
   }
 };
 

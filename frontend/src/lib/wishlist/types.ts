@@ -11,5 +11,6 @@ export interface WishlistItem {
   clarity?: string;
   origin?: string;
   verification_status?: string;
+  status?: string;
   image_url?: string;
 }

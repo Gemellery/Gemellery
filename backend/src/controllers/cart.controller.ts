@@ -74,7 +74,7 @@ export const getCart = async (req: any, res: Response) => {
             g.clarity,
             g.color,
             g.origin,
-            gi.image_url AS image,
+            (SELECT image_url FROM gem_images WHERE gem_id = g.gem_id LIMIT 1) AS image,
             g.ngja_certificate_no AS certification,
             g.ngja_certificate_url,
             ci.quantity,
@@ -83,7 +83,6 @@ export const getCart = async (req: any, res: Response) => {
         FROM cart c
         JOIN cart_items ci ON c.cart_id = ci.cart_id
         JOIN gem g ON ci.gem_id = g.gem_id
-        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
         LEFT JOIN user u ON g.seller_id = u.user_id
         WHERE c.user_id = ?`,
             [user_id]

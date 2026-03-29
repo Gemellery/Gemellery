@@ -2,7 +2,7 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\contracts\\GemCertificate.sol": {
-      "lastModificationDate": 1772614103442,
+      "lastModificationDate": 1772995061137,
       "contentHash": "7aeb27949b62dfda8fd0159bc0c18a8f",
       "sourceName": "contracts/GemCertificate.sol",
       "solcConfig": {
@@ -27,6 +27,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -42,7 +45,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol": {
-      "lastModificationDate": 1772668789517,
+      "lastModificationDate": 1772948742303,
       "contentHash": "ad5144b924800b6f617bc84e4f1fb556",
       "sourceName": "@openzeppelin/contracts/token/ERC721/ERC721.sol",
       "solcConfig": {
@@ -67,6 +70,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -87,7 +93,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
-      "lastModificationDate": 1772668789910,
+      "lastModificationDate": 1772948742685,
       "contentHash": "d3c790edc9ccf808a17c5a6cd13614fd",
       "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
       "solcConfig": {
@@ -112,6 +118,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -126,7 +135,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol": {
-      "lastModificationDate": 1772668789416,
+      "lastModificationDate": 1772948742208,
       "contentHash": "0906d06dca25210d4696dcef6dad2909",
       "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
       "solcConfig": {
@@ -151,6 +160,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -165,7 +177,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\Strings.sol": {
-      "lastModificationDate": 1772668790000,
+      "lastModificationDate": 1772948742776,
       "contentHash": "d2fa243e766a193585b7e9bf36898d80",
       "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
       "solcConfig": {
@@ -190,6 +202,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -207,7 +222,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol": {
-      "lastModificationDate": 1772668789274,
+      "lastModificationDate": 1772948742132,
       "contentHash": "bcc76f4747d56c28c40ae272ef3470a6",
       "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
       "solcConfig": {
@@ -232,6 +247,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -246,7 +264,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1772668789055,
+      "lastModificationDate": 1772948742090,
       "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
       "solcConfig": {
@@ -271,6 +289,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -283,7 +304,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721.sol": {
-      "lastModificationDate": 1772668789792,
+      "lastModificationDate": 1772948742600,
       "contentHash": "f62e11dbd302e17a5621a1438f4e054c",
       "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
       "solcConfig": {
@@ -308,6 +329,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -322,7 +346,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\utils\\ERC721Utils.sol": {
-      "lastModificationDate": 1772668789551,
+      "lastModificationDate": 1772948742334,
       "contentHash": "eaad77accc6e32b20dfbbbe9813e1dce",
       "sourceName": "@openzeppelin/contracts/token/ERC721/utils/ERC721Utils.sol",
       "solcConfig": {
@@ -347,6 +371,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -362,7 +389,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\IERC721Metadata.sol": {
-      "lastModificationDate": 1772668789815,
+      "lastModificationDate": 1772948742610,
       "contentHash": "136c64eca25bcb8a68f43ac6605559f9",
       "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
       "solcConfig": {
@@ -387,6 +414,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -401,7 +431,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol": {
-      "lastModificationDate": 1772668789733,
+      "lastModificationDate": 1772948742544,
       "contentHash": "7074c93b1ea0a122063f26ddd1db1032",
       "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
       "solcConfig": {
@@ -426,6 +456,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -438,7 +471,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\Bytes.sol": {
-      "lastModificationDate": 1772668788983,
+      "lastModificationDate": 1772948742067,
       "contentHash": "3b32ea3a40a2d708f61e7161f081ca93",
       "sourceName": "@openzeppelin/contracts/utils/Bytes.sol",
       "solcConfig": {
@@ -463,6 +496,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -477,7 +513,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SignedMath.sol": {
-      "lastModificationDate": 1772668789958,
+      "lastModificationDate": 1772948742748,
       "contentHash": "ae3528afb8bdb0a7dcfba5b115ee8074",
       "sourceName": "@openzeppelin/contracts/utils/math/SignedMath.sol",
       "solcConfig": {
@@ -502,6 +538,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -516,7 +555,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
-      "lastModificationDate": 1772668789858,
+      "lastModificationDate": 1772948742653,
       "contentHash": "5b8c6935ac52b7494df19d6feb38f5cc",
       "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
       "solcConfig": {
@@ -541,6 +580,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -556,7 +598,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
-      "lastModificationDate": 1772668789956,
+      "lastModificationDate": 1772948742731,
       "contentHash": "f28a38cd37f4225d0a91fb5405dd850f",
       "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
       "solcConfig": {
@@ -581,6 +623,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -593,7 +638,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\utils\\Panic.sol": {
-      "lastModificationDate": 1772668789925,
+      "lastModificationDate": 1772948742701,
       "contentHash": "2133dc13536b4a6a98131e431fac59e1",
       "sourceName": "@openzeppelin/contracts/utils/Panic.sol",
       "solcConfig": {
@@ -618,6 +663,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
@@ -630,7 +678,7 @@
       ]
     },
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721Receiver.sol": {
-      "lastModificationDate": 1772668789820,
+      "lastModificationDate": 1772948742617,
       "contentHash": "d61660a41ce200e99816e4734f7fd202",
       "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
       "solcConfig": {
@@ -655,6 +703,9 @@
                 "ast"
               ]
             }
+          },
+          "metadata": {
+            "useLiteralContent": false
           }
         }
       },
