@@ -28,11 +28,12 @@ export const register = async (req: Request, res: Response) => {
         business_name,
         business_reg_no,
         ngja_registration_no,
+        google_id = null,  
     } = req.body;
 
     if (
         !email ||
-        !password ||
+        (!password && !google_id) ||
         !role ||
         (role === "seller" && !business_name) ||
         (role === "seller" && !business_reg_no) ||
@@ -56,13 +57,17 @@ export const register = async (req: Request, res: Response) => {
     try {
         await conn.beginTransaction();
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // For Google registrations, generate a secure random hash so the password
+        // field is never empty (prevents empty-string login attacks). Standard practice.
+        const hashedPassword = google_id
+            ? await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10)
+            : await bcrypt.hash(password, 10);
 
         const [userResult]: any = await conn.query(
             `INSERT INTO user
-            (email, password, role, full_name, mobile, joined_date, country_id)
-            VALUES (?, ?, ?, ?, ?, CURDATE(), ?)`,
-            [email, hashedPassword, role, full_name, mobile, country_id]
+            (email, password, role, full_name, mobile, joined_date, country_id, google_id)
+            VALUES (?, ?, ?, ?, ?, CURDATE(), ?, ?)`,
+            [email, hashedPassword, role, full_name, mobile, country_id, google_id]
         );
 
         const user_id = userResult.insertId;
@@ -379,17 +384,15 @@ export const googleLogin = async (req: Request, res: Response) => {
                     [googleId, user.user_id]
                 );
             } else {
-                const [insertResult]: any = await pool.query(
-                    `INSERT INTO user (email, password, role, full_name, google_id, joined_date)
-                     VALUES (?, ?, 'buyer', ?, ?, CURDATE())`,
-                    [email, "", fullName, googleId]
-                );
-
-                const [newUser]: any = await pool.query(
-                    "SELECT * FROM user WHERE user_id = ?",
-                    [insertResult.insertId]
-                );
-                user = newUser[0];
+                // Brand-new Google user — don't auto-create an account.
+                // Return a signal to the frontend to redirect them to the sign-up form
+                // with their Google email & name pre-filled so they can complete registration.
+                return res.status(200).json({
+                    needsRegistration: true,
+                    email,
+                    fullName,
+                    googleId,
+                });
             }
         }
 
