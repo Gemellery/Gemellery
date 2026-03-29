@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\ASUS\\Desktop\\My Projects\\My projects\\Gemellery\\blockchain\\contracts\\GemCertificate.sol": {
-      "lastModificationDate": 1774759525149,
-      "contentHash": "b50f98d9032d932c9414ae2f95cc1256",
+      "lastModificationDate": 1774761998073,
+      "contentHash": "7aeb27949b62dfda8fd0159bc0c18a8f",
       "sourceName": "contracts/GemCertificate.sol",
       "solcConfig": {
         "version": "0.8.28",
