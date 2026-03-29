@@ -295,7 +295,7 @@ function ManageAdmins() {
                 </div>
 
                 {/* Maintenance */}
-                <div className="bg-white border rounded-xl shadow-sm p-6 mb-6">
+                {/* <div className="bg-white border rounded-xl shadow-sm p-6 mb-6">
 
                     <div className="flex items-center justify-between">
 
@@ -345,7 +345,7 @@ function ManageAdmins() {
 
                     </div>
 
-                </div>
+                </div> */}
 
                 <div className="flex justify-between mb-6">
                     <input
