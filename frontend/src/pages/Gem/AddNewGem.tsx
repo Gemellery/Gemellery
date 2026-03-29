@@ -126,7 +126,7 @@ function AddNewGem() {
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
+            <main className="flex-1 ml-0 md:ml-72 overflow-y-auto p-6 md:p-8">
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
 

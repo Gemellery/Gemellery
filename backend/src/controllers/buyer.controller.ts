@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import db from "../database";
+import PDFDocument from "pdfkit";
+import { transferGemOwnership } from "../services/blockchain.service";
 
 // GET /api/buyer/profile
 export const getBuyerProfile = async (req: Request, res: Response) => {
@@ -319,6 +321,125 @@ export const getOrderDetails = async (req: Request, res: Response) => {
   }
 };
 
+// GET /api/buyer/orders/:id/receipt
+export const downloadOrderReceipt = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id } = req.params;
+
+    const [orderRows]: any = await db.query(
+      `
+        SELECT
+          o.order_id,
+          o.total_amount,
+          o.payment_method,
+          o.payment_status,
+          o.created_at,
+          sa.street AS address_line1,
+          sa.city,
+          sa.postal_code AS zip,
+          sa.country,
+          COALESCE(NULLIF(CONCAT(sa.first_name, ' ', sa.last_name), ' '), u.full_name) AS buyer_name,
+          u.email
+        FROM orders o
+        LEFT JOIN user u ON u.user_id = o.buyer_id
+        LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
+        WHERE o.order_id = ? AND o.buyer_id = ?
+        LIMIT 1
+      `,
+      [id, buyerId]
+    );
+
+    if (!orderRows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const order = orderRows[0];
+
+    if (order.payment_status !== "Paid") {
+      return res.status(400).json({ error: "Receipt is available only for paid orders" });
+    }
+
+    const [items]: any = await db.query(
+      `
+        SELECT
+          g.gem_name,
+          oi.quantity,
+          oi.price
+        FROM order_items oi
+        JOIN gem g ON g.gem_id = oi.gem_id
+        WHERE oi.order_id = ?
+        ORDER BY oi.order_item_id ASC
+      `,
+      [id]
+    );
+
+    const formatAmount = (value: number) =>
+      `LKR ${Number(value || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+
+    const filename = `payment_receipt_order_${order.order_id}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    doc.pipe(res);
+
+    doc.fontSize(20).text("Gemellery Payment Receipt", { align: "center" });
+    doc.moveDown(1.2);
+
+    doc.fontSize(12).text(`Receipt Number: RCPT-${order.order_id}`);
+    doc.text(`Order ID: ${order.order_id}`);
+    doc.text(`Payment Date: ${new Date(order.created_at).toLocaleString()}`);
+    doc.text(`Payment Method: ${order.payment_method || "Card"}`);
+    doc.text(`Payment Status: ${order.payment_status}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Buyer Details", { underline: true });
+    doc.moveDown(0.3);
+    doc.text(`Name: ${order.buyer_name || "N/A"}`);
+    doc.text(`Email: ${order.email || "N/A"}`);
+    doc.text(`Address: ${order.address_line1 || ""}`);
+    doc.text(`City: ${order.city || ""}`);
+    doc.text(`Postal Code: ${order.zip || ""}`);
+    doc.text(`Country: ${order.country || ""}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Items", { underline: true });
+    doc.moveDown(0.3);
+
+    if (!items.length) {
+      doc.text("No items found for this order.");
+    } else {
+      items.forEach((item: any, index: number) => {
+        const lineTotal = Number(item.price) * Number(item.quantity);
+        doc.text(
+          `${index + 1}. ${item.gem_name}  |  Qty: ${item.quantity}  |  Unit: ${formatAmount(
+            Number(item.price)
+          )}  |  Line Total: ${formatAmount(lineTotal)}`
+        );
+      });
+    }
+
+    doc.moveDown(1.2);
+    doc.fontSize(14).text(`Total Paid: ${formatAmount(Number(order.total_amount))}`, {
+      align: "right",
+    });
+    doc.moveDown(1.2);
+    doc.fontSize(10).fillColor("#555").text("This is a system-generated payment receipt.", {
+      align: "center",
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to generate payment receipt" });
+  }
+};
+
 // GET /api/buyer/wishlist
 export const getWishlist = async (req: Request, res: Response) => {
   try {
@@ -496,6 +617,141 @@ export const updateReview = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to update review" });
+  }
+};
+
+// ==========================================
+// BLOCKCHAIN CERTIFICATES
+// ==========================================
+
+// GET /api/buyer/certificates
+export const getBuyerCertificates = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          g.gem_id,
+          g.gem_name,
+          g.gem_type,
+          g.carat,
+          g.cut,
+          g.clarity,
+          g.color,
+          g.origin,
+          g.price,
+          g.ngja_certificate_no,
+          g.token_id,
+          g.tx_hash,
+          g.blockchain_status,
+          g.minted_at,
+          g.nft_claimed,
+          g.nft_owner_address,
+          u.full_name as seller_name,
+          s.business_name,
+          o.order_id,
+          o.created_at as purchased_at,
+          MIN(gi.image_url) as image_url
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        LEFT JOIN user u ON g.seller_id = u.user_id
+        LEFT JOIN seller s ON g.seller_id = s.seller_id
+        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+        WHERE o.buyer_id = ?
+          AND g.blockchain_status = 'minted'
+          AND g.token_id IS NOT NULL
+        GROUP BY g.gem_id, o.order_id, o.created_at,
+                 g.gem_name, g.gem_type, g.carat, g.cut, g.clarity, g.color,
+                 g.origin, g.price, g.ngja_certificate_no, g.token_id, g.tx_hash,
+                 g.blockchain_status, g.minted_at, g.nft_claimed, g.nft_owner_address,
+                 u.full_name, s.business_name
+        ORDER BY o.created_at DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load certificates" });
+  }
+};
+
+// POST /api/buyer/certificates/claim
+export const claimNFT = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { gem_id, wallet_address } = req.body;
+
+    if (!gem_id) {
+      return res.status(400).json({ error: "gem_id is required" });
+    }
+
+    if (!wallet_address) {
+      return res.status(400).json({ error: "wallet_address is required" });
+    }
+
+    // Validate Ethereum address format
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!ethAddressRegex.test(wallet_address)) {
+      return res.status(400).json({ error: "Invalid Ethereum wallet address" });
+    }
+
+    // Verify buyer owns this gem (purchased it)
+    const [ownerCheck]: any = await db.query(
+      `
+        SELECT g.gem_id, g.token_id, g.nft_claimed, g.blockchain_status
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        WHERE o.buyer_id = ? AND g.gem_id = ?
+        LIMIT 1
+      `,
+      [buyerId, gem_id]
+    );
+
+    if (ownerCheck.length === 0) {
+      return res.status(403).json({ error: "You do not own this gem" });
+    }
+
+    const gem = ownerCheck[0];
+
+    if (gem.nft_claimed) {
+      return res.status(400).json({ error: "NFT has already been claimed to a wallet" });
+    }
+
+    if (gem.blockchain_status !== "minted" || !gem.token_id) {
+      return res.status(400).json({ error: "This gem does not have a minted NFT" });
+    }
+
+    // Transfer the NFT on the blockchain
+    const result = await transferGemOwnership(gem.token_id, wallet_address);
+
+    // Update the database to record the claim
+    await db.query(
+      `
+        UPDATE gem
+        SET nft_claimed = TRUE,
+            nft_owner_address = ?,
+            nft_claim_tx_hash = ?
+        WHERE gem_id = ?
+      `,
+      [wallet_address, result.txHash, gem_id]
+    );
+
+    return res.json({
+      message: "NFT transferred to your wallet successfully!",
+      txHash: result.txHash,
+      walletAddress: wallet_address,
+    });
+  } catch (err: any) {
+    console.error("NFT claim failed:", err);
+    return res.status(500).json({
+      error: "Failed to transfer NFT to wallet",
+      details: err.message,
+    });
   }
 };
 

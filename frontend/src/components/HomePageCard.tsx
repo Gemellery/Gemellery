@@ -31,7 +31,7 @@ const features = [
         from: "#0c1e38",
         to: "#091630",
         tag: "Buyer Protected",
-        title: "Secure Escrow",
+        title: "Secure Payment",
         description:
             "Payment is safely held in escrow until you physically receive and verify the jewel. Complete confidence on every purchase.",
         highlight: "Zero risk buying",

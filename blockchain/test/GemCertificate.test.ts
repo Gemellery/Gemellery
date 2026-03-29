@@ -58,6 +58,7 @@ describe("GemCertificate", function () {
             origin: "Sri Lanka",
             carat: "2.45",
             certificateNumber: "NGJA-2024-001234",
+            sellerName: "Royal Gems Lanka",
         };
 
         it("should mint a gem and assign token ID 1", async function () {
@@ -69,7 +70,8 @@ describe("GemCertificate", function () {
                 sampleGem.clarity,
                 sampleGem.origin,
                 sampleGem.carat,
-                sampleGem.certificateNumber
+                sampleGem.certificateNumber,
+                sampleGem.sellerName
             );
 
             // Wait for the transaction to be mined
@@ -79,7 +81,7 @@ describe("GemCertificate", function () {
             expect(await gemCertificate.totalGemsMinted()).to.equal(1);
         });
 
-        it("should store the correct gem data on-chain", async function () {
+        it("should store the correct gem data on-chain including sellerName", async function () {
             const tx = await gemCertificate.mintGem(
                 sampleGem.gemName,
                 sampleGem.gemType,
@@ -88,7 +90,8 @@ describe("GemCertificate", function () {
                 sampleGem.clarity,
                 sampleGem.origin,
                 sampleGem.carat,
-                sampleGem.certificateNumber
+                sampleGem.certificateNumber,
+                sampleGem.sellerName
             );
             await tx.wait();
 
@@ -103,10 +106,11 @@ describe("GemCertificate", function () {
             expect(gemData.origin).to.equal(sampleGem.origin);
             expect(gemData.carat).to.equal(sampleGem.carat);
             expect(gemData.certificateNumber).to.equal(sampleGem.certificateNumber);
+            expect(gemData.sellerName).to.equal(sampleGem.sellerName);
             expect(gemData.mintedAt).to.be.greaterThan(0);
         });
 
-        it("should emit a GemMinted event with correct data", async function () {
+        it("should emit a GemMinted event with correct data including sellerName", async function () {
             await expect(
                 gemCertificate.mintGem(
                     sampleGem.gemName,
@@ -116,7 +120,8 @@ describe("GemCertificate", function () {
                     sampleGem.clarity,
                     sampleGem.origin,
                     sampleGem.carat,
-                    sampleGem.certificateNumber
+                    sampleGem.certificateNumber,
+                    sampleGem.sellerName
                 )
             )
                 .to.emit(gemCertificate, "GemMinted")
@@ -125,6 +130,7 @@ describe("GemCertificate", function () {
                     sampleGem.gemName,              // gemName
                     sampleGem.gemType,              // gemType
                     sampleGem.certificateNumber,    // certificateNumber
+                    sampleGem.sellerName,           // sellerName
                     (mintedAt: any) => true          // mintedAt — just verify it exists
                 );
         });
@@ -132,15 +138,15 @@ describe("GemCertificate", function () {
         it("should increment token IDs correctly for multiple mints", async function () {
             // Mint 3 gems
             await (await gemCertificate.mintGem(
-                "Gem 1", "Ruby", "Round", "Red", "VS1", "Myanmar", "1.00", "CERT-001"
+                "Gem 1", "Ruby", "Round", "Red", "VS1", "Myanmar", "1.00", "CERT-001", "Seller A"
             )).wait();
 
             await (await gemCertificate.mintGem(
-                "Gem 2", "Emerald", "Square", "Green", "SI1", "Colombia", "2.00", "CERT-002"
+                "Gem 2", "Emerald", "Square", "Green", "SI1", "Colombia", "2.00", "CERT-002", "Seller B"
             )).wait();
 
             await (await gemCertificate.mintGem(
-                "Gem 3", "Diamond", "Brilliant", "White", "VVS1", "South Africa", "3.00", "CERT-003"
+                "Gem 3", "Diamond", "Brilliant", "White", "VVS1", "South Africa", "3.00", "CERT-003", "Seller C"
             )).wait();
 
             // Verify total count
@@ -152,8 +158,11 @@ describe("GemCertificate", function () {
             const gem3 = await gemCertificate.getGemData(3);
 
             expect(gem1.gemName).to.equal("Gem 1");
+            expect(gem1.sellerName).to.equal("Seller A");
             expect(gem2.gemName).to.equal("Gem 2");
+            expect(gem2.sellerName).to.equal("Seller B");
             expect(gem3.gemName).to.equal("Gem 3");
+            expect(gem3.sellerName).to.equal("Seller C");
 
             // Next token ID should be 4
             expect(await gemCertificate.getNextTokenId()).to.equal(4);
@@ -170,9 +179,111 @@ describe("GemCertificate", function () {
                     sampleGem.clarity,
                     sampleGem.origin,
                     sampleGem.carat,
-                    sampleGem.certificateNumber
+                    sampleGem.certificateNumber,
+                    sampleGem.sellerName
                 )
             ).to.be.revertedWithCustomError(gemCertificate, "OwnableUnauthorizedAccount");
+        });
+    });
+
+    // ==========================================
+    // TRANSFER TESTS
+    // ==========================================
+
+    describe("Transfer to Buyer", function () {
+
+        const sampleGem = {
+            gemName: "Blue Kashmir Sapphire",
+            gemType: "Sapphire",
+            cut: "Oval",
+            color: "Blue",
+            clarity: "VS1",
+            origin: "Sri Lanka",
+            carat: "2.45",
+            certificateNumber: "NGJA-2024-001234",
+            sellerName: "Royal Gems Lanka",
+        };
+
+        beforeEach(async function () {
+            // Mint a gem first so we have something to transfer
+            const tx = await gemCertificate.mintGem(
+                sampleGem.gemName,
+                sampleGem.gemType,
+                sampleGem.cut,
+                sampleGem.color,
+                sampleGem.clarity,
+                sampleGem.origin,
+                sampleGem.carat,
+                sampleGem.certificateNumber,
+                sampleGem.sellerName
+            );
+            await tx.wait();
+        });
+
+        it("should transfer an NFT from the contract to a buyer", async function () {
+            const contractAddress = await gemCertificate.getAddress();
+
+            // Before transfer: contract owns it
+            expect(await gemCertificate.ownerOf(1)).to.equal(contractAddress);
+
+            // Transfer to buyer (otherAccount)
+            await gemCertificate.transferGemToBuyer(1, otherAccount.address);
+
+            // After transfer: buyer owns it
+            expect(await gemCertificate.ownerOf(1)).to.equal(otherAccount.address);
+        });
+
+        it("should emit a GemTransferred event", async function () {
+            const contractAddress = await gemCertificate.getAddress();
+
+            await expect(
+                gemCertificate.transferGemToBuyer(1, otherAccount.address)
+            )
+                .to.emit(gemCertificate, "GemTransferred")
+                .withArgs(
+                    1,                          // tokenId
+                    contractAddress,            // from (contract)
+                    otherAccount.address,       // to (buyer)
+                    (transferredAt: any) => true // timestamp
+                );
+        });
+
+        it("should reject transfer from non-owner accounts", async function () {
+            await expect(
+                gemCertificate.connect(otherAccount).transferGemToBuyer(1, otherAccount.address)
+            ).to.be.revertedWithCustomError(gemCertificate, "OwnableUnauthorizedAccount");
+        });
+
+        it("should reject transfer to zero address", async function () {
+            await expect(
+                gemCertificate.transferGemToBuyer(1, "0x0000000000000000000000000000000000000000")
+            ).to.be.revertedWith("GemCertificate: cannot transfer to zero address");
+        });
+
+        it("should reject transfer of non-existent token", async function () {
+            await expect(
+                gemCertificate.transferGemToBuyer(999, otherAccount.address)
+            ).to.be.revertedWith("GemCertificate: token does not exist");
+        });
+
+        it("should reject transfer if token is already transferred", async function () {
+            // Transfer once
+            await gemCertificate.transferGemToBuyer(1, otherAccount.address);
+
+            // Try to transfer again — should fail because the contract no longer owns it
+            await expect(
+                gemCertificate.transferGemToBuyer(1, otherAccount.address)
+            ).to.be.revertedWith("GemCertificate: token not held by contract");
+        });
+
+        it("should preserve gem data after transfer", async function () {
+            // Transfer the gem
+            await gemCertificate.transferGemToBuyer(1, otherAccount.address);
+
+            // Gem data should still be readable
+            const gemData = await gemCertificate.getGemData(1);
+            expect(gemData.gemName).to.equal(sampleGem.gemName);
+            expect(gemData.sellerName).to.equal(sampleGem.sellerName);
         });
     });
 

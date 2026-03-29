@@ -15,7 +15,7 @@ interface CartContextType {
   error: string | null;
 
   // Actions
-  addToCart: (gemId: number) => Promise<boolean>;
+  addToCart: (gemId: number, quantity?: number) => Promise<boolean>;
   removeFromCart: (cartItemId: number) => Promise<boolean>;
   updateCartItem: (cartItemId: number, quantity: number) => Promise<boolean>;
   clearCart: () => Promise<void>;
@@ -109,10 +109,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Add gem to cart
-  const addToCart = useCallback(async (gemId: number): Promise<boolean> => {
+  const addToCart = useCallback(async (gemId: number, quantity: number = 1): Promise<boolean> => {
     setError(null);
     try {
-      await cartApi.addToCart(gemId, 1);
+      await cartApi.addToCart(gemId, quantity);
       await refreshCart();
       return true;
     } catch (err: any) {

@@ -256,7 +256,7 @@ function ManageAdmins() {
                 onClose={() => setIsOpen(false)}
             />
 
-            <div className="flex-1 overflow-y-auto p-6 md:ml-64">
+            <div className="flex-1 overflow-y-auto p-6 md:ml-72">
 
 
                 {/* Mobile Header */}
@@ -295,7 +295,7 @@ function ManageAdmins() {
                 </div>
 
                 {/* Maintenance */}
-                <div className="bg-white border rounded-xl shadow-sm p-6 mb-6">
+                {/* <div className="bg-white border rounded-xl shadow-sm p-6 mb-6">
 
                     <div className="flex items-center justify-between">
 
@@ -345,7 +345,7 @@ function ManageAdmins() {
 
                     </div>
 
-                </div>
+                </div> */}
 
                 <div className="flex justify-between mb-6">
                     <input

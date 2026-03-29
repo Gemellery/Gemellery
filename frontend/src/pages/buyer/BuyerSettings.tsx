@@ -127,7 +127,7 @@ function BuyerSettings() {
             />
 
             {/* MAIN CONTENT */}
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto bg-gray-50 flex flex-col">
+            <main className="flex-1 ml-0 md:ml-72 overflow-y-auto bg-gray-50 flex flex-col">
                 <div className="p-6 md:p-8 flex-1">
                     {/* HEADER */}
                     <div className="flex items-center justify-between mb-6">

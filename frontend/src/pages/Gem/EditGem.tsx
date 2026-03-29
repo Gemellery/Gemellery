@@ -155,7 +155,7 @@ function EditGem() {
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
                 />
-                <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8 flex items-center justify-center">
+                <main className="flex-1 ml-0 md:ml-72 overflow-y-auto p-6 md:p-8 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-12 h-12 border-4 border-[#1F7A73] border-t-transparent rounded-full animate-spin" />
                         <p className="text-gray-500 text-sm">Loading gem details...</p>
@@ -173,7 +173,7 @@ function EditGem() {
                 onClose={() => setSidebarOpen(false)}
             />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto p-6 md:p-8">
+            <main className="flex-1 ml-0 md:ml-72 overflow-y-auto p-6 md:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     <div className="lg:col-span-3 space-y-6">
                         <div>

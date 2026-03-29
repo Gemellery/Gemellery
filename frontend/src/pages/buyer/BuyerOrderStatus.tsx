@@ -79,7 +79,7 @@ function BuyerOrderStatus() {
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 ml-0 md:ml-64 overflow-y-auto">
+        <main className="flex-1 ml-0 md:ml-72 overflow-y-auto">
           {/* Header */}
           <div className="bg-white shadow-sm sticky top-0 z-30">
             <div className="px-6 py-5 md:px-10 md:py-6 flex items-center justify-between">
