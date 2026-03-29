@@ -33,6 +33,7 @@ export declare namespace GemCertificate {
     origin: string;
     carat: string;
     certificateNumber: string;
+    sellerName: string;
     mintedAt: BigNumberish;
   };
 
@@ -45,6 +46,7 @@ export declare namespace GemCertificate {
     origin: string,
     carat: string,
     certificateNumber: string,
+    sellerName: string,
     mintedAt: bigint
   ] & {
     gemName: string;
@@ -55,6 +57,7 @@ export declare namespace GemCertificate {
     origin: string;
     carat: string;
     certificateNumber: string;
+    sellerName: string;
     mintedAt: bigint;
   };
 }
@@ -81,6 +84,7 @@ export interface GemCertificateInterface extends Interface {
       | "tokenURI"
       | "totalGemsMinted"
       | "transferFrom"
+      | "transferGemToBuyer"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -89,6 +93,7 @@ export interface GemCertificateInterface extends Interface {
       | "Approval"
       | "ApprovalForAll"
       | "GemMinted"
+      | "GemTransferred"
       | "OwnershipTransferred"
       | "Transfer"
   ): EventFragment;
@@ -119,7 +124,17 @@ export interface GemCertificateInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mintGem",
-    values: [string, string, string, string, string, string, string, string]
+    values: [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string
+    ]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -159,6 +174,10 @@ export interface GemCertificateInterface extends Interface {
   encodeFunctionData(
     functionFragment: "transferFrom",
     values: [AddressLike, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferGemToBuyer",
+    values: [BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -215,6 +234,10 @@ export interface GemCertificateInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "transferGemToBuyer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
@@ -266,6 +289,7 @@ export namespace GemMintedEvent {
     gemName: string,
     gemType: string,
     certificateNumber: string,
+    sellerName: string,
     mintedAt: BigNumberish
   ];
   export type OutputTuple = [
@@ -273,6 +297,7 @@ export namespace GemMintedEvent {
     gemName: string,
     gemType: string,
     certificateNumber: string,
+    sellerName: string,
     mintedAt: bigint
   ];
   export interface OutputObject {
@@ -280,7 +305,33 @@ export namespace GemMintedEvent {
     gemName: string;
     gemType: string;
     certificateNumber: string;
+    sellerName: string;
     mintedAt: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GemTransferredEvent {
+  export type InputTuple = [
+    tokenId: BigNumberish,
+    from: AddressLike,
+    to: AddressLike,
+    transferredAt: BigNumberish
+  ];
+  export type OutputTuple = [
+    tokenId: bigint,
+    from: string,
+    to: string,
+    transferredAt: bigint
+  ];
+  export interface OutputObject {
+    tokenId: bigint;
+    from: string;
+    to: string;
+    transferredAt: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -395,7 +446,8 @@ export interface GemCertificate extends BaseContract {
       clarity: string,
       origin: string,
       carat: string,
-      certificateNumber: string
+      certificateNumber: string,
+      sellerName: string
     ],
     [bigint],
     "nonpayable"
@@ -446,6 +498,12 @@ export interface GemCertificate extends BaseContract {
 
   transferFrom: TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  transferGemToBuyer: TypedContractMethod<
+    [tokenId: BigNumberish, buyer: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -501,7 +559,8 @@ export interface GemCertificate extends BaseContract {
       clarity: string,
       origin: string,
       carat: string,
-      certificateNumber: string
+      certificateNumber: string,
+      sellerName: string
     ],
     [bigint],
     "nonpayable"
@@ -564,6 +623,13 @@ export interface GemCertificate extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "transferGemToBuyer"
+  ): TypedContractMethod<
+    [tokenId: BigNumberish, buyer: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
 
@@ -587,6 +653,13 @@ export interface GemCertificate extends BaseContract {
     GemMintedEvent.InputTuple,
     GemMintedEvent.OutputTuple,
     GemMintedEvent.OutputObject
+  >;
+  getEvent(
+    key: "GemTransferred"
+  ): TypedContractEvent<
+    GemTransferredEvent.InputTuple,
+    GemTransferredEvent.OutputTuple,
+    GemTransferredEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -626,7 +699,7 @@ export interface GemCertificate extends BaseContract {
       ApprovalForAllEvent.OutputObject
     >;
 
-    "GemMinted(uint256,string,string,string,uint256)": TypedContractEvent<
+    "GemMinted(uint256,string,string,string,string,uint256)": TypedContractEvent<
       GemMintedEvent.InputTuple,
       GemMintedEvent.OutputTuple,
       GemMintedEvent.OutputObject
@@ -635,6 +708,17 @@ export interface GemCertificate extends BaseContract {
       GemMintedEvent.InputTuple,
       GemMintedEvent.OutputTuple,
       GemMintedEvent.OutputObject
+    >;
+
+    "GemTransferred(uint256,address,address,uint256)": TypedContractEvent<
+      GemTransferredEvent.InputTuple,
+      GemTransferredEvent.OutputTuple,
+      GemTransferredEvent.OutputObject
+    >;
+    GemTransferred: TypedContractEvent<
+      GemTransferredEvent.InputTuple,
+      GemTransferredEvent.OutputTuple,
+      GemTransferredEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
