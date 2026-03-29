@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import db from "../database";
+import PDFDocument from "pdfkit";
 import { transferGemOwnership } from "../services/blockchain.service";
 
 // GET /api/buyer/profile
@@ -317,6 +318,125 @@ export const getOrderDetails = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to load order details" });
+  }
+};
+
+// GET /api/buyer/orders/:id/receipt
+export const downloadOrderReceipt = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { id } = req.params;
+
+    const [orderRows]: any = await db.query(
+      `
+        SELECT
+          o.order_id,
+          o.total_amount,
+          o.payment_method,
+          o.payment_status,
+          o.created_at,
+          sa.street AS address_line1,
+          sa.city,
+          sa.postal_code AS zip,
+          sa.country,
+          COALESCE(NULLIF(CONCAT(sa.first_name, ' ', sa.last_name), ' '), u.full_name) AS buyer_name,
+          u.email
+        FROM orders o
+        LEFT JOIN user u ON u.user_id = o.buyer_id
+        LEFT JOIN shipping_addresses sa ON sa.address_id = o.address_id
+        WHERE o.order_id = ? AND o.buyer_id = ?
+        LIMIT 1
+      `,
+      [id, buyerId]
+    );
+
+    if (!orderRows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const order = orderRows[0];
+
+    if (order.payment_status !== "Paid") {
+      return res.status(400).json({ error: "Receipt is available only for paid orders" });
+    }
+
+    const [items]: any = await db.query(
+      `
+        SELECT
+          g.gem_name,
+          oi.quantity,
+          oi.price
+        FROM order_items oi
+        JOIN gem g ON g.gem_id = oi.gem_id
+        WHERE oi.order_id = ?
+        ORDER BY oi.order_item_id ASC
+      `,
+      [id]
+    );
+
+    const formatAmount = (value: number) =>
+      `LKR ${Number(value || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+
+    const filename = `payment_receipt_order_${order.order_id}.pdf`;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    doc.pipe(res);
+
+    doc.fontSize(20).text("Gemellery Payment Receipt", { align: "center" });
+    doc.moveDown(1.2);
+
+    doc.fontSize(12).text(`Receipt Number: RCPT-${order.order_id}`);
+    doc.text(`Order ID: ${order.order_id}`);
+    doc.text(`Payment Date: ${new Date(order.created_at).toLocaleString()}`);
+    doc.text(`Payment Method: ${order.payment_method || "Card"}`);
+    doc.text(`Payment Status: ${order.payment_status}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Buyer Details", { underline: true });
+    doc.moveDown(0.3);
+    doc.text(`Name: ${order.buyer_name || "N/A"}`);
+    doc.text(`Email: ${order.email || "N/A"}`);
+    doc.text(`Address: ${order.address_line1 || ""}`);
+    doc.text(`City: ${order.city || ""}`);
+    doc.text(`Postal Code: ${order.zip || ""}`);
+    doc.text(`Country: ${order.country || ""}`);
+    doc.moveDown(1);
+
+    doc.fontSize(12).text("Items", { underline: true });
+    doc.moveDown(0.3);
+
+    if (!items.length) {
+      doc.text("No items found for this order.");
+    } else {
+      items.forEach((item: any, index: number) => {
+        const lineTotal = Number(item.price) * Number(item.quantity);
+        doc.text(
+          `${index + 1}. ${item.gem_name}  |  Qty: ${item.quantity}  |  Unit: ${formatAmount(
+            Number(item.price)
+          )}  |  Line Total: ${formatAmount(lineTotal)}`
+        );
+      });
+    }
+
+    doc.moveDown(1.2);
+    doc.fontSize(14).text(`Total Paid: ${formatAmount(Number(order.total_amount))}`, {
+      align: "right",
+    });
+    doc.moveDown(1.2);
+    doc.fontSize(10).fillColor("#555").text("This is a system-generated payment receipt.", {
+      align: "center",
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to generate payment receipt" });
   }
 };
 

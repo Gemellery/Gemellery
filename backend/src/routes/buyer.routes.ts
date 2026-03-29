@@ -4,6 +4,7 @@ import {
   getRecentOrders,
   getAllOrders,
   getOrderDetails,
+  downloadOrderReceipt,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -54,6 +55,13 @@ router.get(
   authGuard,
   authorizeRole("buyer"),
   getOrderDetails
+);
+
+router.get(
+  "/orders/:id/receipt",
+  authGuard,
+  authorizeRole("buyer"),
+  downloadOrderReceipt
 );
 
 router.get(
