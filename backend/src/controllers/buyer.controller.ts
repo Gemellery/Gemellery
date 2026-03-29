@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import db from "../database";
 import PDFDocument from "pdfkit";
+import { transferGemOwnership } from "../services/blockchain.service";
 
 // GET /api/buyer/profile
 export const getBuyerProfile = async (req: Request, res: Response) => {
@@ -616,6 +617,141 @@ export const updateReview = async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to update review" });
+  }
+};
+
+// ==========================================
+// BLOCKCHAIN CERTIFICATES
+// ==========================================
+
+// GET /api/buyer/certificates
+export const getBuyerCertificates = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+
+    const [rows]: any = await db.query(
+      `
+        SELECT
+          g.gem_id,
+          g.gem_name,
+          g.gem_type,
+          g.carat,
+          g.cut,
+          g.clarity,
+          g.color,
+          g.origin,
+          g.price,
+          g.ngja_certificate_no,
+          g.token_id,
+          g.tx_hash,
+          g.blockchain_status,
+          g.minted_at,
+          g.nft_claimed,
+          g.nft_owner_address,
+          u.full_name as seller_name,
+          s.business_name,
+          o.order_id,
+          o.created_at as purchased_at,
+          MIN(gi.image_url) as image_url
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        LEFT JOIN user u ON g.seller_id = u.user_id
+        LEFT JOIN seller s ON g.seller_id = s.seller_id
+        LEFT JOIN gem_images gi ON g.gem_id = gi.gem_id
+        WHERE o.buyer_id = ?
+          AND g.blockchain_status = 'minted'
+          AND g.token_id IS NOT NULL
+        GROUP BY g.gem_id, o.order_id, o.created_at,
+                 g.gem_name, g.gem_type, g.carat, g.cut, g.clarity, g.color,
+                 g.origin, g.price, g.ngja_certificate_no, g.token_id, g.tx_hash,
+                 g.blockchain_status, g.minted_at, g.nft_claimed, g.nft_owner_address,
+                 u.full_name, s.business_name
+        ORDER BY o.created_at DESC
+      `,
+      [buyerId]
+    );
+
+    return res.json(rows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to load certificates" });
+  }
+};
+
+// POST /api/buyer/certificates/claim
+export const claimNFT = async (req: Request, res: Response) => {
+  try {
+    const buyerId = (req.user as any).id;
+    const { gem_id, wallet_address } = req.body;
+
+    if (!gem_id) {
+      return res.status(400).json({ error: "gem_id is required" });
+    }
+
+    if (!wallet_address) {
+      return res.status(400).json({ error: "wallet_address is required" });
+    }
+
+    // Validate Ethereum address format
+    const ethAddressRegex = /^0x[a-fA-F0-9]{40}$/;
+    if (!ethAddressRegex.test(wallet_address)) {
+      return res.status(400).json({ error: "Invalid Ethereum wallet address" });
+    }
+
+    // Verify buyer owns this gem (purchased it)
+    const [ownerCheck]: any = await db.query(
+      `
+        SELECT g.gem_id, g.token_id, g.nft_claimed, g.blockchain_status
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN gem g ON oi.gem_id = g.gem_id
+        WHERE o.buyer_id = ? AND g.gem_id = ?
+        LIMIT 1
+      `,
+      [buyerId, gem_id]
+    );
+
+    if (ownerCheck.length === 0) {
+      return res.status(403).json({ error: "You do not own this gem" });
+    }
+
+    const gem = ownerCheck[0];
+
+    if (gem.nft_claimed) {
+      return res.status(400).json({ error: "NFT has already been claimed to a wallet" });
+    }
+
+    if (gem.blockchain_status !== "minted" || !gem.token_id) {
+      return res.status(400).json({ error: "This gem does not have a minted NFT" });
+    }
+
+    // Transfer the NFT on the blockchain
+    const result = await transferGemOwnership(gem.token_id, wallet_address);
+
+    // Update the database to record the claim
+    await db.query(
+      `
+        UPDATE gem
+        SET nft_claimed = TRUE,
+            nft_owner_address = ?,
+            nft_claim_tx_hash = ?
+        WHERE gem_id = ?
+      `,
+      [wallet_address, result.txHash, gem_id]
+    );
+
+    return res.json({
+      message: "NFT transferred to your wallet successfully!",
+      txHash: result.txHash,
+      walletAddress: wallet_address,
+    });
+  } catch (err: any) {
+    console.error("NFT claim failed:", err);
+    return res.status(500).json({
+      error: "Failed to transfer NFT to wallet",
+      details: err.message,
+    });
   }
 };
 
