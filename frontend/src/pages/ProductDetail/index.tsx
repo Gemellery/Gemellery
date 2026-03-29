@@ -159,6 +159,7 @@ const ProductDetail = () => {
             <ProductActions
               gemId={product.gem_id}
               onBookViewing={handleBookViewing}
+              vendorEmail={sellerProfile?.seller?.email}
             />
 
             {/* Shipping Info */}

@@ -8,12 +8,14 @@ interface ProductActionsProps {
   onBookViewing?: () => void
   quantity?: number
   showQuantitySelector?: boolean
+  vendorEmail?: string
 }
 
 const ProductActions: React.FC<ProductActionsProps> = ({
   gemId,
   onBookViewing,
-  quantity: initialQuantity = 1
+  quantity: initialQuantity = 1,
+  vendorEmail
 }) => {
   const [quantity] = useState(initialQuantity)
   const [isFavorited, setIsFavorited] = useState(false)
@@ -63,6 +65,20 @@ const ProductActions: React.FC<ProductActionsProps> = ({
   const handleBookViewing = async () => {
     setIsBooking(true)
     try {
+      // Use the vendor's email if available, otherwise fallback to support
+      const supportEmail = vendorEmail || 'support@gemellery.com'
+      
+      // Prefill event details
+      const title = encodeURIComponent(`Gem Viewing Appointment - Gem ID: ${gemId || 'Unknown'}`)
+      const details = encodeURIComponent(`I would like to schedule a viewing for this gem.`)
+      
+      // Construct Google Calendar event link (action=TEMPLATE creates a new event)
+      // The 'add' parameter adds the support email to the guest list so they get notified
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&add=${supportEmail}`
+      
+      // Open in a new tab
+      window.open(url, '_blank', 'noopener,noreferrer')
+
       if (onBookViewing) {
         await onBookViewing()
       }
