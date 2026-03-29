@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck, Star } from "lucide-react";
+import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck, Star, Shield } from "lucide-react";
 import API_CONFIG from "../lib/api.config";
 
 interface BuyerSidebarProps {
@@ -125,6 +125,7 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
             {navItem("/buyer/dashboard", "Overview", LayoutDashboard)}
             {navItem("/buyer/orders/history", "Order History", History)}
             {navItem("/buyer/order-status", "Live Tracking", Truck)}
+            {navItem("/buyer/certificates", "My Certificates", Shield)}
             {navItem("/buyer/reviews", "My Reviews", Star, 
               pendingReviewCount > 0 && (
                 <span className="bg-[#cc000b] text-white text-[10px] font-black px-2 py-0.5 rounded-[6px] shadow-sm">
