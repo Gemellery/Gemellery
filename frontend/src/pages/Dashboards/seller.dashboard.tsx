@@ -100,7 +100,7 @@ function SellerDashboardLayout() {
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)} />
 
-            <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+            <main className="flex-1 ml-0 md:ml-72 overflow-y-auto flex flex-col">
                 <div className="bg-white border-b border-gray-100 px-6 py-8 md:px-10 md:py-8 flex flex-col md:flex-row md:items-center justify-between gap-4 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
                         <button
@@ -198,57 +198,59 @@ function SellerDashboardLayout() {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 mb-10">
 
                     {/* Total Revenue */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
-                        <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                            <BanknoteArrowDown className="w-5 h-5" />
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] flex flex-col xl:flex-row items-center xl:items-center gap-3 xl:gap-5 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="size-12 sm:size-14 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100/50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100/30 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <BanknoteArrowDown className="size-6 sm:size-7" />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Total Revenue</p>
-                            <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+                        <div className="flex flex-col items-center xl:items-start text-center xl:text-left min-w-0 w-full">
+                            <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">Revenue</p>
+                            <h3 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 leading-tight">
                                 {dashboardStats ? `LKR ${Number(dashboardStats.totalRevenue).toLocaleString('en-US')}` : "—"}
                             </h3>
-                            <span className={`text-xs font-medium ${dashboardStats?.revenueTrend >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-                                {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "+" : ""}${dashboardStats.revenueTrend}% this month` : ""}
-                            </span>
+                            <div className={`flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full ${dashboardStats?.revenueTrend >= 0 ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"}`}>
+                                <span className="text-[10px] sm:text-xs font-bold">
+                                    {dashboardStats ? `${dashboardStats.revenueTrend >= 0 ? "↑" : "↓"} ${Math.abs(dashboardStats.revenueTrend)}%` : ""}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Total Listings */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
-                        <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                            <Package className="w-5 h-5" />
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] flex flex-col xl:flex-row items-center xl:items-center gap-3 xl:gap-5 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="size-12 sm:size-14 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/30 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <Package className="size-6 sm:size-7" />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Active Listings</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.totalListings ?? "—"}</h3>
-                            <p className="text-xs text-gray-400">Available gems</p>
+                        <div className="flex flex-col items-center xl:items-start text-center xl:text-left min-w-0 w-full">
+                            <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">Active</p>
+                            <h3 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 leading-tight">{dashboardStats?.totalListings ?? "—"}</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-400 font-medium mt-1">Listed masterpieces</p>
                         </div>
                     </div>
 
                     {/* Total Orders */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
-                        <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                            <BadgeCheck className="w-5 h-5" />
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] flex flex-col xl:flex-row items-center xl:items-center gap-3 xl:gap-5 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="size-12 sm:size-14 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100/50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/30 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <BadgeCheck className="size-6 sm:size-7" />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Total Orders</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.totalOrders ?? "—"}</h3>
-                            <p className="text-xs text-gray-400">All time</p>
+                        <div className="flex flex-col items-center xl:items-start text-center xl:text-left min-w-0 w-full">
+                            <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">Orders</p>
+                            <h3 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 leading-tight">{dashboardStats?.totalOrders ?? "—"}</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-400 font-medium mt-1">Total sales success</p>
                         </div>
                     </div>
 
                     {/* Wishlist Count */}
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-shadow duration-300">
-                        <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
-                            <Heart className="w-5 h-5" />
+                    <div className="bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] flex flex-col xl:flex-row items-center xl:items-center gap-3 xl:gap-5 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group">
+                        <div className="size-12 sm:size-14 rounded-2xl bg-gradient-to-br from-red-50 to-red-100/50 text-red-500 flex items-center justify-center shrink-0 border border-red-100/30 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <Heart className="size-6 sm:size-7" />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Wishlisted Gems</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.wishlistCount ?? "—"}</h3>
-                            <p className="text-xs text-gray-400">Across all listings</p>
+                        <div className="flex flex-col items-center xl:items-start text-center xl:text-left min-w-0 w-full">
+                            <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-0.5 uppercase tracking-[0.1em]">Wishlisted</p>
+                            <h3 className="text-base sm:text-xl lg:text-2xl font-black text-gray-900 leading-tight">{dashboardStats?.wishlistCount ?? "—"}</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-400 font-medium mt-1">Collector interest</p>
                         </div>
                     </div>
                 </div>
@@ -354,14 +356,14 @@ function SellerDashboardLayout() {
                         <p className="text-xs text-gray-400 mt-2">Gems approved vs. submitted</p>
                     </div>
 
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-5">
-                        <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                            <Package className="w-6 h-6" />
+                    <div className="bg-white p-4 sm:p-5 lg:p-6 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] flex items-center gap-4 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
+                        <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                            <Package className="w-5 h-5 lg:w-6 lg:h-6" />
                         </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Active Shipments</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{dashboardStats?.activeShipments ?? "—"}</h3>
-                            <p className="text-xs text-gray-400 mt-1">Currently in transit</p>
+                        <div className="min-w-0">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1 truncate">Active Shipments</p>
+                            <h3 className="text-xl lg:text-2xl font-bold text-gray-900 truncate">{dashboardStats?.activeShipments ?? "—"}</h3>
+                            <p className="text-[10px] sm:text-xs text-gray-400 truncate mt-1">Currently in transit</p>
                         </div>
                     </div>
                 </div>
