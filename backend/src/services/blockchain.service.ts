@@ -14,11 +14,17 @@ export interface MintGemData {
     origin: string;
     carat: string;
     certificateNumber: string;
+    sellerName: string;
 }
 
 export interface MintResult {
     tokenId: number;
     txHash: string;
+}
+
+export interface TransferResult {
+    txHash: string;
+    blockNumber: number;
 }
 
 // ==========================================
@@ -82,7 +88,7 @@ export async function mintGemOnChain(data: MintGemData): Promise<MintResult | nu
     // Get the contract instance (initializes on first call)
     const gemContract = getContract();
 
-    console.log(`[INFO] Minting gem on blockchain: "${data.gemName}" (${data.certificateNumber})`);
+    console.log(`[INFO] Minting gem on blockchain: "${data.gemName}" (${data.certificateNumber}) by seller "${data.sellerName}"`);
 
     const tx = await gemContract.mintGem(
         data.gemName,
@@ -92,7 +98,8 @@ export async function mintGemOnChain(data: MintGemData): Promise<MintResult | nu
         data.clarity,
         data.origin,
         data.carat,
-        data.certificateNumber
+        data.certificateNumber,
+        data.sellerName
     );
 
     console.log(`[INFO] Transaction sent: ${tx.hash}`);
@@ -141,6 +148,47 @@ export async function mintGemOnChain(data: MintGemData): Promise<MintResult | nu
     };
 }
 
+// ==========================================
+// TRANSFER FUNCTION (Hybrid Claim-to-Wallet)
+// ==========================================
+export async function transferGemOwnership(
+    tokenId: number,
+    buyerAddress: string
+): Promise<TransferResult> {
+    if (!BLOCKCHAIN_ENABLED) {
+        throw new Error("Blockchain is disabled. Cannot transfer NFT.");
+    }
+
+    const gemContract = getContract();
+
+    console.log(`[INFO] Transferring gem token #${tokenId} to buyer wallet: ${buyerAddress}`);
+
+    const tx = await gemContract.transferGemToBuyer(tokenId, buyerAddress);
+
+    console.log(`[INFO] Transfer transaction sent: ${tx.hash}`);
+    console.log(`       Waiting for confirmation...`);
+
+    const receipt = await tx.wait();
+
+    if (!receipt || receipt.status === 0) {
+        throw new Error("Transfer transaction failed on-chain (receipt status = 0)");
+    }
+
+    console.log(`[SUCCESS] Gem transferred successfully!`);
+    console.log(`          Token ID: ${tokenId}`);
+    console.log(`          To:       ${buyerAddress}`);
+    console.log(`          TX Hash:  ${tx.hash}`);
+    console.log(`          Block:    ${receipt.blockNumber}`);
+
+    return {
+        txHash: tx.hash,
+        blockNumber: receipt.blockNumber,
+    };
+}
+
+// ==========================================
+// STATUS FUNCTION
+// ==========================================
 export async function getBlockchainStatus(): Promise<{
     enabled: boolean;
     connected: boolean;

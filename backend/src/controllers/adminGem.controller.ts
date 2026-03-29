@@ -67,10 +67,13 @@ export const updateGemStatus = async (req: Request, res: Response) => {
             return res.json({ message: `Gem rejected successfully` });
         }
 
-        // Fetch the gem details needed for minting
+        // Fetch the gem details needed for minting (including seller name)
         const [gemRows]: any = await pool.query(
-            `SELECT gem_name, gem_type, cut, color, clarity, origin, carat, ngja_certificate_no 
-             FROM gem WHERE gem_id = ?`,
+            `SELECT g.gem_name, g.gem_type, g.cut, g.color, g.clarity, g.origin, g.carat, 
+                    g.ngja_certificate_no, u.full_name as seller_name
+             FROM gem g
+             LEFT JOIN user u ON g.seller_id = u.user_id
+             WHERE g.gem_id = ?`,
             [gem_id]
         );
 
@@ -90,6 +93,7 @@ export const updateGemStatus = async (req: Request, res: Response) => {
             origin: gem.origin || "Unknown",
             carat: gem.carat ? String(gem.carat) : "0",
             certificateNumber: gem.ngja_certificate_no || "N/A",
+            sellerName: gem.seller_name || "Unknown Seller",
         };
 
         try {
@@ -148,9 +152,12 @@ export const retryMintGem = async (req: Request, res: Response) => {
 
     try {
             const [gemRows]: any = await pool.query(
-            `SELECT gem_id, gem_name, gem_type, cut, color, clarity, origin, carat, 
-                    ngja_certificate_no, verification_status, blockchain_status
-             FROM gem WHERE gem_id = ?`,
+            `SELECT g.gem_id, g.gem_name, g.gem_type, g.cut, g.color, g.clarity, g.origin, g.carat, 
+                    g.ngja_certificate_no, g.verification_status, g.blockchain_status,
+                    u.full_name as seller_name
+             FROM gem g
+             LEFT JOIN user u ON g.seller_id = u.user_id
+             WHERE g.gem_id = ?`,
             [gem_id]
         );
 
@@ -185,6 +192,7 @@ export const retryMintGem = async (req: Request, res: Response) => {
             origin: gem.origin || "Unknown",
             carat: gem.carat ? String(gem.carat) : "0",
             certificateNumber: gem.ngja_certificate_no || "N/A",
+            sellerName: gem.seller_name || "Unknown Seller",
         };
 
         try {
