@@ -1,16 +1,28 @@
-import React, { useState,useRef } from 'react'
-import { Shield, QrCode, ExternalLink, Wallet, CheckCircle2, Loader2, Download, ExternalLink, X, Loader2 } from 'lucide-react'
+import React, { useState, useRef } from 'react'
+import { Shield, QrCode, ExternalLink, Wallet, CheckCircle2, Loader2, Download, X } from 'lucide-react'
 import { QRCodeCanvas } from 'qrcode.react'
 import type { GemData } from '@/lib/gems/types'
 import logoSvgRaw from '@/assets/logo.svg?raw'
 
-// ─── helper ────────────────────────────────────────────────────────────────
+// ─── Constants & Utils ───────────────────────────────────────────────────────
+
+/**
+ * Formats a value for display, returning a fallback if the value is empty or null.
+ * @param v - The value to format (string, number, null, or undefined)
+ * @param fallback - The string to return if v is empty or null (defaults to 'N/A')
+ * @returns The formatted string or fallback
+ */
 const fmt = (v: string | number | null | undefined, fallback = 'N/A') =>
   v !== null && v !== undefined && String(v).trim() !== '' ? String(v) : fallback
 
 // ─── Logo as base64 data URL so html2canvas can render the full SVG ────────
 const logoDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(logoSvgRaw)))}`
 
+/**
+ * Renders the Gemellery logo as a base64 encoded image.
+ * This ensures the logo is correctly captured when using html2canvas/html-to-image
+ * even if there are cross-origin restrictions on external SVG files.
+ */
 const GemelleryLogoImg = () => (
   <img
     src={logoDataUrl}
@@ -22,7 +34,14 @@ const GemelleryLogoImg = () => (
 
 
 
-// ─── The hidden certificate canvas that gets screenshot-ed ─────────────────
+/**
+ * CertificateCanvas Component
+ * This component renders the high-fidelity certificate design that is used
+ * to generate the downloadable PDF. It is typically hidden or rendered in a modal.
+ * 
+ * @param data - The gem data to populate the certificate
+ * @param ref - React ref to the container element for screenshot capture
+ */
 const CertificateCanvas = React.forwardRef<HTMLDivElement, { data: GemData }>(
   ({ data }, ref) => {
     const isOnChain =
@@ -402,7 +421,14 @@ const CertificateCanvas = React.forwardRef<HTMLDivElement, { data: GemData }>(
 )
 CertificateCanvas.displayName = 'CertificateCanvas'
 
-// ─── Modal wrapper showing the certificate + download button ───────────────
+/**
+ * CertificateModal Component
+ * Displays a preview of the Gem Certificate and provides functionality
+ * to download it as a PDF document.
+ * 
+ * @param data - The gem data to display
+ * @param onClose - Callback function to close the modal
+ */
 const CertificateModal: React.FC<{ data: GemData; onClose: () => void }> = ({
   data,
   onClose,
@@ -410,10 +436,15 @@ const CertificateModal: React.FC<{ data: GemData; onClose: () => void }> = ({
   const certRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
 
+  /**
+   * Generates a PDF from the CertificateCanvas component.
+   * Uses html-to-image for the screenshot and jsPDF for the document creation.
+   */
   const handleDownload = async () => {
     if (!certRef.current) return
     setLoading(true)
     try {
+      // Dynamic imports to reduce bundle size
       const { toPng } = await import('html-to-image')
       const jsPDFModule = await import('jspdf')
       const JsPDFClass = (jsPDFModule.jsPDF ? jsPDFModule.jsPDF : (jsPDFModule.default || jsPDFModule)) as any
@@ -424,9 +455,10 @@ const CertificateModal: React.FC<{ data: GemData; onClose: () => void }> = ({
       const w = el.scrollWidth
       const h = el.scrollHeight
 
+      // Capture the certificate content as a high-resolution PNG
       const imgData = await toPng(el, {
         quality: 1,
-        pixelRatio: 2,
+        pixelRatio: 2, // Higher pixel ratio for better print quality
         width: w,
         height: h,
         style: { overflow: 'visible' },
@@ -434,9 +466,12 @@ const CertificateModal: React.FC<{ data: GemData; onClose: () => void }> = ({
         skipFonts: false,
       })
 
+      // Create PDF and add the image
       const orientation = w > h ? 'landscape' : 'portrait'
       const pdf = new JsPDFClass({ orientation, unit: 'px', format: [w, h] })
       pdf.addImage(imgData, 'PNG', 0, 0, w, h)
+      
+      // Save the generated PDF
       pdf.save(`Gemellery_Certificate_GEM-${String(data.gem_id).padStart(6, '0')}.pdf`)
     } catch (e) {
       console.error('Certificate generation failed:', e)
@@ -563,15 +598,35 @@ const CertificateModal: React.FC<{ data: GemData; onClose: () => void }> = ({
   )
 }
 
-// ─── Main exported component ───────────────────────────────────────────────import API_CONFIG from '@/lib/api.config'
+// ─── Main exported component ───────────────────────────────────────────────
+import API_CONFIG from '@/lib/api.config'
 
+/**
+ * Props for the GemPassport component
+ * Extends GemData with additional UI-specific flags and callbacks
+ */
 interface GemPassportProps extends GemData {
+  /** Whether to show the blockchain claim (transfer to wallet) button */
   showClaimButton?: boolean;
+  /** Whether the NFT has already been claimed/transferred */
   nft_claimed?: boolean;
+  /** The wallet address of the current NFT owner */
   nft_owner_address?: string | null;
+  /** Callback triggered after a successful claim transaction */
   onClaimed?: (txHash: string, walletAddress: string) => void;
 }
 
+/**
+ * GemPassport Component
+ * 
+ * The main UI component for displaying gem authenticity information.
+ * Features:
+ * - Summary view of gem specifications
+ * - Blockchain status and transaction hash tracking
+ * - QR code link to block explorer
+ * - On-demand PDF certificate generation via modal
+ * - Claim-to-wallet functionality for NFT-backed certificates
+ */
 const GemPassport: React.FC<GemPassportProps> = (props) => {
   const { showClaimButton, nft_claimed, nft_owner_address, onClaimed, ...data } = props;
   const [walletInput, setWalletInput] = useState('');
@@ -579,21 +634,25 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
   const [claimError, setClaimError] = useState('');
   const [showWalletInput, setShowWalletInput] = useState(false);
 
-  const etherscanUrl = data.tx_hash 
-    ? `https://sepolia.etherscan.io/tx/${data.tx_hash}` 
-    : null;
 
   const truncateHash = (hash: string) => {
     if (hash.length <= 16) return hash;
     return `${hash.slice(0, 8)}...${hash.slice(-6)}`;
   };
 
+  /**
+   * Initiates the NFT claim process.
+   * Validates the wallet address and sends a request to the backend
+   * to transfer the certificate NFT to the user's wallet.
+   */
   const handleClaim = async () => {
+    // 1. Validate Input
     if (!walletInput) {
       setClaimError('Please enter your Ethereum wallet address');
       return;
     }
 
+    // 2. Validate Ethereum Address Format
     const ethRegex = /^0x[a-fA-F0-9]{40}$/;
     if (!ethRegex.test(walletInput)) {
       setClaimError('Invalid Ethereum address format (must start with 0x followed by 40 hex characters)');
@@ -605,6 +664,7 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
 
     try {
       const token = localStorage.getItem('token');
+      // 3. API Request to claim endpoint
       const res = await fetch(`${API_CONFIG.BASE_URL}/api/buyer/certificates/claim`, {
         method: 'POST',
         headers: {
@@ -624,23 +684,26 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
         return;
       }
 
+      // 4. Success callback
       onClaimed?.(result.txHash, walletInput);
       setShowWalletInput(false);
     } catch (err: any) {
+      console.error('Claim error:', err);
       setClaimError(err.message || 'Failed to claim NFT');
     } finally {
       setClaiming(false);
     }
   };
 
-  const [showCert, setShowCert] = useState(false)
+  const [showCert, setShowCert] = useState(false);
 
   return (
     <>
+      {/* ── Summary Card View ── */}
       <div className="bg-[#f8f7f5] border border-gray-100/80 rounded-2xl overflow-hidden">
         <div className="p-5">
           <div className="flex items-start justify-between">
-            {/* Left Section */}
+            {/* Left Section: Gem Name & Status */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
                 <Shield size={16} className="text-teal-600" />
@@ -663,25 +726,10 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
                       : data.blockchain_status}
                   </p>
                 </div>
-
-              {/* Etherscan Link */}
-              {etherscanUrl && (
-                <div>
-                  <a
-                    href={etherscanUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-600 hover:text-teal-700 transition-colors"
-                  >
-                    <ExternalLink size={11} />
-                    View on Etherscan
-                  </a>
-                </div>
-              )}
               </div>
             </div>
 
-            {/* Right: QR + View Certificate */}
+            {/* Right Section: QR Link + View Modal Trigger */}
             <div className="flex-shrink-0 ml-4 flex flex-col items-center gap-2">
               <div className="bg-white rounded-xl p-3 w-24 h-24 flex items-center justify-center border border-gray-200/60 shadow-sm">
                 {data.tx_hash ? (
@@ -695,7 +743,6 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
                 )}
               </div>
 
-              {/* View Certificate link-button */}
               <button
                 id="view-certificate-btn"
                 onClick={() => setShowCert(true)}
@@ -709,79 +756,105 @@ const GemPassport: React.FC<GemPassportProps> = (props) => {
         </div>
       </div>
 
-      {/* Claim to Wallet Section — Only shown on the Certificates page */}
+      {/* Claim to Wallet Section — Redesigned as per user request */}
       {showClaimButton && data.blockchain_status === 'minted' && (
-        <div className="border-t border-gray-200/60 px-5 py-4 bg-gradient-to-b from-[#f8f7f5] to-[#f3f2ef]">
+        <div className="mt-4 p-6 bg-white border border-gray-100 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.05)] rounded-3xl overflow-hidden relative group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gray-50 via-teal-500/10 to-gray-50 opacity-50"></div>
+          
           {nft_claimed ? (
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 rounded-xl">
-                <CheckCircle2 size={16} className="text-emerald-600" />
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100/50">
+                <CheckCircle2 size={24} className="text-emerald-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">
+                <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">
                   Transferred to Wallet
                 </p>
-                <p className="text-[12px] font-mono text-gray-600 truncate" title={nft_owner_address || ''}>
-                  {nft_owner_address ? truncateHash(nft_owner_address) : 'Unknown'}
-                </p>
+                <div className="flex items-center gap-2">
+                  <Wallet size={12} className="text-gray-400" />
+                  <p className="text-[13px] font-mono font-bold text-gray-700 truncate" title={nft_owner_address || ''}>
+                    {nft_owner_address ? nft_owner_address : 'Unknown Address'}
+                  </p>
+                </div>
+              </div>
+              <div className="hidden sm:block px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full uppercase tracking-tight">
+                Confirmed
               </div>
             </div>
           ) : showWalletInput ? (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                  Your Ethereum Wallet Address
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-3 bg-teal-500 rounded-full"></div>
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">
+                  Secure Wallet Address
                 </label>
+              </div>
+              
+              <div className="relative">
                 <input
                   type="text"
                   placeholder="0x..."
                   value={walletInput}
                   onChange={(e) => { setWalletInput(e.target.value); setClaimError(''); }}
-                  className="w-full px-3 py-2.5 text-[13px] font-mono bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 transition-all placeholder:text-gray-300"
+                  className="w-full pl-4 pr-10 py-3 text-[14px] font-mono bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-teal-500/5 focus:border-teal-400 transition-all placeholder:text-gray-300"
                   disabled={claiming}
                 />
-                {claimError && (
-                  <p className="text-[11px] text-red-500 mt-1.5">{claimError}</p>
-                )}
-                <p className="text-[10px] text-gray-400 mt-1.5">
-                  This action is permanent. The NFT will be transferred to this address and cannot be reversed.
-                </p>
+                <Wallet size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300" />
               </div>
+
+              {claimError && (
+                <div className="p-3 bg-red-50 rounded-xl flex items-center gap-2 border border-red-100">
+                  <div className="w-1 h-1 bg-red-500 rounded-full"></div>
+                  <p className="text-[11px] text-red-600 font-medium">{claimError}</p>
+                </div>
+              )}
+              
               <div className="flex gap-2">
                 <button
                   onClick={handleClaim}
                   disabled={claiming}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white text-[12px] font-bold uppercase tracking-wider rounded-xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-black text-white text-[12px] font-bold uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md active:scale-[0.98]"
                 >
                   {claiming ? (
                     <>
-                      <Loader2 size={14} className="animate-spin" />
-                      Transferring...
+                      <Loader2 size={16} className="animate-spin" />
+                      Minting...
                     </>
                   ) : (
                     <>
-                      <Wallet size={14} />
-                      Confirm Transfer
+                      <CheckCircle2 size={16} />
+                      Confirm Claim
                     </>
                   )}
                 </button>
                 <button
                   onClick={() => { setShowWalletInput(false); setClaimError(''); setWalletInput(''); }}
                   disabled={claiming}
-                  className="px-4 py-2.5 text-[12px] font-bold text-gray-500 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+                  className="px-6 py-3 text-[12px] font-bold text-gray-400 bg-white border border-gray-100 rounded-2xl hover:bg-gray-50 transition-all"
                 >
                   Cancel
                 </button>
               </div>
+              
+              <p className="text-[10px] text-gray-400 text-center px-4 leading-relaxed">
+                <span className="font-bold text-gray-500">Notice:</span> This will permanently associate the physical gem with your digital wallet address on-chain.
+              </p>
             </div>
           ) : (
-            <button
-              onClick={() => setShowWalletInput(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-[12px] font-bold uppercase tracking-wider rounded-xl hover:bg-black hover:text-white hover:border-black transition-all duration-300 shadow-sm group"
-            >
-              <Wallet size={14} className="group-hover:scale-110 transition-transform" />
-              Claim to Your Wallet
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+              <div className="text-center sm:text-left">
+                <h4 className="text-sm font-bold text-gray-900 mb-0.5">Claim to Your Wallet</h4>
+                <p className="text-[11px] text-gray-500">Secure your digital certificate on the blockchain</p>
+              </div>
+              
+              <button
+                onClick={() => setShowWalletInput(true)}
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-white border border-gray-200 text-gray-700 text-[12px] font-bold uppercase tracking-widest rounded-2xl hover:border-black hover:text-black hover:bg-black/5 transition-all duration-300 shadow-sm"
+              >
+                <Wallet size={16} />
+                Begin Transfer
+              </button>
+            </div>
           )}
         </div>
       )}
