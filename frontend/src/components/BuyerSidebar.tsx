@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LogOut, Settings, LayoutDashboard, Flower, Rows3, X, History, Home, Truck, Star } from "lucide-react";
 import API_CONFIG from "../lib/api.config";
@@ -11,7 +11,7 @@ interface BuyerSidebarProps {
 
 function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
   const navigate = useNavigate();
-  const location = window.location;
+  const location = useLocation();
   const [pendingReviewCount, setPendingReviewCount] = useState(0);
 
   useEffect(() => {
@@ -39,98 +39,129 @@ function BuyerSidebar({ buyerName, isOpen, onClose }: BuyerSidebarProps) {
     navigate("/");
   };
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const navItem = (path: string, label: string, Icon: any, extra?: React.ReactNode) => {
+    const active = isActive(path);
+    return (
+      <button
+        onClick={() => navigate(path)}
+        className={`flex items-center justify-between w-full px-3 py-2.5 rounded-2xl transition-all duration-300 text-left group relative
+        ${active
+            ? "bg-white text-black shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] border border-gray-100/50"
+            : "text-gray-400 hover:text-black hover:bg-white/40"
+          }`}
+      >
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-xl transition-all duration-300 ${
+            active 
+              ? "bg-black text-white shadow-lg shadow-black/10 scale-110" 
+              : "bg-gray-100/80 text-gray-400 group-hover:bg-white group-hover:text-black group-hover:shadow-sm"
+          }`}>
+            <Icon className="w-3.5 h-3.5 shrink-0" />
+          </div>
+          <span className={`text-[13px] font-bold tracking-tight transition-colors duration-300 ${active ? "text-black" : ""}`}>{label}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {extra}
+          {active && (
+            <div className="w-1.5 h-1.5 rounded-full bg-black animate-[pulse_2s_infinite]" />
+          )}
+        </div>
+      </button>
+    );
+  };
+
   return (
     <>
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 bg-black/10 backdrop-blur-[2px] z-40 md:hidden transition-opacity duration-500 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       />
       <aside
-        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-[#fcfbf8] border-r flex flex-col justify-between overflow-hidden
-        transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
+        className={`fixed top-0 left-0 z-50 w-72 h-screen bg-[#fcfbf8] border-r border-gray-200/50 flex flex-col overflow-hidden
+        transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 shadow-[20px_0_40px_-20px_rgba(0,0,0,0.02)] md:shadow-none`}
       >
-
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-lg font-semibold">{buyerName}</h2>
-              <p className="text-xs text-gray-500">Buyer Dashboard</p>
+        <div className="p-8 pb-6">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="relative group">
+                <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white font-bold text-xl shadow-xl shadow-black/10 group-hover:scale-105 transition-transform duration-300">
+                  {(buyerName || "B").charAt(0).toUpperCase()}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-blue-500 border-2 border-[#fcfbf8] shadow-sm" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg font-bold tracking-tight text-gray-900 leading-tight truncate px-1">{buyerName || "Buyer"}</h2>
+                <div className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100/80 border border-gray-200/50 mt-1">
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Buyer Account</span>
+                </div>
+              </div>
             </div>
-            <button onClick={onClose}>
-              <X className="w-5 h-5 md:hidden" />
-            </button>
           </div>
 
-          <nav className="mt-8 space-y-4">
-            <button
-              onClick={() => navigate("/")}
-              className={"flex items-center gap-3 text-left w-full text-red-600 font-semibold hover:text-red-700 transition-colors duration-200 ease-in-out"}
-            >
-              <Home className="w-4 h-4" /> Home
-            </button>
+          <button 
+            onClick={onClose}
+            className="absolute top-6 -right-14 p-3 bg-[#fcfbf8]/60 backdrop-blur-md text-gray-900 rounded-full md:hidden hover:bg-[#fcfbf8]/80 transition-all border border-white/40 shadow-2xl group flex items-center justify-center"
+          >
+            <X className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500" />
+          </button>
 
-            <button
-              onClick={() => navigate("/buyer/dashboard")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/dashboard' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <LayoutDashboard className="w-4 h-4" /> Dashboard
-            </button>
+          <button
+            onClick={() => navigate("/")}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm text-gray-600 hover:text-black hover:shadow-md transition-all duration-300 group overflow-hidden relative"
+          >
+            <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-300 opacity-[0.02]" />
+            <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-widest">Back to Store</span>
+          </button>
+        </div>
 
-            <button
-              onClick={() => navigate("/buyer/orders/history")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/orders/history' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <History className="w-4 h-4" /> Order History
-            </button>
-
-            <button
-              onClick={() => navigate("/buyer/order-status")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/order-status' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <Truck className="w-4 h-4" /> Order Status
-            </button>
-
-            <button
-              onClick={() => navigate("/buyer/reviews")}
-              className="flex items-center justify-between w-full text-left group"
-            >
-              <div className="flex items-center gap-3">
-                <Star className="w-4 h-4" />
-                <span className={location.pathname === '/buyer/reviews' ? 'underline decoration-black decoration-2' : 'group-hover:underline'}>
-                  Reviews
-                </span>
-              </div>
-              {pendingReviewCount > 0 && (
-                <span className="bg-[#cc000b] text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center justify-center !no-underline">
+        <div className="flex-1 overflow-y-auto px-6 py-2 scrollbar-hide space-y-8">
+          <nav className="space-y-1.5">
+            <p className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Activity</p>
+            {navItem("/buyer/dashboard", "Overview", LayoutDashboard)}
+            {navItem("/buyer/orders/history", "Order History", History)}
+            {navItem("/buyer/order-status", "Live Tracking", Truck)}
+            {navItem("/buyer/reviews", "My Reviews", Star, 
+              pendingReviewCount > 0 && (
+                <span className="bg-[#cc000b] text-white text-[10px] font-black px-2 py-0.5 rounded-[6px] shadow-sm">
                   {pendingReviewCount}
                 </span>
-              )}
-            </button>
+              )
+            )}
+          </nav>
 
-            <button
-              onClick={() => navigate("/buyer/ai-designs")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/ai-designs' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <Flower className="w-4 h-4" /> My Designs
-            </button>
+          <nav className="space-y-1.5">
+            <p className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Discovery</p>
+            {navItem("/buyer/ai-designs", "Studio Designs", Flower)}
+            {navItem("/buyer/wishlist", "Wishlist", Rows3)}
+          </nav>
 
-            <button
-              onClick={() => navigate("/buyer/wishlist")}
-              className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/wishlist' ? ' underline decoration-black decoration-2' : ''}`}
-            >
-              <Rows3 className="w-4 h-4" /> Wishlist
-            </button>
+          <nav className="space-y-1.5 pb-8">
+            <p className="px-4 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4">Settings</p>
+            {navItem("/buyer/settings", "Preferences", Settings)}
           </nav>
         </div>
 
-        <div className="p-6 border-t space-y-3">
-          <button onClick={() => navigate("/buyer/settings")} className={`flex items-center gap-3 w-full text-left hover:underline${location.pathname === '/buyer/settings' ? ' underline decoration-black decoration-2' : ''}`}>
-            <Settings className="w-4 h-4" /> Settings
-          </button>
-
-          <button onClick={handleLogout} className="flex items-center gap-3 w-full text-left text-red-600">
-            <LogOut className="w-4 h-4" /> Logout
-          </button>
+        {/* Footer Area */}
+        <div className="p-6">
+          <div className="bg-white/40 backdrop-blur-sm rounded-[2rem] p-2 border border-white/60">
+            <button
+              onClick={handleLogout}
+              className="flex items-center justify-between w-full p-3 rounded-3xl bg-red-50 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-500 group shadow-sm hover:shadow-xl hover:shadow-red-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-2xl bg-white group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-sm">
+                  <LogOut className="w-4 h-4 shrink-0 transition-transform" />
+                </div>
+                <span className="text-sm font-black uppercase tracking-widest px-1">Sign Out</span>
+              </div>
+              <div className="bg-red-500 group-hover:bg-white w-2 h-2 rounded-full transition-colors mr-2" />
+            </button>
+          </div>
         </div>
       </aside>
     </>

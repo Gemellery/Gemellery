@@ -129,7 +129,7 @@ function VerifySellers() {
         onClose={() => setIsOpen(false)}
       />
 
-      <div className="flex-1 overflow-y-auto p-6 md:ml-64">
+      <div className="flex-1 overflow-y-auto p-6 md:ml-72">
         {/* Mobile Header */}
         <div className="flex items-center gap-4 mb-6 md:hidden">
           <button onClick={() => setIsOpen(true)}>

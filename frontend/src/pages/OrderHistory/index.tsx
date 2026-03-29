@@ -237,7 +237,7 @@ function OrderHistory() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+      <main className="flex-1 ml-0 md:ml-72 overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="bg-white shadow-sm sticky top-0 z-10">
           <div className="p-6 md:p-8 flex items-center justify-between">
