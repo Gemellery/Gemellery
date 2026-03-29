@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { ShoppingCart, Calendar, Heart } from 'lucide-react'
-import { addToCart } from '@/lib/cart/api'
+import { useCart } from '@/context/CartContext'
 import { addToWishlist, removeFromWishlist, checkWishlist } from '@/lib/wishlist/api'
 
 interface ProductActionsProps {
@@ -20,6 +20,8 @@ const ProductActions: React.FC<ProductActionsProps> = ({
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [isBooking, setIsBooking] = useState(false)
   const [isWishlistLoading, setIsWishlistLoading] = useState(false)
+  const [buttonText, setButtonText] = useState('Add to Cart')
+  const { addToCart } = useCart()
 
   // Check initial wishlist status
   useEffect(() => {
@@ -40,11 +42,19 @@ const ProductActions: React.FC<ProductActionsProps> = ({
     if (!gemId) return
     setIsAddingToCart(true)
     try {
-      await addToCart(gemId, quantity)
-      alert("Item added to cart successfully!")
+      const success = await addToCart(gemId, quantity)
+      if (success) {
+        setButtonText('Added')
+      } else {
+        setButtonText('Failed to Add')
+      }
+      
+      setTimeout(() => {
+        setButtonText('Add to Cart')
+      }, 2000)
     } catch (error) {
       console.error(error)
-      alert(error instanceof Error ? error.message : "Failed to add to cart")
+      // We still don't show the alert as per user request to avoid "popups"
     } finally {
       setIsAddingToCart(false)
     }
@@ -89,7 +99,7 @@ const ProductActions: React.FC<ProductActionsProps> = ({
         className="w-full bg-[#1a3a2a] hover:bg-[#142e22] disabled:bg-[#1a3a2a]/70 text-white font-semibold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.99]"
       >
         <ShoppingCart size={17} />
-        <span className="text-[15px]">{isAddingToCart ? 'Adding to Cart...' : 'Add to Cart'}</span>
+        <span className="text-[15px]">{isAddingToCart ? 'Adding to Cart...' : buttonText}</span>
       </button>
 
       {/* Book Viewing and Wishlist Row */}

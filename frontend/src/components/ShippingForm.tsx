@@ -272,10 +272,11 @@ function CheckoutContent() {
 
   return (
 
-    <div className="min-h-screen bg-[#fcfbf8] p-6">
+    <div className="min-h-screen bg-[#fcfbf8] flex flex-col">
       {/* NavBar */}
       <Navbar />
-      <main className="flex-1 overflow-auto py-6">
+      <main className="flex-1 py-6">
+        <div className="p-6">
 
 
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -586,11 +587,6 @@ function CheckoutContent() {
                   </div>
                 </div>
               )}
-
-              <div className="flex gap-2 bg-[#eaf3ef] p-3 rounded-lg text-xs text-gray-600">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                Gemellery Escrow Protection ensures secure transactions.
-              </div>
             </section>
           </div>
 
@@ -713,6 +709,7 @@ function CheckoutContent() {
             </div>
 
           </div>
+          </div>
         </div>
       </main>
 
@@ -725,9 +722,9 @@ function CheckoutContent() {
 function Checkout() {
   if (!stripePromise) {
     return (
-      <div className="min-h-screen bg-[#fcfbf8] p-6">
+      <div className="min-h-screen bg-[#fcfbf8] flex flex-col">
         <Navbar />
-        <main className="max-w-3xl mx-auto py-10">
+        <main className="max-w-3xl mx-auto py-10 flex-1 px-6">
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-red-700">
             Stripe is not configured. Set VITE_STRIPE_PUBLISHABLE_KEY in your frontend environment.
           </div>
