@@ -80,7 +80,7 @@ const AdminDashboardLayout: React.FC = () => {
       />
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col ml-0 md:ml-64">
+      <div className="flex-1 flex flex-col ml-0 md:ml-72">
 
         {/* Navbar */}
         <AdminNavbar
@@ -90,30 +90,31 @@ const AdminDashboardLayout: React.FC = () => {
         />
 
         {/* Main Content */}
-        <main className="p-6 flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto flex flex-col">
+          <div className="p-8 md:p-10 flex-1">
+            <AdminStatCards
+              totalUsers={stats.totalUsers}
+              totalGems={stats.totalGems}
+              pendingVerifications={stats.pendingVerifications}
+              pendingGemApprovals={stats.pendingGemApprovals}
+              totalOrders={stats.totalOrders}
+            />
 
-          <AdminStatCards
-            totalUsers={stats.totalUsers}
-            totalGems={stats.totalGems}
-            pendingVerifications={stats.pendingVerifications}
-            pendingGemApprovals={stats.pendingGemApprovals}
-            totalOrders={stats.totalOrders}
-          />
+            {/* Admin shortcuts */}
+            <AdminQuickActions />
 
-          {/* Admin shortcuts */}
-          <AdminQuickActions />
+            {/* Platform trends */}
+            <AdminOverviewSection />
 
-          {/* Platform trends */}
-          <AdminOverviewSection />
+            {/* Marketplace insights */}
+            <AdminInsightsSection />
 
-          {/* Marketplace insights */}
-          <AdminInsightsSection />
+            {/* Operational monitoring */}
+            <AdminRecentOrdersAndApprovals />
 
-          {/* Operational monitoring */}
-          <AdminRecentOrdersAndApprovals />
-
-          {/* Performance highlights */}
-          <AdminTopSellers />
+            {/* Performance highlights */}
+            <AdminTopSellers />
+          </div>
 
           <Footer />
 

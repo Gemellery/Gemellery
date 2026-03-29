@@ -256,7 +256,7 @@ function ManageAdmins() {
                 onClose={() => setIsOpen(false)}
             />
 
-            <div className="flex-1 overflow-y-auto p-6 md:ml-64">
+            <div className="flex-1 overflow-y-auto p-6 md:ml-72">
 
 
                 {/* Mobile Header */}

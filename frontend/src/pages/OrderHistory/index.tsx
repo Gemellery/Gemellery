@@ -7,6 +7,7 @@ import {
   Menu,
   Search,
   Eye,
+  Download,
   ExternalLink,
   Calendar,
   MapPin,
@@ -103,6 +104,7 @@ function OrderHistory() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderDetails | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [downloadingReceiptId, setDownloadingReceiptId] = useState<number | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("all");
@@ -175,6 +177,47 @@ function OrderHistory() {
     }
   };
 
+  const downloadReceipt = async (orderId: number) => {
+    if (!token) return;
+
+    setDownloadingReceiptId(orderId);
+
+    try {
+      const response = await fetch(
+        `${API_CONFIG.BASE_URL}/api/buyer/orders/${orderId}/receipt`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to download receipt");
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition") || "";
+      const match = disposition.match(/filename="?([^\"]+)"?/i);
+      const filename = match?.[1] || `payment_receipt_order_${orderId}.pdf`;
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Failed to download receipt");
+    } finally {
+      setDownloadingReceiptId(null);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
   }, [statusFilter, page]);
@@ -194,7 +237,7 @@ function OrderHistory() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      <main className="flex-1 ml-0 md:ml-64 overflow-y-auto flex flex-col">
+      <main className="flex-1 ml-0 md:ml-72 overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="bg-white shadow-sm sticky top-0 z-10">
           <div className="p-6 md:p-8 flex items-center justify-between">
@@ -333,13 +376,26 @@ function OrderHistory() {
                       </div>
 
                       {/* Right - Action Button */}
-                      <button
-                        onClick={() => fetchOrderDetails(order.order_id)}
-                        className="flex items-center justify-center gap-2 px-4 py-2 bg-[#cc000b] text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold md:w-auto w-full"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Details
-                      </button>
+                      <div className="flex gap-2 md:flex-col lg:flex-row">
+                        <button
+                          onClick={() => fetchOrderDetails(order.order_id)}
+                          className="flex items-center justify-center gap-2 px-4 py-2 bg-[#cc000b] text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold md:w-auto w-full"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Details
+                        </button>
+
+                        <button
+                          onClick={() => downloadReceipt(order.order_id)}
+                          disabled={downloadingReceiptId === order.order_id}
+                          className="flex items-center justify-center gap-2 px-4 py-2 border border-[#cc000b] text-[#cc000b] rounded-lg hover:bg-red-50 transition-colors text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed md:w-auto w-full"
+                        >
+                          <Download className="w-4 h-4" />
+                          {downloadingReceiptId === order.order_id
+                            ? "Downloading..."
+                            : "Receipt"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -487,6 +543,16 @@ function OrderHistory() {
                       LKR {Number(selectedOrder.total_amount).toLocaleString('en-US')}
                     </span>
                   </div>
+                  <button
+                    onClick={() => downloadReceipt(selectedOrder.order_id)}
+                    disabled={downloadingReceiptId === selectedOrder.order_id}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 border border-[#cc000b] text-[#cc000b] rounded-lg hover:bg-red-50 transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <Download className="w-4 h-4" />
+                    {downloadingReceiptId === selectedOrder.order_id
+                      ? "Downloading receipt..."
+                      : "Download Payment Receipt"}
+                  </button>
                 </div>
 
                 {/* Status History */}

@@ -2,9 +2,9 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const stats = [
-    { value: 500, suffix: "+", label: "Verified Gems" },
-    { value: 80, suffix: "+", label: "Trusted Sellers" },
-    { value: 1200, suffix: "+", label: "Happy Buyers" },
+    { value: 50, suffix: "+", label: "Verified Gems" },
+    { value: 10, suffix: "+", label: "Trusted Sellers" },
+    { value: 5, suffix: "+", label: "Happy Buyers" },
     { value: 100, suffix: "%", label: "NGJA Certified" },
 ];
 
