@@ -21,6 +21,7 @@ contract GemCertificate is ERC721, Ownable {
         string origin;
         string carat;
         string certificateNumber;
+        string sellerName;
         uint256 mintedAt;
     }
 
@@ -35,7 +36,15 @@ contract GemCertificate is ERC721, Ownable {
         string gemName,
         string gemType,
         string certificateNumber,
+        string sellerName,
         uint256 mintedAt
+    );
+
+    event GemTransferred(
+        uint256 indexed tokenId,
+        address indexed from,
+        address indexed to,
+        uint256 transferredAt
     );
 
     // ==========================================
@@ -62,7 +71,8 @@ contract GemCertificate is ERC721, Ownable {
         string calldata clarity,
         string calldata origin,
         string calldata carat,
-        string calldata certificateNumber
+        string calldata certificateNumber,
+        string calldata sellerName
     ) external onlyOwner returns (uint256) {
         _nextTokenId++;
         uint256 newTokenId = _nextTokenId;
@@ -78,6 +88,7 @@ contract GemCertificate is ERC721, Ownable {
             origin: origin,
             carat: carat,
             certificateNumber: certificateNumber,
+            sellerName: sellerName,
             mintedAt: block.timestamp
         });
 
@@ -86,10 +97,29 @@ contract GemCertificate is ERC721, Ownable {
             gemName,
             gemType,
             certificateNumber,
+            sellerName,
             block.timestamp
         );
 
         return newTokenId;
+    }
+
+    /// @notice Transfer a gem NFT from the contract vault to a buyer's wallet
+    /// @param tokenId The token ID to transfer
+    /// @param buyer The buyer's Ethereum wallet address
+    function transferGemToBuyer(uint256 tokenId, address buyer) external onlyOwner {
+        require(tokenId > 0 && tokenId <= _nextTokenId, "GemCertificate: token does not exist");
+        require(buyer != address(0), "GemCertificate: cannot transfer to zero address");
+        require(ownerOf(tokenId) == address(this), "GemCertificate: token not held by contract");
+
+        _transfer(address(this), buyer, tokenId);
+
+        emit GemTransferred(
+            tokenId,
+            address(this),
+            buyer,
+            block.timestamp
+        );
     }
 
     function getGemData(uint256 tokenId) external view returns (GemData memory) {

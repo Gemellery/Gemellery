@@ -34,6 +34,7 @@ import BuyerSettings from "./pages/buyer/BuyerSettings";
 import BuyerOrderStatus from "./pages/buyer/BuyerOrderStatus";
 import BuyerMyDesigns from "./pages/buyer/BuyerMyDesigns";
 import BuyerReviews from "./pages/buyer/BuyerReviews";
+import BuyerCertificates from "./pages/buyer/BuyerCertificates";
 import { CartProvider } from '@/context/CartContext';
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -509,6 +510,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["buyer"]}>
                 <BuyerOrderStatus />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/buyer/certificates"
+            element={
+              <ProtectedRoute allowedRoles={["buyer"]}>
+                <BuyerCertificates />
               </ProtectedRoute>
             }
           />

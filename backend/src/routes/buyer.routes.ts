@@ -4,6 +4,7 @@ import {
   getRecentOrders,
   getAllOrders,
   getOrderDetails,
+  downloadOrderReceipt,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -57,6 +58,13 @@ router.get(
 );
 
 router.get(
+  "/orders/:id/receipt",
+  authGuard,
+  authorizeRole("buyer"),
+  downloadOrderReceipt
+);
+
+router.get(
   "/wishlist",
   authGuard,
   authorizeRole("buyer"),
@@ -77,11 +85,13 @@ router.delete(
   removeFromWishlist
 );
 
-// Review endoints
+// Review endpoints
 import {
   getPendingReviews,
   getCompletedReviews,
   updateReview,
+  getBuyerCertificates,
+  claimNFT,
 } from "../controllers/buyer.controller";
 
 router.get(
@@ -103,6 +113,21 @@ router.put(
   authGuard,
   authorizeRole("buyer"),
   updateReview
+);
+
+// Blockchain certificate endpoints
+router.get(
+  "/certificates",
+  authGuard,
+  authorizeRole("buyer"),
+  getBuyerCertificates
+);
+
+router.post(
+  "/certificates/claim",
+  authGuard,
+  authorizeRole("buyer"),
+  claimNFT
 );
 
 export default router;

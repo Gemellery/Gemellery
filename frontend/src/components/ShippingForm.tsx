@@ -182,6 +182,7 @@ function CheckoutContent() {
       // Success! Redirect to order confirmation or history page
       if (response.order_id) {
         await refreshCart();
+        window.alert("Order placed successfully!");
         navigate(`/buyer/orders/history`);
       }
     } catch (err) {
