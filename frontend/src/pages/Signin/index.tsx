@@ -24,6 +24,7 @@ function SignIn() {
   const [businessRegNo, setBusinessRegNo] = useState("");
   const [ngjaRegNo, setNgjaRegNo] = useState("");
   const [licenseFile, setLicenseFile] = useState<File | null>(null);
+  const [googleId, setGoogleId] = useState(""); // stored when coming from Google OAuth
   const navigate = useNavigate();
   const handleAuthSuccess = (token: string, user: any) => {
     localStorage.setItem("token", token);
@@ -90,7 +91,18 @@ function SignIn() {
       });
 
       const data = await res.json();
+
       if (!res.ok) { setError(data.message); return; }
+
+      // Brand-new Google user — redirect to signup form with details pre-filled
+      if (data.needsRegistration) {
+        setEmail(data.email || "");
+        setFullName(data.fullName || "");
+        setGoogleId(data.googleId || "");
+        setMode("signup");
+        return;
+      }
+
       handleAuthSuccess(data.token, data.user);
     } catch {
       setError("Google sign-in failed. Please try again.");
@@ -118,12 +130,18 @@ function SignIn() {
     // Using FormData because sellers may upload a file (NGJA certificate)
     const formData = new FormData();
     formData.append("email", email);
-    formData.append("password", password);
     formData.append("role", userType);
     formData.append("full_name", full_name);
     formData.append("mobile", mobile);
     formData.append("country_id", countryId);
     formData.append("address", address);
+
+    if (googleId) {
+      // Google registration — pass googleId, no password needed
+      formData.append("google_id", googleId);
+    } else {
+      formData.append("password", password);
+    }
 
     // Seller-only fields
     if (userType === "seller") {
@@ -142,7 +160,11 @@ function SignIn() {
     if (!res.ok) { setError(data.message); return; }
 
     setSuccess("Registration successful! You can now sign in.");
-    setTimeout(() => { setMode("signin"); setSuccess(""); }, 2000);
+    setTimeout(() => {
+      setGoogleId(""); // clear google state
+      setMode("signin");
+      setSuccess("");
+    }, 2000);
   };
 
   // Shared input class — keeps all inputs consistent
@@ -338,22 +360,31 @@ function SignIn() {
               <div className="mb-4">
                 <label className={labelClass}>Full Name</label>
                 <input type="text" placeholder="John Doe" value={full_name}
-                  onChange={(e) => setFullName(e.target.value)} className={inputClass} />
+                  onChange={(e) => setFullName(e.target.value)}
+                  readOnly={!!googleId}
+                  className={`${inputClass} ${googleId ? "bg-gray-100 cursor-not-allowed" : ""}`} />
               </div>
 
-              {/* === Email === */}
+              {/* === Email — locked if pre-filled from Google === */}
               <div className="mb-4">
                 <label className={labelClass}>Email Address</label>
                 <input type="email" placeholder="name@example.com" value={email}
-                  onChange={(e) => setEmail(e.target.value)} className={inputClass} />
+                  onChange={(e) => setEmail(e.target.value)}
+                  readOnly={!!googleId}
+                  className={`${inputClass} ${googleId ? "bg-gray-100 cursor-not-allowed" : ""}`} />
+                {googleId && (
+                  <p className="text-xs text-gray-400 mt-1">✓ Verified by Google</p>
+                )}
               </div>
 
-              {/* === Password === */}
-              <div className="mb-4">
-                <label className={labelClass}>Password</label>
-                <input type="password" placeholder="Create a strong password" value={password}
-                  onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-              </div>
+              {/* === Password — hidden when registering via Google === */}
+              {!googleId && (
+                <div className="mb-4">
+                  <label className={labelClass}>Password</label>
+                  <input type="password" placeholder="Create a strong password" value={password}
+                    onChange={(e) => setPassword(e.target.value)} className={inputClass} />
+                </div>
+              )}
 
               {/* === Contact === */}
               <div className="mb-4">
